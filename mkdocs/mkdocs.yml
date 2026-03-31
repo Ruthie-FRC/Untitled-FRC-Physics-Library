@@ -38,6 +38,13 @@ theme:
 
 nav:
   - Home: index.md
+  - API Usage: api_usage.md
+  - Architecture: architecture.md
+  - Physics Reference: physics_reference.md
+  - Math:
+      - Integrators: integrators.md
+      - Vector3: vector.md
+      - Quaternion: quaternion.md
 
 plugins:
   - search
