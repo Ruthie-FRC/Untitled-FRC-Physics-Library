@@ -38,6 +38,7 @@ theme:
 
 nav:
   - Home: docs/index.md
+  - GitHub Workflows: ../mkdocs/github-workflows.md
   - GitHub Workflows: github-workflows.md
 
 plugins:
