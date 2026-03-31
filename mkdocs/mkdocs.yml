@@ -42,7 +42,6 @@ nav:
 
 plugins:
   - search
-  - mkdocs-material
 
 markdown_extensions:
   - admonition
