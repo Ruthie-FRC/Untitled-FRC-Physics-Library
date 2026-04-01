@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/frcsim_modular_body_test.dir/vendordep/tests/modular_body_test.cpp.o -o frcsim_modular_body_test  core/physics-core/libfrcsim_physics.a 

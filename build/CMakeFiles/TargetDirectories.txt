@@ -2,6 +2,7 @@
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_modular_bodies.dir
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_rigidbody_test.dir
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_magnus_test.dir
+/workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_modular_body_test.dir
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/edit_cache.dir
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/rebuild_cache.dir
 /workspaces/Untitled-FRC-Physics-Library/build/core/physics-core/CMakeFiles/frcsim_physics.dir

@@ -169,6 +169,19 @@ frcsim_magnus_test/fast:
 .PHONY : frcsim_magnus_test/fast
 
 #=============================================================================
+# Target rules for targets named frcsim_modular_body_test
+
+# Build rule for target.
+frcsim_modular_body_test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 frcsim_modular_body_test
+.PHONY : frcsim_modular_body_test
+
+# fast build rule for target.
+frcsim_modular_body_test/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_modular_body_test.dir/build.make CMakeFiles/frcsim_modular_body_test.dir/build
+.PHONY : frcsim_modular_body_test/fast
+
+#=============================================================================
 # Target rules for targets named frcsim_physics
 
 # Build rule for target.
@@ -253,6 +266,30 @@ vendordep/tests/magnus_test.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_magnus_test.dir/build.make CMakeFiles/frcsim_magnus_test.dir/vendordep/tests/magnus_test.cpp.s
 .PHONY : vendordep/tests/magnus_test.cpp.s
 
+vendordep/tests/modular_body_test.o: vendordep/tests/modular_body_test.cpp.o
+.PHONY : vendordep/tests/modular_body_test.o
+
+# target to build an object file
+vendordep/tests/modular_body_test.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_modular_body_test.dir/build.make CMakeFiles/frcsim_modular_body_test.dir/vendordep/tests/modular_body_test.cpp.o
+.PHONY : vendordep/tests/modular_body_test.cpp.o
+
+vendordep/tests/modular_body_test.i: vendordep/tests/modular_body_test.cpp.i
+.PHONY : vendordep/tests/modular_body_test.i
+
+# target to preprocess a source file
+vendordep/tests/modular_body_test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_modular_body_test.dir/build.make CMakeFiles/frcsim_modular_body_test.dir/vendordep/tests/modular_body_test.cpp.i
+.PHONY : vendordep/tests/modular_body_test.cpp.i
+
+vendordep/tests/modular_body_test.s: vendordep/tests/modular_body_test.cpp.s
+.PHONY : vendordep/tests/modular_body_test.s
+
+# target to generate assembly for a file
+vendordep/tests/modular_body_test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_modular_body_test.dir/build.make CMakeFiles/frcsim_modular_body_test.dir/vendordep/tests/modular_body_test.cpp.s
+.PHONY : vendordep/tests/modular_body_test.cpp.s
+
 vendordep/tests/rigidbody_test.o: vendordep/tests/rigidbody_test.cpp.o
 .PHONY : vendordep/tests/rigidbody_test.o
 
@@ -288,6 +325,7 @@ help:
 	@echo "... frcsim_magnus_test"
 	@echo "... frcsim_minimal_world"
 	@echo "... frcsim_modular_bodies"
+	@echo "... frcsim_modular_body_test"
 	@echo "... frcsim_physics"
 	@echo "... frcsim_rigidbody_test"
 	@echo "... examples/cpp/minimal_world.o"
@@ -299,6 +337,9 @@ help:
 	@echo "... vendordep/tests/magnus_test.o"
 	@echo "... vendordep/tests/magnus_test.i"
 	@echo "... vendordep/tests/magnus_test.s"
+	@echo "... vendordep/tests/modular_body_test.o"
+	@echo "... vendordep/tests/modular_body_test.i"
+	@echo "... vendordep/tests/modular_body_test.s"
 	@echo "... vendordep/tests/rigidbody_test.o"
 	@echo "... vendordep/tests/rigidbody_test.i"
 	@echo "... vendordep/tests/rigidbody_test.s"

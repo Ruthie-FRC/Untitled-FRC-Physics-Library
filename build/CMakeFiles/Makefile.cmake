@@ -46,5 +46,6 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/frcsim_modular_bodies.dir/DependInfo.cmake"
   "CMakeFiles/frcsim_rigidbody_test.dir/DependInfo.cmake"
   "CMakeFiles/frcsim_magnus_test.dir/DependInfo.cmake"
+  "CMakeFiles/frcsim_modular_body_test.dir/DependInfo.cmake"
   "core/physics-core/CMakeFiles/frcsim_physics.dir/DependInfo.cmake"
   )
