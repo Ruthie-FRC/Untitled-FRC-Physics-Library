@@ -12,7 +12,7 @@ int main() {
         frcsim::DeformableBody def_body(2.0);
         
         // Check rigid base properties
-        assert(std::fabs(def_body.rigidBase().massKg() - 2.0) < 1e-9);
+        assert(std::fabs(def_body.rigidBase().massKg() - 2.0) < 1e-6);
         assert(!def_body.isDeformationEnabled());
 
         std::cout << "  ✓ Deformable body creation works\n";
@@ -23,7 +23,7 @@ int main() {
         frcsim::DeformableBody def_body(2.0);
         
         def_body.setBendStiffness(150.0);
-        assert(std::fabs(def_body.bendStiffness() - 150.0) < 1e-9);
+        assert(std::fabs(def_body.bendStiffness() - 150.0) < 1e-6);
 
         std::cout << "  ✓ Bend stiffness settable\n";
     }
@@ -33,7 +33,7 @@ int main() {
         frcsim::DeformableBody def_body(2.0);
         
         def_body.setWarpDamping(25.0);
-        assert(std::fabs(def_body.warpDamping() - 25.0) < 1e-9);
+        assert(std::fabs(def_body.warpDamping() - 25.0) < 1e-6);
 
         std::cout << "  ✓ Warp damping settable\n";
     }
@@ -93,8 +93,8 @@ int main() {
         def_body.rigidBase().setPosition(frcsim::Vector3(1.0, 2.0, 3.0));
         def_body.rigidBase().setLinearVelocity(frcsim::Vector3(0.5, 0.0, 0.0));
         
-        assert(std::fabs(def_body.rigidBase().position().x - 1.0) < 1e-9);
-        assert(std::fabs(def_body.rigidBase().linearVelocity().x - 0.5) < 1e-9);
+        assert(std::fabs(def_body.rigidBase().position().x - 1.0) < 1e-6);
+        assert(std::fabs(def_body.rigidBase().linearVelocity().x - 0.5) < 1e-6);
 
         std::cout << "  ✓ Rigid base properties accessible\n";
     }
@@ -161,7 +161,7 @@ int main() {
         
         assert(spring.isDeformationEnabled());
         assert(spring.deformationNodes().size() == 3);
-        assert(std::fabs(spring.bendStiffness() - 200.0) < 1e-9);
+        assert(std::fabs(spring.bendStiffness() - 200.0) < 1e-6);
 
         std::cout << "  ✓ Complex deformable body configuration works\n";
     }

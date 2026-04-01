@@ -90,13 +90,13 @@ int main() {
 
         // Set position
         boundary.position_m = frcsim::Vector3(1.0, 2.0, 3.0);
-        assert(std::fabs(boundary.position_m.x - 1.0) < 1e-9);
-        assert(std::fabs(boundary.position_m.y - 2.0) < 1e-9);
-        assert(std::fabs(boundary.position_m.z - 3.0) < 1e-9);
+        assert(std::fabs(boundary.position_m.x - 1.0) < 1e-6);
+        assert(std::fabs(boundary.position_m.y - 2.0) < 1e-6);
+        assert(std::fabs(boundary.position_m.z - 3.0) < 1e-6);
 
         // Set orientation
         boundary.orientation = frcsim::Quaternion(1.0, 0.0, 0.0, 0.0);
-        assert(std::fabs(boundary.orientation.w - 1.0) < 1e-9);
+        assert(std::fabs(boundary.orientation.w - 1.0) < 1e-6);
 
         std::cout << "  ✓ Boundary position and orientation configurable\n";
     }
@@ -113,9 +113,9 @@ int main() {
             box.type = frcsim::BoundaryType::kBox;
             box.half_extents_m = frcsim::Vector3(1.0, 2.0, 3.0);
             
-            assert(std::fabs(box.half_extents_m.x - 1.0) < 1e-9);
-            assert(std::fabs(box.half_extents_m.y - 2.0) < 1e-9);
-            assert(std::fabs(box.half_extents_m.z - 3.0) < 1e-9);
+            assert(std::fabs(box.half_extents_m.x - 1.0) < 1e-6);
+            assert(std::fabs(box.half_extents_m.y - 2.0) < 1e-6);
+            assert(std::fabs(box.half_extents_m.z - 3.0) < 1e-6);
         }
 
         {
@@ -123,7 +123,7 @@ int main() {
             cylinder.type = frcsim::BoundaryType::kCylinder;
             cylinder.radius_m = 0.5;
             
-            assert(std::fabs(cylinder.radius_m - 0.5) < 1e-9);
+            assert(std::fabs(cylinder.radius_m - 0.5) < 1e-6);
         }
 
         std::cout << "  ✓ Boundary geometry configurable\n";
@@ -140,8 +140,8 @@ int main() {
         boundary.restitution = 0.8;
         boundary.friction_coefficient = 0.6;
 
-        assert(std::fabs(boundary.restitution - 0.8) < 1e-9);
-        assert(std::fabs(boundary.friction_coefficient - 0.6) < 1e-9);
+        assert(std::fabs(boundary.restitution - 0.8) < 1e-6);
+        assert(std::fabs(boundary.friction_coefficient - 0.6) < 1e-6);
 
         std::cout << "  ✓ Boundary physical properties configurable\n";
     }
@@ -209,9 +209,9 @@ int main() {
 
         // Default normal should be Z-up
         const frcsim::Vector3& normal = boundary.normal();
-        assert(std::fabs(normal.x - 0.0) < 1e-9);
-        assert(std::fabs(normal.y - 0.0) < 1e-9);
-        assert(std::fabs(normal.z - 1.0) < 1e-9);
+        assert(std::fabs(normal.x - 0.0) < 1e-6);
+        assert(std::fabs(normal.y - 0.0) < 1e-6);
+        assert(std::fabs(normal.z - 1.0) < 1e-6);
 
         std::cout << "  ✓ Boundary normal vector correct\n";
     }

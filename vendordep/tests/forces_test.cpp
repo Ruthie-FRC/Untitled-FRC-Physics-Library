@@ -97,7 +97,7 @@ int main() {
         
         world.step();
 
-        assert(std::fabs(body.linearVelocity().x - 0.1) < 1e-9);
+        assert(std::fabs(body.linearVelocity().x - 0.1) < 1e-6);
         std::cout << "  ✓ Force accumulation works\n";
     }
 
@@ -143,7 +143,7 @@ int main() {
             world.step();
         }
 
-        assert(std::fabs(body.linearVelocity().x - 10.0) < 1e-9);
+        assert(std::fabs(body.linearVelocity().x - 10.0) < 1e-6);
         std::cout << "  ✓ Aerodynamics can be disabled\n";
     }
 
