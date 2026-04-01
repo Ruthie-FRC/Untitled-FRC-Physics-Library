@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -48,8 +49,8 @@ double accumulatedSimTimeS() const;
 std::uint64_t stepCount() const;
 
 // Get all bodies (individual + assembly bodies) for iteration
-void forEachBody(std::function<void(RigidBody&)> callback);
-void forEachBody(std::function<void(const RigidBody&)> callback) const;
+void forEachBody(const std::function<void(RigidBody&)>& callback);
+void forEachBody(const std::function<void(const RigidBody&)>& callback) const;
 
   private:
 void applyGlobalForces(double dt_s);
