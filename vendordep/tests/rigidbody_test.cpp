@@ -24,8 +24,7 @@ int main() {
     // z should decrease under gravity.
     assert(body.position().z < 0.0);
 
-    // Compare velocity to v = g*t with damping disabled for test accuracy.
-    // TODO: If damping defaults change, set them explicitly in this test config.
+    // Compare velocity to v = g*t; damping is explicitly disabled above.
     const double t = steps * config.fixed_dt_s;
     const double expected_vz = config.gravity_mps2.z * t;
     const double tolerance = 0.1;
