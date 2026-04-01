@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/frcsim_modular_bodies.dir/examples/cpp/modular_bodies_demo.cpp.o -o frcsim_modular_bodies  core/physics-core/libfrcsim_physics.a 

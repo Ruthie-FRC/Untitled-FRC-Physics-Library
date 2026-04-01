@@ -299,16 +299,21 @@ CMakeFiles/frcsim_minimal_world.dir/examples/cpp/minimal_world.cpp.o: /workspace
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/aerodynamics/magnus_model.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/aerodynamics/spin_decay_model.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/config/physics_config.hpp \
+  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/field/boundary.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/forces/force_generator.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/math/integrators.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/math/matrix.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/math/quaternion.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/math/vector.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/physics_world.hpp \
+  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/rigidbody/body_flags.hpp \
+  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/rigidbody/material.hpp \
   /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/rigidbody/rigid_body.hpp
 
 
 /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/rigidbody/rigid_body.hpp:
+
+/workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/rigidbody/body_flags.hpp:
 
 /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/physics_world.hpp:
 
@@ -539,6 +544,8 @@ CMakeFiles/frcsim_minimal_world.dir/examples/cpp/minimal_world.cpp.o: /workspace
 /usr/include/c++/13/bits/specfun.h:
 
 /usr/include/c++/13/bits/basic_string.h:
+
+/workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/field/boundary.hpp:
 
 /usr/include/c++/13/tr1/poly_laguerre.tcc:
 
@@ -875,6 +882,8 @@ CMakeFiles/frcsim_minimal_world.dir/examples/cpp/minimal_world.cpp.o: /workspace
 /usr/include/time.h:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
+
+/workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/rigidbody/material.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 

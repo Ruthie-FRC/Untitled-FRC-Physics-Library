@@ -1,4 +1,5 @@
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_minimal_world.dir
+/workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_modular_bodies.dir
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_rigidbody_test.dir
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_magnus_test.dir
 /workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/edit_cache.dir

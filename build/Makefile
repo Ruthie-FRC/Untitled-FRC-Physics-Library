@@ -130,6 +130,19 @@ frcsim_minimal_world/fast:
 .PHONY : frcsim_minimal_world/fast
 
 #=============================================================================
+# Target rules for targets named frcsim_modular_bodies
+
+# Build rule for target.
+frcsim_modular_bodies: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 frcsim_modular_bodies
+.PHONY : frcsim_modular_bodies
+
+# fast build rule for target.
+frcsim_modular_bodies/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_modular_bodies.dir/build.make CMakeFiles/frcsim_modular_bodies.dir/build
+.PHONY : frcsim_modular_bodies/fast
+
+#=============================================================================
 # Target rules for targets named frcsim_rigidbody_test
 
 # Build rule for target.
@@ -192,6 +205,30 @@ examples/cpp/minimal_world.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_minimal_world.dir/build.make CMakeFiles/frcsim_minimal_world.dir/examples/cpp/minimal_world.cpp.s
 .PHONY : examples/cpp/minimal_world.cpp.s
 
+examples/cpp/modular_bodies_demo.o: examples/cpp/modular_bodies_demo.cpp.o
+.PHONY : examples/cpp/modular_bodies_demo.o
+
+# target to build an object file
+examples/cpp/modular_bodies_demo.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_modular_bodies.dir/build.make CMakeFiles/frcsim_modular_bodies.dir/examples/cpp/modular_bodies_demo.cpp.o
+.PHONY : examples/cpp/modular_bodies_demo.cpp.o
+
+examples/cpp/modular_bodies_demo.i: examples/cpp/modular_bodies_demo.cpp.i
+.PHONY : examples/cpp/modular_bodies_demo.i
+
+# target to preprocess a source file
+examples/cpp/modular_bodies_demo.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_modular_bodies.dir/build.make CMakeFiles/frcsim_modular_bodies.dir/examples/cpp/modular_bodies_demo.cpp.i
+.PHONY : examples/cpp/modular_bodies_demo.cpp.i
+
+examples/cpp/modular_bodies_demo.s: examples/cpp/modular_bodies_demo.cpp.s
+.PHONY : examples/cpp/modular_bodies_demo.s
+
+# target to generate assembly for a file
+examples/cpp/modular_bodies_demo.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frcsim_modular_bodies.dir/build.make CMakeFiles/frcsim_modular_bodies.dir/examples/cpp/modular_bodies_demo.cpp.s
+.PHONY : examples/cpp/modular_bodies_demo.cpp.s
+
 vendordep/tests/magnus_test.o: vendordep/tests/magnus_test.cpp.o
 .PHONY : vendordep/tests/magnus_test.o
 
@@ -250,11 +287,15 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... frcsim_magnus_test"
 	@echo "... frcsim_minimal_world"
+	@echo "... frcsim_modular_bodies"
 	@echo "... frcsim_physics"
 	@echo "... frcsim_rigidbody_test"
 	@echo "... examples/cpp/minimal_world.o"
 	@echo "... examples/cpp/minimal_world.i"
 	@echo "... examples/cpp/minimal_world.s"
+	@echo "... examples/cpp/modular_bodies_demo.o"
+	@echo "... examples/cpp/modular_bodies_demo.i"
+	@echo "... examples/cpp/modular_bodies_demo.s"
 	@echo "... vendordep/tests/magnus_test.o"
 	@echo "... vendordep/tests/magnus_test.i"
 	@echo "... vendordep/tests/magnus_test.s"
