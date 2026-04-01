@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/frcsim_minimal_world.dir/examples/cpp/minimal_world.cpp.o -o frcsim_minimal_world  core/physics-core/libfrcsim_physics.a 

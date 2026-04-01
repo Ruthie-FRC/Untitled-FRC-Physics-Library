@@ -1,0 +1,8 @@
+/workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_minimal_world.dir
+/workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_rigidbody_test.dir
+/workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/frcsim_magnus_test.dir
+/workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/edit_cache.dir
+/workspaces/Untitled-FRC-Physics-Library/build/CMakeFiles/rebuild_cache.dir
+/workspaces/Untitled-FRC-Physics-Library/build/core/physics-core/CMakeFiles/frcsim_physics.dir
+/workspaces/Untitled-FRC-Physics-Library/build/core/physics-core/CMakeFiles/edit_cache.dir
+/workspaces/Untitled-FRC-Physics-Library/build/core/physics-core/CMakeFiles/rebuild_cache.dir

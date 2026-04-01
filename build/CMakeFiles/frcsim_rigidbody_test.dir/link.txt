@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/frcsim_rigidbody_test.dir/vendordep/tests/rigidbody_test.cpp.o -o frcsim_rigidbody_test  core/physics-core/libfrcsim_physics.a 

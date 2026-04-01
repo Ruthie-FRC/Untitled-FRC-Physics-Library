@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfrcsim_physics.a CMakeFiles/frcsim_physics.dir/src/physics_world.cpp.o
+/usr/bin/ranlib libfrcsim_physics.a
