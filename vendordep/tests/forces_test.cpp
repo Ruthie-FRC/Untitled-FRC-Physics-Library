@@ -8,9 +8,6 @@
 int main() {
     std::cout << "Testing forces and aerodynamics...\n";
 
-    // Note: More advanced force generator classes need implementation
-    // For now, test the basic force application system
-
     // ===== Basic Applied Force Tests =====
     {
         frcsim::PhysicsConfig config;
@@ -28,7 +25,6 @@ int main() {
         body.applyForce(frcsim::Vector3(10.0, 0.0, 0.0));
         world.step();
 
-        // Acceleration should be F/m = 10/1 = 10 m/s^2
         // Velocity should be a*dt = 10*0.01 = 0.1 m/s
         assert(std::fabs(body.linearVelocity().x - 0.1) < 1e-9);
 
@@ -69,7 +65,7 @@ int main() {
         config.enable_joint_constraints = false;
         config.linear_damping_per_s = 0.0;
         config.angular_damping_per_s = 0.0;
-        config.enable_gravity = false;  // Disable global gravity
+        config.enable_gravity = false;
 
         frcsim::PhysicsWorld world(config);
         frcsim::RigidBody& body = world.createBody(1.0);
@@ -91,7 +87,7 @@ int main() {
         std::cout << "  ✓ Gravity force generator works\n";
     }
 
-    // ===== Multiple Force Accumulatin =====
+    // ===== Multiple Force Accumulation =====
     {
         frcsim::PhysicsConfig config;
         config.fixed_dt_s = 0.01;
@@ -110,7 +106,7 @@ int main() {
         
         world.step();
 
-        // Total force should be 10 N, acceleration 10 m/s^2, velocity 0.1 m/s
+        // Total force should be 10 N, velocity 0.1 m/s
         assert(std::fabs(body.linearVelocity().x - 0.1) < 1e-9);
 
         std::cout << "  ✓ Force accumulation works\n";
@@ -129,10 +125,8 @@ int main() {
         frcsim::PhysicsWorld world(config);
         frcsim::RigidBody& body = world.createBody(1.0);
 
-        // Apply initial velocity
         body.setLinearVelocity(frcsim::Vector3(10.0, 0.0, 0.0));
 
-        // Run simulation
         for (int i = 0; i < 100; ++i) {
             world.step();
         }
@@ -150,7 +144,7 @@ int main() {
         config.enable_collision_detection = false;
         config.enable_joint_constraints = false;
         config.enable_gravity = false;
-        config.enable_aerodynamics = false;  // Disabled
+        config.enable_aerodynamics = false;
         config.linear_damping_per_s = 0.0;
 
         frcsim::PhysicsWorld world(config);
@@ -158,7 +152,6 @@ int main() {
 
         body.setLinearVelocity(frcsim::Vector3(10.0, 0.0, 0.0));
 
-        // Run simulation
         for (int i = 0; i < 100; ++i) {
             world.step();
         }
@@ -181,13 +174,11 @@ int main() {
         config.angular_damping_per_s = 0.0;
 
         frcsim::PhysicsWorld world(config);
-        frcsim::RigidBody& body = world.createBody(0.05);  // Small object (ball)
+        frcsim::RigidBody& body = world.createBody(0.05);
 
-        // Apply velocity and spin
         body.setLinearVelocity(frcsim::Vector3(10.0, 0.0, 0.0));
-        body.setAngularVelocity(frcsim::Vector3(0.0, 50.0, 0.0));  // Spinning
+        body.setAngularVelocity(frcsim::Vector3(0.0, 50.0, 0.0));
 
-        // Run simulation
         for (int i = 0; i < 50; ++i) {
             world.step();
         }
@@ -201,9 +192,6 @@ int main() {
     std::cout << "✓ All force and aerodynamics tests passed!\n";
     return 0;
 }
-
-
-    // ===== Spring Force Generator Tests =====
     {
         frcsim::PhysicsConfig config;
         config.fixed_dt_s = 0.01;
