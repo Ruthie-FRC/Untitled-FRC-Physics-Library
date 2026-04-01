@@ -247,6 +247,9 @@ CMakeFiles/frcsim_minimal_world.dir/examples/cpp/minimal_world.cpp.o: \
  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/math/integrators.hpp \
  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/math/quaternion.hpp \
  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/math/matrix.hpp \
+ /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/rigidbody/body_flags.hpp \
+ /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/rigidbody/material.hpp \
  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/aerodynamics/magnus_model.hpp \
  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/aerodynamics/spin_decay_model.hpp \
+ /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/field/boundary.hpp \
  /workspaces/Untitled-FRC-Physics-Library/core/physics-core/include/frcsim/forces/force_generator.hpp
