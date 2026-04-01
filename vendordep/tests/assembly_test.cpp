@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include "frcsim/physics_world.hpp"
+#include "frcsim/joints/revolute_joint.hpp"
+#include "frcsim/joints/prismatic_joint.hpp"
 
 int main() {
     std::cout << "Testing rigid assemblies and material system...\n";
