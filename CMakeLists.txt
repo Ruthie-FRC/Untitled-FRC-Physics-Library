@@ -11,7 +11,18 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_subdirectory(core/driver)
+add_library(frcsim_physics
+	core/driver/src/physics_world.cpp
+	core/driver/src/rigid_assembly.cpp
+	core/driver/src/joints.cpp
+)
+
+target_include_directories(frcsim_physics
+	PUBLIC
+		${CMAKE_CURRENT_SOURCE_DIR}/core/driver/include
+)
+
+target_compile_features(frcsim_physics PUBLIC cxx_std_20)
 
 if(FRCSIM_BUILD_EXAMPLES)
 add_executable(frcsim_minimal_world examples/cpp/minimal_world.cpp)
