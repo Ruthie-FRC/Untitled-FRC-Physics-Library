@@ -1,6 +1,6 @@
-# RemSim Physics Library
+# RenSim Physics Library
 
-RemSim is a modular FRC physics library for simulation, analysis, and robotics workflow integration.
+RenSim is a modular FRC physics library for simulation, analysis, and robotics workflow integration.
 
 ## Monorepo Structure
 

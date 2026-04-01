@@ -1,8 +1,8 @@
-site_name: RemSim
-repo_url: https://github.com/Ruthie-FRC/RemSim
-repo_name: Ruthie-FRC/RemSim
+site_name: RenSim
+repo_url: https://github.com/Ruthie-FRC/RenSim
+repo_name: Ruthie-FRC/RenSim
 site_description: >-
-  RemSim is a modular FRC physics library.
+  RenSim is a modular FRC physics library.
 site_author: Ruthie-FRC
 edit_uri: edit/main/mkdocs/docs/
 

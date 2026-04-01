@@ -1,6 +1,6 @@
 # Physics Reference
 
-This page summarizes the physical models currently represented in RemSim.
+This page summarizes the physical models currently represented in RenSim.
 
 ## Rigid-Body Dynamics
 
@@ -26,7 +26,7 @@ See [Quaternion](quaternion.md) for API details.
 
 ## Forces
 
-RemSim supports force models including:
+RenSim supports force models including:
 
 - Gravity
 - Springs

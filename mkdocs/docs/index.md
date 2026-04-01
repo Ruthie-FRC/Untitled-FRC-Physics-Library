@@ -1,6 +1,6 @@
-# RemSim
+# RenSim
 
-RemSim is a modular FRC physics library for simulation, analysis, and robotics workflow integration.
+RenSim is a modular FRC physics library for simulation, analysis, and robotics workflow integration.
 
 ### Key Capabilities (implementaion ongoing)
 - **Unified Physics Engine:**
