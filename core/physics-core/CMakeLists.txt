@@ -1,5 +1,6 @@
 add_library(frcsim_physics
     src/physics_world.cpp
+    src/rigid_assembly.cpp
 )
 
 target_include_directories(frcsim_physics
