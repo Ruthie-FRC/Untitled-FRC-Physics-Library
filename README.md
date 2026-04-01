@@ -19,3 +19,17 @@ This repository is organized as a monorepo.
 - **cad-import/**: CAD import utilities and scripts; this can be split into its own repository later if it remains loosely coupled to the core.
 
 All source code is kept in dedicated folders by responsibility.
+
+## Running Tests
+
+Use the helper script at [scripts/run-tests.sh](scripts/run-tests.sh) to configure, build, and run the full test suite in one step:
+
+```bash
+./scripts/run-tests.sh
+```
+
+You can pass extra `ctest` arguments through the script, for example:
+
+```bash
+./scripts/run-tests.sh -R frcsim_math_test
+```
