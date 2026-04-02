@@ -1,13 +1,25 @@
 :root {
-  --rensim-brand: #0f4c81;
+  --rensim-brand: #005a8d;
   --rensim-brand-dark: #0b3559;
+  --rensim-accent: #e17b2d;
   --rensim-surface: #f4f8fc;
+  --rensim-border: rgba(11, 53, 89, 0.16);
+  --md-primary-fg-color: #005a8d;
+  --md-primary-fg-color--light: #2a7aa8;
+  --md-primary-fg-color--dark: #0b3559;
+  --md-accent-fg-color: #e17b2d;
 }
 
 /* Improve readability for technical prose */
 .md-typeset {
-  font-size: 0.83rem;
+  font-size: 0.9rem;
   line-height: 1.7;
+}
+
+.md-content__inner > h1 + p {
+  font-size: 1.05rem;
+  color: rgba(0, 0, 0, 0.72);
+  margin-bottom: 1.2rem;
 }
 
 .md-typeset h1,
@@ -22,7 +34,7 @@
 }
 
 .md-typeset h2 {
-  border-bottom: 1px solid rgba(15, 76, 129, 0.18);
+  border-bottom: 1px solid var(--rensim-border);
   padding-bottom: 0.25rem;
   margin-top: 1.8rem;
 }
@@ -35,11 +47,30 @@
   border-radius: 0.25rem;
 }
 
+.md-typeset table:not([class]) th {
+  background: rgba(0, 90, 141, 0.08);
+}
+
 .md-typeset .admonition,
 .md-typeset details {
   border-radius: 0.45rem;
 }
 
+.md-typeset .admonition-title,
+.md-typeset summary {
+  font-weight: 600;
+}
+
 [data-md-color-scheme="default"] .md-typeset table:not([class]) {
   background: var(--rensim-surface);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-fg-color--light: rgba(255, 255, 255, 0.78);
+  --md-default-bg-color: #0f1a24;
+  --md-default-bg-color--light: #132230;
+}
+
+[data-md-color-scheme="slate"] .md-typeset h1 {
+  color: #87b6d4;
 }

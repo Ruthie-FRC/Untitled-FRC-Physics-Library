@@ -11,12 +11,15 @@ This page explains the spin-induced side force model used by RenSim.
 | k_m | Magnus coefficient | model coefficient |
 | F_m | Magnus force | N-equivalent model force |
 
-## Implemented model
+## Source and scope
 
-Relevant code and tests:
+Primary implementation:
 
 - core/physics-core/include/frcsim/aerodynamics/magnus_model.hpp
 - core/driver/include/frcsim/math/vector.hpp
+
+Validation tests:
+
 - vendordep/tests/magnus_test.cpp
 - vendordep/tests/forces_test.cpp
 
@@ -100,3 +103,10 @@ In practice, trajectory curvature depends on all three terms and their time-vary
 
 - vendordep/tests/magnus_test.cpp checks canonical omega x v sign
 - vendordep/tests/forces_test.cpp checks integration with broader force pipeline
+
+## Related Pages
+
+- [Aerodynamics Math](aerodynamics.md)
+- [Vector3](vector.md)
+- [Physics Reference](physics_reference.md)
+- [Units and Conventions](units_and_conventions.md)

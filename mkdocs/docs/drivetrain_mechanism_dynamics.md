@@ -15,7 +15,9 @@ This page captures mathematical assumptions for drivetrain and mechanism dynamic
 | theta | Joint angle | rad |
 | omega | Angular speed | rad/s |
 
-## Current implementation status
+## Source and scope
+
+Current implementation status:
 
 The following headers currently exist as placeholders in core/driver:
 
@@ -27,6 +29,10 @@ The following headers currently exist as placeholders in core/driver:
 - core/driver/include/frcsim/mechanisms/shooter_wheel.hpp
 
 Because APIs are still evolving, this page documents the baseline equations and assumptions to keep future implementations consistent.
+
+Validation tests:
+
+- vendordep/tests/integration_test.cpp
 
 ## Modeling intent
 
@@ -155,3 +161,9 @@ Each model page should include:
 - one test mapping section
 
 - parameter-identification guidance when coefficients are empirical
+
+## Related Pages
+
+- [Physics Reference](physics_reference.md)
+- [Integrators](integrators.md)
+- [Collision Impulses](collision_impulses.md)

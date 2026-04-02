@@ -14,17 +14,22 @@ This page describes the math conventions RenSim uses for boundary interactions a
 | j_t | Tangential impulse magnitude | N*s |
 | k_n | Effective inverse mass along contact normal | 1/kg |
 
-## Current implementation status
+## Source and scope
+
+Current implementation status:
 
 - Boundary data structures are implemented.
 - Collision detector and contact solver headers in core/driver are currently placeholders.
 - Tests currently validate boundary configuration and integration presence.
 
-Relevant files:
+Primary implementation:
 
 - core/driver/include/frcsim/field/boundary.hpp
 - core/driver/include/frcsim/contact/collision_detector.hpp
 - core/driver/include/frcsim/contact/contact_solver.hpp
+
+Validation tests:
+
 - vendordep/tests/boundary_test.cpp
 
 ## Boundary primitives
@@ -140,3 +145,9 @@ When detector/solver implementation is expanded, add tests for:
 - stack stability across timesteps
 
 Also include regression tests for frame/sign conventions in contact normals and impulse directions.
+
+## Related Pages
+
+- [Physics Reference](physics_reference.md)
+- [Units and Conventions](units_and_conventions.md)
+- [Integrators](integrators.md)

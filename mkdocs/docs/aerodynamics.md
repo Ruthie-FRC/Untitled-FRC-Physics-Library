@@ -15,13 +15,16 @@ This page explains drag equations used by RenSim and how projected area and coef
 | k_1 | Linear drag coefficient | N/(m/s) |
 | k_2 | Quadratic drag coefficient | N/(m/s)^2 |
 
-## Implemented model pieces
+## Source and scope
 
-Relevant code and tests:
+Primary implementation:
 
 - core/physics-core/include/frcsim/aerodynamics/drag_model.hpp
 - core/driver/include/frcsim/math/vector.hpp
 - core/driver/include/frcsim/rigidbody/rigid_body.hpp
+
+Validation tests:
+
 - vendordep/tests/forces_test.cpp
 
 ## Quadratic drag
@@ -158,3 +161,10 @@ Check:
 Recommended additional check:
 
 - compare simulated terminal-speed trend against expected drag balance for representative masses
+
+## Related Pages
+
+- [Vector3](vector.md)
+- [Physics Reference](physics_reference.md)
+- [Magnus Effect Math](magnus.md)
+- [Units and Conventions](units_and_conventions.md)

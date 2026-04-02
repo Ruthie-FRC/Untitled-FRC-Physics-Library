@@ -10,6 +10,8 @@ theme:
   name: material
  # logo: assets/logo.png
  # favicon: assets/logo.png
+  icon:
+    repo: fontawesome/brands/github
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -27,9 +29,12 @@ theme:
         name: Switch to light mode
   features:
     - navigation.instant
+    - navigation.tabs
     - navigation.tracking
     - navigation.sections
+    - navigation.expand
     - navigation.top
+    - toc.follow
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -39,10 +44,14 @@ theme:
 
 nav:
   - Home: index.md
-  - API Usage: api_usage.md
-  - Architecture: architecture.md
-  - Physics Reference: physics_reference.md
-  - Math:
+  - Getting Started:
+      - API Usage: api_usage.md
+      - Architecture: architecture.md
+  - Physics Models:
+      - Physics Reference: physics_reference.md
+      - Collision Impulses: collision_impulses.md
+      - Drivetrain and Mechanism Dynamics: drivetrain_mechanism_dynamics.md
+  - Math Reference:
       - Overview: math_index.md
       - Units and Conventions: units_and_conventions.md
       - Integrators: integrators.md
@@ -51,11 +60,16 @@ nav:
       - Quaternion: quaternion.md
       - Aerodynamics Math: aerodynamics.md
       - Magnus Effect Math: magnus.md
-      - Collision Impulses: collision_impulses.md
-      - Drivetrain and Mechanism Dynamics: drivetrain_mechanism_dynamics.md
 
 plugins:
   - search
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Ruthie-FRC/RenSim
+      name: RenSim on GitHub
 
 extra_css:
   - assets/stylesheets/extra.css
@@ -66,6 +80,9 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - tables
+  - pymdownx.highlight
+  - pymdownx.tabbed:
+      alternate_style: true
   - toc:
       permalink: true
   - pymdownx.superfences
