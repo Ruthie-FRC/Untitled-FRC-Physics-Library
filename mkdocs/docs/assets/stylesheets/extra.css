@@ -4,6 +4,7 @@
   --rensim-accent: #e17b2d;
   --rensim-surface: #f4f8fc;
   --rensim-border: rgba(11, 53, 89, 0.16);
+  --rensim-heading-color: var(--rensim-brand-dark);
   --rensim-text-primary: rgba(11, 53, 89, 0.94);
   --rensim-text-secondary: rgba(11, 53, 89, 0.74);
   --rensim-shadow: 0 10px 30px rgba(11, 53, 89, 0.08);
@@ -53,10 +54,10 @@ pre {
 .md-typeset h3 {
   letter-spacing: -0.01em;
   line-height: 1.2;
+  color: var(--rensim-heading-color);
 }
 
 .md-typeset h1 {
-  color: var(--rensim-brand-dark);
   font-weight: 750;
 }
 
@@ -146,17 +147,15 @@ pre {
 }
 
 [data-md-color-scheme="slate"] {
+  --md-default-fg-color: rgba(240, 247, 252, 0.94);
   --md-default-fg-color--light: rgba(255, 255, 255, 0.78);
   --md-default-bg-color: #0f1a24;
   --md-default-bg-color--light: #132230;
+  --rensim-heading-color: #cde7f6;
   --rensim-text-primary: rgba(240, 247, 252, 0.94);
   --rensim-text-secondary: rgba(240, 247, 252, 0.76);
   --rensim-border: rgba(135, 182, 212, 0.2);
   --rensim-surface: #132230;
-}
-
-[data-md-color-scheme="slate"] .md-typeset h1 {
-  color: #87b6d4;
 }
 
 [data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
