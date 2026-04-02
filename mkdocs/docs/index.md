@@ -59,9 +59,3 @@ We welcome issues, pull requests, and ideas from the FRC and robotics community.
   <img src="assets/images/frc_field.png" alt="FRC Field" width="400"/>
 </div>
 -->
-
----
-
-<div align="center">
-  <b>Simulate. Innovate. Win.</b>
-</div>
