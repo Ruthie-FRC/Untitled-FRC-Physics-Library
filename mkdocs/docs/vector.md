@@ -103,7 +103,7 @@ $$
 Vector3 torque helper implements:
 
 $$
-\\tau = r \\times F
+tau = r \times F
 $$
 
 Units:
