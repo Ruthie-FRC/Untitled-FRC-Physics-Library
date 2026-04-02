@@ -1,7 +1,7 @@
 # RenSim Physics Library
 
 [![CI](https://github.com/Ruthie-FRC/RenSim/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ruthie-FRC/RenSim/actions/workflows/ci.yml)
-[![Docs Deploy](https://github.com/Ruthie-FRC/RenSim/actions/workflows/deploy-mkdocs.yml/badge.svg?branch=main)](https://github.com/Ruthie-FRC/RenSim/actions/workflows/deploy-mkdocs.yml)
+[![Deploy to rensim.dev](https://github.com/Ruthie-FRC/RenSim/actions/workflows/deploy-mkdocs.yml/badge.svg?branch=main)](https://github.com/Ruthie-FRC/RenSim/actions/workflows/deploy-mkdocs.yml)
 [![License](https://img.shields.io/github/license/Ruthie-FRC/RenSim)](LICENSE.txt)
 [![Last Commit](https://img.shields.io/github/last-commit/Ruthie-FRC/RenSim/main)](https://github.com/Ruthie-FRC/RenSim/commits/main)
 [![Latest Release](https://img.shields.io/github/v/release/Ruthie-FRC/RenSim)](https://github.com/Ruthie-FRC/RenSim/releases)

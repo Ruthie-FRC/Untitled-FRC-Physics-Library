@@ -1,6 +1,6 @@
-# Deploy MkDocs to GitHub Pages
+# Deploy MkDocs docs to rensim.dev
 
-name: Deploy MkDocs site to GitHub Pages
+name: Deploy docs to rensim.dev
 
 on:
   push:
@@ -25,4 +25,4 @@ jobs:
           pip install mkdocs mkdocs-material
       - name: Build and Deploy
         run: |
-          mkdocs gh-deploy --force --config-file mkdocs/mkdocs.yml
+          mkdocs gh-deploy --force --config-file mkdocs/mkdocs.yml --cname rensim.dev
