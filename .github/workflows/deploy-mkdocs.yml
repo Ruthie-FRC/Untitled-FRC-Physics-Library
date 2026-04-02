@@ -25,4 +25,4 @@ jobs:
           pip install mkdocs mkdocs-material
       - name: Build and Deploy
         run: |
-          mkdocs gh-deploy --force --config-file mkdocs/mkdocs.yml --cname rensim.dev
+          mkdocs gh-deploy --force --config-file mkdocs/mkdocs.yml
