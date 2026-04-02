@@ -132,6 +132,80 @@ int main() {
         std::cout << "  ✓ Drag model reduces velocity\n";
     }
 
+    // ===== Aerodynamics: Detailed Drag Diagnostics =====
+    {
+        const auto details = frcsim::Vector3::dragForceDetailed(
+            frcsim::Vector3(10.0, 0.0, 0.0), 0.47, 0.01);
+
+        assert(details.valid);
+        assert(std::fabs(details.speed_mps - 10.0) < 1e-9);
+        assert(std::fabs(details.dynamic_pressure_pa - 61.25) < 1e-6);
+        assert(details.force.x < 0.0);
+        assert(std::fabs(details.force.y) < 1e-12);
+        assert(std::fabs(details.force.z) < 1e-12);
+        std::cout << "  ✓ Detailed drag diagnostics are populated\n";
+    }
+
+    // ===== Aerodynamics: Nonlinear Drag Includes Linear and Quadratic Terms =====
+    {
+        const auto details = frcsim::Vector3::dragForceDetailed(
+            frcsim::Vector3(10.0, 0.0, 0.0), 0.47, 0.01, 1.225, 0.25);
+
+        assert(details.valid);
+        assert(details.linear_drag_coefficient_n_per_mps > 0.0);
+        assert(details.quadratic_drag_coefficient_n_per_mps2 > 0.0);
+        assert(details.drag_force_magnitude_n > 0.0);
+        std::cout << "  ✓ Nonlinear drag terms are combined\n";
+    }
+
+    // ===== Aerodynamics: Drag Compared With Gravity =====
+    {
+        frcsim::DragModel drag_model(0.47, 0.01);
+        frcsim::RigidBody body(2.0);
+        body.setLinearVelocity(frcsim::Vector3(10.0, 0.0, 0.0));
+
+        const auto comparison = drag_model.compareToEffectiveGravity(
+            body, frcsim::Vector3(0.0, 0.0, -9.81));
+
+        assert(comparison.valid);
+        assert(comparison.drag_force_magnitude_n > 0.0);
+        assert(comparison.effective_gravity_acceleration_mps2 > 0.0);
+        assert(comparison.drag_to_gravity_ratio >= 0.0);
+        std::cout << "  ✓ Drag-to-gravity comparison is available\n";
+    }
+
+    // ===== Aerodynamics: Body Geometry Controls Cross Section =====
+    {
+        frcsim::RigidBody body(1.0);
+        frcsim::RigidBody::AerodynamicGeometry geometry;
+        geometry.shape = frcsim::RigidBody::AerodynamicGeometry::Shape::kBox;
+        geometry.box_dimensions_m = frcsim::Vector3(2.0, 1.0, 3.0);
+
+        body.setAerodynamicGeometry(geometry);
+        body.setOrientation(frcsim::Quaternion::fromAxisAngle(
+            frcsim::Vector3::unitZ(), 1.5707963267948966));
+
+        const double projected_area = body.dragReferenceAreaM2(frcsim::Vector3(1.0, 0.0, 0.0));
+
+        assert(std::fabs(projected_area - 6.0) < 1e-9);
+
+        frcsim::DragModel drag_model(0.47, 0.01);
+        const auto details = drag_model.computeForceDetailed(body);
+
+        assert(std::fabs(details.reference_area_m2 - 6.0) < 1e-9);
+        std::cout << "  ✓ Body geometry drives projected drag area\n";
+    }
+
+    // ===== Aerodynamics: Invalid Drag Inputs Return Zero Force =====
+    {
+        const auto details = frcsim::Vector3::dragForceDetailed(
+            frcsim::Vector3(10.0, 0.0, 0.0), -0.47, 0.01);
+
+        assert(!details.valid);
+        assert(details.force.isZero());
+        std::cout << "  ✓ Invalid drag inputs fail closed\n";
+    }
+
     // ===== Aerodynamics: Disabled Test =====
     {
         frcsim::PhysicsConfig config;

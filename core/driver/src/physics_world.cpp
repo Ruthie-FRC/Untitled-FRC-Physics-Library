@@ -32,8 +32,8 @@ void PhysicsWorld::step() {
 	auto step_body = [&](RigidBody& body) {
 		if (config_.enable_aerodynamics && !body.flags().is_kinematic) {
 			// TODO(placeholder-aero): Replace hard-coded drag params with body/material/config-driven coefficients.
-			const Vector3 drag = Vector3::dragForce(body.linearVelocity(), 0.47, 0.01);
-			body.applyForce(drag);
+			const auto drag = Vector3::dragForceDetailed(body.linearVelocity(), 0.47, body.dragReferenceAreaM2(body.linearVelocity()) > 0.0 ? body.dragReferenceAreaM2(body.linearVelocity()) : 0.01);
+			body.applyForce(drag.force);
 
 			// TODO(placeholder-aero): Route through aerodynamic models and expose magnus tuning in PhysicsConfig.
 			const Vector3 magnus = Vector3::magnusForce(body.linearVelocity(), body.angularVelocity(), 1e-4);

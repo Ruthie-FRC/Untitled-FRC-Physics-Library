@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <cmath>
 #include <optional>
 
 #include "frcsim/math/integrators.hpp"
@@ -19,6 +21,19 @@ enum class IntegrationMethod {
 
 class RigidBody {
   public:
+	struct AerodynamicGeometry {
+		enum class Shape {
+			kCustom,
+			kSphere,
+			kBox,
+		};
+
+		Shape shape{Shape::kCustom};
+		double reference_area_m2{0.0};
+		double radius_m{0.0};
+		Vector3 box_dimensions_m{0.0, 0.0, 0.0};
+	};
+
 	explicit RigidBody(double mass_kg = 1.0) { setMassKg(mass_kg); }
 
 	double massKg() const { return mass_kg_; }
@@ -53,6 +68,39 @@ class RigidBody {
 
 	void setMaterial(const Material& material) { material_ = material; }
 	const Material* material() const { return material_ ? &(*material_) : nullptr; }
+
+	void setAerodynamicGeometry(const AerodynamicGeometry& geometry) { aerodynamic_geometry_ = geometry; }
+	const AerodynamicGeometry* aerodynamicGeometry() const { return aerodynamic_geometry_ ? &(*aerodynamic_geometry_) : nullptr; }
+
+	double dragReferenceAreaM2(const Vector3& velocity_world) const {
+		if (!aerodynamic_geometry_) return 0.0;
+
+		const AerodynamicGeometry& geometry = *aerodynamic_geometry_;
+		if (geometry.reference_area_m2 > 0.0) return geometry.reference_area_m2;
+
+		switch (geometry.shape) {
+			case AerodynamicGeometry::Shape::kSphere: {
+				const double radius_m = std::max(0.0, geometry.radius_m);
+				return 3.14159265358979323846 * radius_m * radius_m;
+			}
+			case AerodynamicGeometry::Shape::kBox: {
+				if (geometry.box_dimensions_m.x <= 0.0 || geometry.box_dimensions_m.y <= 0.0 || geometry.box_dimensions_m.z <= 0.0) {
+					return 0.0;
+				}
+
+				Vector3 velocity_direction = velocity_world.isZero() ? Vector3::unitX() : velocity_world.normalized();
+				velocity_direction = orientation_.inverse().rotate(velocity_direction);
+
+				const Vector3 dims = geometry.box_dimensions_m;
+				return std::abs(velocity_direction.x) * dims.y * dims.z +
+					std::abs(velocity_direction.y) * dims.x * dims.z +
+					std::abs(velocity_direction.z) * dims.x * dims.y;
+			}
+			case AerodynamicGeometry::Shape::kCustom:
+			default:
+				return 0.0;
+		}
+	}
 
 	void applyForce(const Vector3& force_n) { accumulated_force_n_ += force_n; }
 
@@ -123,6 +171,7 @@ class RigidBody {
 
 	BodyFlags flags_{};
 	std::optional<Material> material_{};
+	std::optional<AerodynamicGeometry> aerodynamic_geometry_{};
 };
 
 }  // namespace frcsim

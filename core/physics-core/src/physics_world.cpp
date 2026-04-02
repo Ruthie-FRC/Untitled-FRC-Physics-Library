@@ -128,7 +128,8 @@ generator->apply(body, dt_s);
 void PhysicsWorld::applyAeroForces() {
 forEachBody([this](RigidBody& body) {
 if (body.isStatic() || body.flags().is_kinematic) return;
-drag_model_.apply(body);
+const auto drag = drag_model_.computeForceDetailed(body);
+body.applyForce(drag.force);
 magnus_model_.apply(body);
 spin_decay_model_.apply(body);
 });

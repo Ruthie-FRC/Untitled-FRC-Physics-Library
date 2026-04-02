@@ -33,6 +33,12 @@ RenSim supports force models including:
 - Motors/actuators
 - Aerodynamic terms (drag, Magnus effect)
 
+Aerodynamic drag is modeled with a projected cross-sectional area. For rigid bodies that define aerodynamic geometry, the engine estimates frontal area from the body's shape and orientation before applying the drag force.
+
+Drag can also be compared against effective gravity on a per-body basis, which is useful for judging whether aerodynamic forces are small, comparable, or dominant relative to weight.
+
+The current body geometry support covers custom reference areas and simple box/sphere approximations.
+
 ## Numerical Considerations
 
 - Use fixed timestep simulation where possible.

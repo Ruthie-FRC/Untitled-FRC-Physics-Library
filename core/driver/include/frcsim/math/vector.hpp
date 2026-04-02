@@ -102,10 +102,63 @@ struct alignas(16) Vector3 {
 
     // Drag force (-1/2 * rho * Cd * A * |v|^2 * v_hat)
     // v: velocity (m/s), Cd: drag coefficient, A: area (m^2), rho: air density (kg/m^3)
+    struct DragForceDetails {
+        Vector3 force{};
+        Vector3 direction{};
+        double speed_mps{0.0};
+        double speed_squared_mps2{0.0};
+        double dynamic_pressure_pa{0.0};
+        double drag_coefficient{0.0};
+        double reference_area_m2{0.0};
+        double cross_section_area_m2{0.0};
+        double air_density_kgpm3{0.0};
+        double linear_drag_coefficient_n_per_mps{0.0};
+        double quadratic_drag_coefficient_n_per_mps2{0.0};
+        double drag_force_magnitude_n{0.0};
+        bool valid{false};
+    };
+
+    static DragForceDetails dragForceDetailed(
+        const Vector3& v,
+        double Cd,
+        double A,
+        double rho = 1.225,
+        double linear_drag_coefficient_n_per_mps = 0.0) noexcept {
+        DragForceDetails details{};
+        details.drag_coefficient = Cd;
+        details.reference_area_m2 = A;
+        details.cross_section_area_m2 = A;
+        details.air_density_kgpm3 = rho;
+        details.linear_drag_coefficient_n_per_mps = linear_drag_coefficient_n_per_mps;
+        details.quadratic_drag_coefficient_n_per_mps2 = 0.5 * rho * Cd * A;
+
+        if (!std::isfinite(v.x) || !std::isfinite(v.y) || !std::isfinite(v.z) ||
+            !std::isfinite(Cd) || !std::isfinite(A) || !std::isfinite(rho) ||
+            !std::isfinite(linear_drag_coefficient_n_per_mps)) {
+            return details;
+        }
+
+        details.speed_mps = v.norm();
+        details.speed_squared_mps2 = details.speed_mps * details.speed_mps;
+
+        if (details.speed_mps <= std::numeric_limits<double>::epsilon() || Cd <= 0.0 || A <= 0.0 || rho <= 0.0 ||
+            linear_drag_coefficient_n_per_mps < 0.0) {
+            return details;
+        }
+
+        details.direction = v / details.speed_mps;
+        details.dynamic_pressure_pa = 0.5 * rho * details.speed_squared_mps2;
+        const double linear_force_n = linear_drag_coefficient_n_per_mps * details.speed_mps;
+        const double quadratic_force_n = details.dynamic_pressure_pa * Cd * A;
+        const double force_magnitude_n = linear_force_n + quadratic_force_n;
+        details.drag_force_magnitude_n = force_magnitude_n;
+        details.force = details.direction * (-force_magnitude_n);
+        details.valid = true;
+        return details;
+    }
+
     static Vector3 dragForce(const Vector3& v, double Cd, double A, double rho = 1.225) noexcept {
-        double speed = v.norm();
-        if (speed < std::numeric_limits<double>::epsilon()) return Vector3{};
-        return v.normalized() * (-0.5 * rho * Cd * A * speed * speed);
+        return dragForceDetailed(v, Cd, A, rho).force;
     }
 
     // Dynamic gravity (optionally with Magnus effect)
