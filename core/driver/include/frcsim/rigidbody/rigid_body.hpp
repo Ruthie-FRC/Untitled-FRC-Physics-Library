@@ -21,6 +21,12 @@ enum class IntegrationMethod {
 
 class RigidBody {
   public:
+	enum class CylinderAxis {
+		kX,
+		kY,
+		kZ,
+	};
+
 	struct AerodynamicGeometry {
 		enum class Shape {
 			kCustom,
@@ -74,6 +80,38 @@ class RigidBody {
 
 	void setAerodynamicGeometry(const AerodynamicGeometry& geometry) { aerodynamic_geometry_ = geometry; }
 	const AerodynamicGeometry* aerodynamicGeometry() const { return aerodynamic_geometry_ ? &(*aerodynamic_geometry_) : nullptr; }
+
+	void setCylinderAxisLocal(CylinderAxis axis) {
+		if (!aerodynamic_geometry_) {
+			aerodynamic_geometry_ = AerodynamicGeometry{};
+		}
+
+		switch (axis) {
+			case CylinderAxis::kX:
+				aerodynamic_geometry_->cylinder_axis_local = Vector3::unitX();
+				break;
+			case CylinderAxis::kY:
+				aerodynamic_geometry_->cylinder_axis_local = Vector3::unitY();
+				break;
+			case CylinderAxis::kZ:
+			default:
+				aerodynamic_geometry_->cylinder_axis_local = Vector3::unitZ();
+				break;
+		}
+	}
+
+	void setCylinderAxisWorld(const Vector3& axis_world) {
+		if (!aerodynamic_geometry_) {
+			aerodynamic_geometry_ = AerodynamicGeometry{};
+		}
+
+		Vector3 axis_local = orientation_.inverse().rotate(axis_world).normalized();
+		if (axis_local.isZero()) {
+			axis_local = Vector3::unitZ();
+		}
+
+		aerodynamic_geometry_->cylinder_axis_local = axis_local;
+	}
 
 	double dragReferenceAreaM2(const Vector3& velocity_world) const {
 		if (!aerodynamic_geometry_) return 0.0;

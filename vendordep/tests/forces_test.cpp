@@ -218,6 +218,58 @@ int main() {
         std::cout << "  ✓ Cylinder projected drag area follows orientation\n";
     }
 
+    // ===== Aerodynamics: Cylinder Axis Convenience Setter =====
+    {
+        frcsim::RigidBody body(1.0);
+        frcsim::RigidBody::AerodynamicGeometry geometry;
+        geometry.shape = frcsim::RigidBody::AerodynamicGeometry::Shape::kCylinder;
+        geometry.radius_m = 0.1;
+        geometry.cylinder_length_m = 0.5;
+
+        body.setAerodynamicGeometry(geometry);
+        body.setCylinderAxisLocal(frcsim::RigidBody::CylinderAxis::kX);
+
+        const double area_end_on = body.dragReferenceAreaM2(frcsim::Vector3(10.0, 0.0, 0.0));
+        const double area_side_on = body.dragReferenceAreaM2(frcsim::Vector3(0.0, 0.0, 10.0));
+
+        const double expected_end_on = 3.14159265358979323846 * 0.1 * 0.1;
+        const double expected_side_on = 2.0 * 0.1 * 0.5;
+
+        assert(std::fabs(area_end_on - expected_end_on) < 1e-9);
+        assert(std::fabs(area_side_on - expected_side_on) < 1e-9);
+        std::cout << "  ✓ Cylinder axis convenience setter works\n";
+    }
+
+    // ===== Aerodynamics: Cylinder World Axis Convenience Setter =====
+    {
+        frcsim::RigidBody body(1.0);
+        frcsim::RigidBody::AerodynamicGeometry geometry;
+        geometry.shape = frcsim::RigidBody::AerodynamicGeometry::Shape::kCylinder;
+        geometry.radius_m = 0.1;
+        geometry.cylinder_length_m = 0.5;
+
+        body.setAerodynamicGeometry(geometry);
+        body.setOrientation(frcsim::Quaternion::fromAxisAngle(
+            frcsim::Vector3::unitY(), 1.5707963267948966));
+        body.setCylinderAxisWorld(frcsim::Vector3::unitX());
+
+        const auto* configured = body.aerodynamicGeometry();
+        assert(configured != nullptr);
+        assert(std::fabs(configured->cylinder_axis_local.x) < 1e-9);
+        assert(std::fabs(configured->cylinder_axis_local.y) < 1e-9);
+        assert(std::fabs(configured->cylinder_axis_local.z - 1.0) < 1e-9);
+
+        const double area_end_on = body.dragReferenceAreaM2(frcsim::Vector3(10.0, 0.0, 0.0));
+        const double area_side_on = body.dragReferenceAreaM2(frcsim::Vector3(0.0, 0.0, 10.0));
+
+        const double expected_end_on = 3.14159265358979323846 * 0.1 * 0.1;
+        const double expected_side_on = 2.0 * 0.1 * 0.5;
+
+        assert(std::fabs(area_end_on - expected_end_on) < 1e-9);
+        assert(std::fabs(area_side_on - expected_side_on) < 1e-9);
+        std::cout << "  ✓ Cylinder world-axis convenience setter works\n";
+    }
+
     // ===== Aerodynamics: Invalid Drag Inputs Return Zero Force =====
     {
         const auto details = frcsim::Vector3::dragForceDetailed(

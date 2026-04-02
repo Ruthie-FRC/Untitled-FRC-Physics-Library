@@ -38,6 +38,8 @@ Aerodynamic drag is modeled with a projected cross-sectional area. For rigid bod
 Drag can also be compared against effective gravity on a per-body basis, which is useful for judging whether aerodynamic forces are small, comparable, or dominant relative to weight.
 
 The current body geometry support covers custom reference areas and simple box/sphere/cylinder approximations.
+For cylinders, the local axis can be set directly through a convenience enum API to avoid manual axis-vector setup.
+Cylinder axis can also be supplied in world coordinates; the engine converts it into local geometry space using the current body orientation.
 
 ## Numerical Considerations
 
