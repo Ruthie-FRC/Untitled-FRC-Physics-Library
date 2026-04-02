@@ -158,6 +158,36 @@ pre {
   --rensim-surface: #132230;
 }
 
+[data-md-color-scheme="slate"] .md-content__inner.md-typeset,
+[data-md-color-scheme="slate"] .md-content__inner.md-typeset p,
+[data-md-color-scheme="slate"] .md-content__inner.md-typeset li,
+[data-md-color-scheme="slate"] .md-content__inner.md-typeset blockquote,
+[data-md-color-scheme="slate"] .md-content__inner.md-typeset h1,
+[data-md-color-scheme="slate"] .md-content__inner.md-typeset h2,
+[data-md-color-scheme="slate"] .md-content__inner.md-typeset h3,
+[data-md-color-scheme="slate"] .md-content__inner > h1 + p {
+  color: var(--rensim-text-primary) !important;
+}
+
+[data-md-color-scheme="slate"] .md-content__inner > h1 + p {
+  color: var(--rensim-text-secondary) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .md-content__inner.md-typeset,
+  .md-content__inner.md-typeset p,
+  .md-content__inner.md-typeset li,
+  .md-content__inner.md-typeset h1,
+  .md-content__inner.md-typeset h2,
+  .md-content__inner.md-typeset h3 {
+    color: rgba(240, 247, 252, 0.94);
+  }
+
+  .md-content__inner > h1 + p {
+    color: rgba(240, 247, 252, 0.76);
+  }
+}
+
 [data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
   background: rgba(135, 182, 212, 0.12);
 }
