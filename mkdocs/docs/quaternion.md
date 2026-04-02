@@ -1,67 +1,128 @@
-# Quaternion (`frcsim::Quaternion`)
+# Quaternion (frcsim::Quaternion)
 
-This page documents the `Quaternion` struct in the `frcsim` physics library, which represents a quaternion for 3D rotations and provides operations for orientation, interpolation, and vector rotation.
+This page explains quaternion math used by RenSim for stable 3D orientation updates.
 
----
+## Source and scope
 
-## Overview
+Primary implementation:
 
-`Quaternion` is a 4D type (`w, x, y, z`) used for representing 3D rotations. It supports construction from axis-angle, angular velocity, and provides methods for normalization, interpolation, and conversion to rotation matrices.
+- core/driver/include/frcsim/math/quaternion.hpp
+- core/driver/include/frcsim/math/integrators.hpp
 
----
+Validation tests:
 
-## Members
-- **w, x, y, z**: The quaternion components (double)
+- vendordep/tests/math_test.cpp
+- vendordep/tests/integration_test.cpp
 
----
+## Representation
 
-## Key Methods & Operations
+RenSim stores quaternion as:
 
-### Constructors
-- `Quaternion()` — Identity quaternion
-- `Quaternion(double w, double x, double y, double z)` — Initialize with values
-- `Quaternion(double w, Vector3 v)` — From scalar and vector part
+$$
+q = (w, x, y, z) = (w, \mathbf{v})
+$$
 
-### Norms & Normalization
-- `norm2()` — Squared magnitude
-- `norm()` — Magnitude
-- `normalized()` — Returns normalized quaternion
-- `normalize()` — In-place normalization
-- `normalizeIfNeeded(eps)` — Normalize if not already unit
+Identity rotation is:
 
-### Construction & Conversion
-- `fromAxisAngle(axis, angleRad)` — From axis-angle
-- `fromAngularVelocity(omega, dt)` — From angular velocity (small angle)
-- `toAxisAngle(axis, angleRad)` — To axis-angle
-- `toMatrix(m)` — To 3x3 rotation matrix
+$$
+q_I = (1,0,0,0)
+$$
 
-### Interpolation
-- `slerp(a, b, t)` — Spherical linear interpolation
+## Hamilton product used by implementation
 
-### Operations
-- `conjugate()` — Conjugate
-- `inverse()` — Inverse
-- `operator*` — Quaternion multiplication
-- `operator+`, `operator-` — Addition, negation
-- `operator==`, `operator!=` — Comparison
+For two quaternions $$q_1 = (w_1, x_1, y_1, z_1)$$ and $$q_2 = (w_2, x_2, y_2, z_2)$$:
 
-### Vector Rotation
-- `rotate(v)` — Rotate a vector
-- `forward()`, `up()`, `right()` — Standard basis directions
+$$
+q_1 q_2 =
+\left(
+w_1w_2 - x_1x_2 - y_1y_2 - z_1z_2,
+\ w_1x_2 + x_1w_2 + y_1z_2 - z_1y_2,
+\ w_1y_2 - x_1z_2 + y_1w_2 + z_1x_2,
+\ w_1z_2 + x_1y_2 - y_1x_2 + z_1w_2
+\right)
+$$
 
-### Utility
-- `isIdentity(eps)` — Check if identity
-- `hasNaN()` — Check for NaN components
-- `operator<<` — Output stream
+This product is non-commutative.
 
----
+## Vector rotation
 
-## Example Usage
-```cpp
-frcsim::Quaternion q = frcsim::Quaternion::fromAxisAngle(frcsim::Vector3(0,1,0), M_PI/2);
-frcsim::Vector3 v = q.rotate(frcsim::Vector3(1,0,0));
-```
+Embed vector $$v$$ as pure quaternion $$p=(0,v)$$ and rotate with:
 
----
+$$
+p' = q p q^{-1}
+$$
 
-*This documentation was generated for the file: `physics-core/include/frcsim/math/quaternion.hpp`*
+The rotated vector is the xyz part of $$p'$$.
+
+RenSim rotate helper uses conjugate for unit quaternions, which is efficient and stable when normalization is maintained.
+
+## Axis-angle conversion
+
+From axis u and angle theta:
+
+$$
+q = \left(\cos\frac{\theta}{2},\ u\sin\frac{\theta}{2}\right)
+$$
+
+Near zero angle, axis is not uniquely defined; implementation falls back to a default axis when needed.
+
+## Why q and -q are equivalent
+
+Both represent the same 3D rotation because they map to the same rotation matrix and produce identical rotated vectors.
+
+Implication for interpolation:
+
+- flip one endpoint sign when dot product is negative to take shortest SLERP path
+
+## SLERP behavior
+
+For interpolation parameter t in [0,1], SLERP follows the geodesic on unit quaternion sphere.
+
+RenSim behavior:
+
+- flips sign when needed for shortest path
+- falls back to normalized lerp when quaternions are very close
+
+## Quaternion integration and normalization
+
+RenSim angular integration uses:
+
+$$
+\dot{q} = \frac{1}{2}\omega_q q
+$$
+
+with forward step and normalize-if-needed.
+
+Why normalization frequency matters:
+
+- too infrequent: drift accumulates and rotation quality degrades
+- every step: robust and simple for real-time simulation
+
+## Worked 90-degree example
+
+Rotate vector $$v=(1,0,0)$$ by +90 degrees about Z.
+
+Axis-angle quaternion:
+
+$$
+q = \left(\cos\frac{\pi}{4}, 0,0,\sin\frac{\pi}{4}\right)
+$$
+
+Applying $$v' = q v q^{-1}$$ yields approximately:
+
+$$
+v' = (0,1,0)
+$$
+
+## Common mistakes
+
+- using non-unit quaternions for repeated rotation steps
+- multiplying in wrong order when composing rotations
+- mixing body and world angular velocity definitions
+- forgetting that q and -q are equivalent during comparisons
+
+## Related Pages
+
+- [Units and Conventions](units_and_conventions.md)
+- [Matrix3](matrix.md)
+- [Integrators](integrators.md)

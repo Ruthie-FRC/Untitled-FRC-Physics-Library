@@ -42,11 +42,16 @@ nav:
   - Architecture: architecture.md
   - Physics Reference: physics_reference.md
   - Math:
+  - Overview: math_index.md
+  - Units and Conventions: units_and_conventions.md
       - Integrators: integrators.md
       - Vector3: vector.md
       - Matrix3: matrix.md
       - Quaternion: quaternion.md
-      - Math Docs Backlog: math_docs_backlog.md
+  - Aerodynamics Math: aerodynamics.md
+  - Magnus Effect Math: magnus.md
+  - Collision Impulses: collision_impulses.md
+  - Drivetrain and Mechanism Dynamics: drivetrain_mechanism_dynamics.md
 
 plugins:
   - search
