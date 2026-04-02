@@ -46,16 +46,16 @@ theme:
 nav:
   - Home: index.md
   - Getting Started:
-    - getting_started.md
+      - getting_started.md
       - API Usage: api_usage.md
       - Architecture: architecture.md
   - Physics Models:
-    - physics_models.md
+      - physics_models.md
       - Physics Reference: physics_reference.md
       - Collision Impulses: collision_impulses.md
       - Drivetrain and Mechanism Dynamics: drivetrain_mechanism_dynamics.md
   - Math Reference:
-    - math_index.md
+      - math_index.md
       - Units and Conventions: units_and_conventions.md
       - Integrators: integrators.md
       - Vector3: vector.md
