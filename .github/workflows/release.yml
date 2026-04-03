@@ -1,0 +1,65 @@
+name: Build and Release
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Release version number"
+        type: string
+        required: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+      pages: write
+      deployments: read
+      id-token: write
+    env:
+      releaseVersion: ${{ inputs.releaseVersion }}
+      workingDirectory: ${{github.workspace}}/vendordep
+      name: github-pages
+      #url: ${{steps.deployment.outputs.page_url}}
+    
+    steps:
+      - run: git config --global user.name "Ruthie-FRC" && git config --global user.email "Ruthie-FRC@users.noreply.github.com"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - run: chmod +x gradlew
+        working-directory: ${{ env.workingDirectory }}
+      - name: Install roboRio toolchain
+        run: ./gradlew installRoboRioToolchain
+        working-directory: ${{ env.workingDirectory }}
+      - name: Build vendordep
+        run: ./gradlew build
+        working-directory: ${{ env.workingDirectory }}
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: ${{ env.workingDirectory }}/build/maven/
+      - name: Publish vendordep
+        run: ./gradlew publish
+        working-directory: ${{ env.workingDirectory }}
+      - name: Create new vendor JSON
+        run: cp ${{ env.workingDirectory }}/build/maven/RenSim.json ${{ env.workingDirectory }}/build/maven/RenSim-${{inputs.releaseVersion}}.json
+      - name: Upload pages
+        run: git add . && git commit -m "Automatically add RenSim version ${{inputs.releaseVersion}}" && git push
+        working-directory: ${{ env.workingDirectory }}/build/maven/
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Upload vendordep json, maven repository, and javadocs
+        uses: actions/upload-pages-artifact@v4
+        with:
+          name: 'github-pages'
+          retention-days: '90'
+          path: ${{ env.workingDirectory }}/build/maven/
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Output Pages Tree
+        run: find ${{ env.workingDirectory }}/build/maven/ -type f
