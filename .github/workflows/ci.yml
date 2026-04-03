@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
       - name: Check Java docs
         working-directory: vendordep
         run: ./gradlew javadoc
@@ -114,7 +114,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           architecture: ${{ matrix.architecture }}
       - name: Build with Gradle
         working-directory: vendordep
@@ -143,7 +143,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
       - name: Combine
         run: ./gradlew publish -Pthirdparty
         working-directory: combiner
