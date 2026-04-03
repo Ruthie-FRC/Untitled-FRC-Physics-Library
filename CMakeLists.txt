@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(FRCSimPhysicsLibrary VERSION 2026.04.03 LANGUAGES CXX)
+project(FRCSimPhysicsLibrary VERSION 0.1.0 LANGUAGES CXX)
 
 include(CTest)
 

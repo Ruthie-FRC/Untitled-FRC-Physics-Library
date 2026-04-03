@@ -144,11 +144,11 @@ model {
       sources {
         cpp {
           source {
-            srcDirs 'src/main/driver/cpp', "$rootDir/../core/driver/src"
+            srcDirs 'src/main/driver/cpp'
             include '**/*.cpp'
           }
           exportedHeaders {
-            srcDirs 'src/main/driver/include', "$rootDir/../core/driver/include"
+            srcDirs 'src/main/driver/include'
           }
         }
       }

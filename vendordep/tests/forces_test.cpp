@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "frcsim/physics_world.hpp"
-#include "frcsim/aerodynamics/drag_model.hpp"
 #include "frcsim/forces/gravity.hpp"
 
 int main() {

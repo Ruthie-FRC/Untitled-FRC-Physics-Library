@@ -57,26 +57,4 @@ public class VendorJNI {
    * @see "VendorJNI.cpp"
    */
   public static native int initialize();
-
-  public static native long createWorld(double fixedDtSeconds, boolean enableGravity);
-
-  public static native void destroyWorld(long worldHandle);
-
-  public static native int createBody(long worldHandle, double massKg);
-
-  public static native int setBodyPosition(long worldHandle, int bodyIndex, double xMeters, double yMeters,
-      double zMeters);
-
-  public static native int setBodyLinearVelocity(long worldHandle, int bodyIndex, double vxMps, double vyMps,
-      double vzMps);
-
-  public static native int setBodyGravityEnabled(long worldHandle, int bodyIndex, boolean enabled);
-
-  public static native int setWorldGravity(long worldHandle, double gxMps2, double gyMps2, double gzMps2);
-
-  public static native int stepWorld(long worldHandle, int steps);
-
-  public static native int getBodyPosition(long worldHandle, int bodyIndex, double[] outXyzMeters);
-
-  public static native int getBodyLinearVelocity(long worldHandle, int bodyIndex, double[] outVxyzMps);
 }
