@@ -18,9 +18,6 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Build with Gradle
-        run: bash scripts/build.sh
-
       - name: Verify legacy native test sources exist
         run: |
           set -euo pipefail
@@ -32,4 +29,6 @@ jobs:
           echo "Found $count standalone native test source files."
 
       - name: Run test suite
-        run: bash scripts/run-tests.sh
+        run: |
+          cd vendordep
+          ./gradlew test

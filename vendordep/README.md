@@ -46,5 +46,5 @@ Use `rensim::PhysicsWorld` from `src/main/native/include/header.h`.
 Before prerelease publishing:
 
 1. Set desired version in `publish.gradle` (`pubVersion`).
-2. Run `./gradlew build` in this folder on a supported JDK.
+2. Run `./gradlew test` in this folder on a supported JDK.
 3. Validate artifacts in `build/outputs` and `build/repos`.

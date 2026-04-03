@@ -16,33 +16,23 @@ This repository is organized as a monorepo containing the core simulation engine
 
 ## Quick Start
 
-### Build (Gradle)
+### Build and Test (Gradle)
 
 ```bash
-bash scripts/build.sh
+cd vendordep
+./gradlew test
 ```
 
 ### Run Tests
 
-Run the full test helper used in CI:
+Run the vendordep Gradle test task used in CI:
 
 ```bash
-./scripts/run-tests.sh
+cd vendordep
+./gradlew test
 ```
 
 This command runs Java tests plus the standalone native verification suite in `vendordep/tests/` through Gradle.
-
-Pass additional Gradle flags when needed:
-
-```bash
-./scripts/run-tests.sh --info
-```
-
-Run Gradle-driven native + Java tests directly:
-
-```bash
-bash scripts/run-tests.sh
-```
 
 ### Preview Docs Locally
 

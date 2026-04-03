@@ -67,7 +67,7 @@ This is a **prerelease**. Core physics API (PhysicsWorld, RigidBody) is stable. 
 - **Gradle 8.14.3**: For native C++, JNI, and Java builds/tests
 
 ### Testing
-Run `bash scripts/run-tests.sh` to validate:
+Run `cd vendordep && ./gradlew test` to validate:
 - Core physics algorithms
 - Integration methods
 - Joint constraint solving

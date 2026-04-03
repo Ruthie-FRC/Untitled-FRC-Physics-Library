@@ -24,8 +24,8 @@ RenSim is a modular FRC physics library for simulation, analysis, and robotics w
 ### C++
 
 ```bash
-bash scripts/build.sh
-bash scripts/run-tests.sh
+cd vendordep
+./gradlew test
 ```
 
 ### Python
