@@ -1,4 +1,4 @@
-package com.vendor.jni;
+package rensim.jni;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
