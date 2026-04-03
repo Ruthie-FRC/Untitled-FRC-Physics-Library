@@ -102,9 +102,19 @@ struct alignas(16) Vector3 {
 
     // Drag force (-1/2 * rho * Cd * A * |v|^2 * v_hat)
     // v: velocity (m/s), Cd: drag coefficient, A: area (m^2), rho: air density (kg/m^3)
+    struct DragVector {
+        double x{0.0};
+        double y{0.0};
+        double z{0.0};
+
+        bool isZero(double eps = 1e-12) const noexcept {
+            return std::abs(x) < eps && std::abs(y) < eps && std::abs(z) < eps;
+        }
+    };
+
     struct DragForceDetails {
-        Vector3 force{};
-        Vector3 direction{};
+        DragVector force{};
+        DragVector direction{};
         double speed_mps{0.0};
         double speed_squared_mps2{0.0};
         double dynamic_pressure_pa{0.0};
@@ -146,19 +156,24 @@ struct alignas(16) Vector3 {
             return details;
         }
 
-        details.direction = v / details.speed_mps;
+        details.direction = {v.x / details.speed_mps, v.y / details.speed_mps, v.z / details.speed_mps};
         details.dynamic_pressure_pa = 0.5 * rho * details.speed_squared_mps2;
         const double linear_force_n = linear_drag_coefficient_n_per_mps * details.speed_mps;
         const double quadratic_force_n = details.dynamic_pressure_pa * Cd * A;
         const double force_magnitude_n = linear_force_n + quadratic_force_n;
         details.drag_force_magnitude_n = force_magnitude_n;
-        details.force = details.direction * (-force_magnitude_n);
+        details.force = {
+            details.direction.x * (-force_magnitude_n),
+            details.direction.y * (-force_magnitude_n),
+            details.direction.z * (-force_magnitude_n)
+        };
         details.valid = true;
         return details;
     }
 
     static Vector3 dragForce(const Vector3& v, double Cd, double A, double rho = 1.225) noexcept {
-        return dragForceDetailed(v, Cd, A, rho).force;
+        const auto details = dragForceDetailed(v, Cd, A, rho);
+        return Vector3(details.force.x, details.force.y, details.force.z);
     }
 
     // Dynamic gravity (optionally with Magnus effect)
