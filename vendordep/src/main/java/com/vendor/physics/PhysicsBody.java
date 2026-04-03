@@ -1,24 +1,22 @@
 package com.vendor.physics;
 
 /**
- * Handle for a body managed by {@link PhysicsWorld}.
+ * Handle for a body managed by the native physics world.
  */
 public final class PhysicsBody {
-  private final PhysicsWorld world;
-  private final int bodyIndex;
+  private final frcsim_physics.PhysicsBody delegate;
 
-  PhysicsBody(PhysicsWorld world, int bodyIndex) {
-    this.world = world;
-    this.bodyIndex = bodyIndex;
+  PhysicsBody(frcsim_physics.PhysicsBody delegate) {
+    this.delegate = delegate;
   }
 
   /**
-   * Returns the native body index for this body.
+   * Gets the native body index for this body.
    *
    * @return the native body index
    */
   public int bodyIndex() {
-    return bodyIndex;
+    return delegate.bodyIndex();
   }
 
   /**
@@ -27,7 +25,7 @@ public final class PhysicsBody {
    * @param positionMeters the new position in meters
    */
   public void setPosition(Vec3 positionMeters) {
-    world.setBodyPosition(bodyIndex, positionMeters);
+    delegate.setPosition(new frcsim_physics.Vec3(positionMeters.x(), positionMeters.y(), positionMeters.z()));
   }
 
   /**
@@ -36,7 +34,7 @@ public final class PhysicsBody {
    * @param velocityMps the new linear velocity in meters per second
    */
   public void setLinearVelocity(Vec3 velocityMps) {
-    world.setBodyLinearVelocity(bodyIndex, velocityMps);
+    delegate.setLinearVelocity(new frcsim_physics.Vec3(velocityMps.x(), velocityMps.y(), velocityMps.z()));
   }
 
   /**
@@ -45,7 +43,7 @@ public final class PhysicsBody {
    * @param enabled true to enable gravity, false to disable it
    */
   public void setGravityEnabled(boolean enabled) {
-    world.setBodyGravityEnabled(bodyIndex, enabled);
+    delegate.setGravityEnabled(enabled);
   }
 
   /**
@@ -54,7 +52,8 @@ public final class PhysicsBody {
    * @return the current position in meters
    */
   public Vec3 position() {
-    return world.bodyPosition(bodyIndex);
+    frcsim_physics.Vec3 position = delegate.position();
+    return new Vec3(position.x(), position.y(), position.z());
   }
 
   /**
@@ -63,6 +62,7 @@ public final class PhysicsBody {
    * @return the current linear velocity in meters per second
    */
   public Vec3 linearVelocity() {
-    return world.bodyLinearVelocity(bodyIndex);
+    frcsim_physics.Vec3 velocity = delegate.linearVelocity();
+    return new Vec3(velocity.x(), velocity.y(), velocity.z());
   }
 }

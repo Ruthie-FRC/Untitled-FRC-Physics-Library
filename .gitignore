@@ -76,9 +76,6 @@ vendor/
 frcsim_*
 !vendordep/tests/*.cpp
 !core/java/java/frcsim_physics/
-!core/java/java/frcsim_physics/*.java
-!vendordep/src/main/java/com/vendor/
-!vendordep/src/main/java/com/vendor/**/*.java
 
 # Build metadata artifacts
 compile_commands.json
