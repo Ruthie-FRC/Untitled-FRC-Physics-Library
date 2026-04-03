@@ -5,9 +5,9 @@
     "frcYear": "2026",
     "uuid": "a87eb0a9-efa5-4de6-9bb0-9ca5565d20c1",
     "mavenUrls": [
-        "https://rensim.dev/maven/"
+        "https://ruthie-frc.github.io/RenSim/maven/"
     ],
-    "jsonUrl": "https://rensim.dev/RenSim.json",
+    "jsonUrl": "https://ruthie-frc.github.io/RenSim/RenSim.json",
     "javaDependencies": [
         {
             "groupId": "${groupId}",
