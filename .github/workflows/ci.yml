@@ -19,6 +19,23 @@ jobs:
           fi
           echo "Found $count standalone native test source files."
 
+  javadoc:
+    needs: [validation]
+    name: "Javadoc"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Check Java docs
+        working-directory: vendordep
+        run: ./gradlew javadoc
+
   build-docker:
     needs: [validation]
     strategy:
