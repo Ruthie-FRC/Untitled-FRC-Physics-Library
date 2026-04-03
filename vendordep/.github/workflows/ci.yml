@@ -41,6 +41,8 @@ jobs:
           git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
       - name: Build with Gradle
         run: ./gradlew build ${{ matrix.build-options }}
+      - name: Test with Gradle
+        run: ./gradlew test ${{ matrix.build-options }}
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
@@ -75,6 +77,8 @@ jobs:
           architecture: ${{ matrix.architecture }}
       - name: Build with Gradle
         run: ./gradlew build -Pbuildalldesktop
+      - name: Test with Gradle
+        run: ./gradlew test -Pbuildalldesktop
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
