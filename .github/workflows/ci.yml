@@ -1,26 +1,17 @@
 name: CI
 
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
-  tests:
-    name: Run Tests
+  validation:
+    name: "Validation"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Verify legacy native test sources exist
+      - uses: actions/checkout@v4
+      - name: Verify vendordep wrapper and sources
         run: |
           set -euo pipefail
+          test -x vendordep/gradlew
           count=$(find vendordep/tests -maxdepth 1 -type f -name '*.cpp' | wc -l)
           if [ "$count" -lt 1 ]; then
             echo "No standalone native tests found in vendordep/tests" >&2
@@ -28,7 +19,105 @@ jobs:
           fi
           echo "Found $count standalone native test source files."
 
-      - name: Run test suite
+  build-docker:
+    needs: [validation]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - container: wpilib/roborio-cross-ubuntu:2025-22.04
+            artifact-name: Athena
+            build-options: "-Ponlylinuxathena"
+          - container: wpilib/raspbian-cross-ubuntu:bookworm-22.04
+            artifact-name: Arm32
+            build-options: "-Ponlylinuxarm32"
+          - container: wpilib/aarch64-cross-ubuntu:bookworm-22.04
+            artifact-name: Arm64
+            build-options: "-Ponlylinuxarm64"
+          - container: wpilib/ubuntu-base:22.04
+            artifact-name: Linux
+            build-options: ""
+    name: "Build - ${{ matrix.artifact-name }}"
+    runs-on: ubuntu-22.04
+    container: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Fetch all history and metadata
         run: |
-          cd vendordep
-          ./gradlew test
+          git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
+      - name: Build with Gradle
+        working-directory: vendordep
+        run: ./gradlew build ${{ matrix.build-options }}
+      - name: Test with Gradle
+        working-directory: vendordep
+        run: ./gradlew test ${{ matrix.build-options }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: vendordep/build/allOutputs
+
+  build-host:
+    needs: [validation]
+    env:
+      MACOSX_DEPLOYMENT_TARGET: 13.3
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            artifact-name: Win64
+            architecture: x64
+          - os: macos-14
+            artifact-name: macOS
+            architecture: aarch64
+    name: "Build - ${{ matrix.artifact-name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Fetch all history and metadata
+        run: git fetch --prune --unshallow
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          architecture: ${{ matrix.architecture }}
+      - name: Build with Gradle
+        working-directory: vendordep
+        run: ./gradlew build -Pbuildalldesktop
+      - name: Test with Gradle
+        working-directory: vendordep
+        run: ./gradlew test -Pbuildalldesktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: vendordep/build/allOutputs
+
+  combine:
+    name: Combine
+    needs: [build-docker, build-host]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: wpilibsuite/build-tools
+      - uses: actions/download-artifact@v4
+        with:
+          path: combiner/products/build/allOutputs
+      - name: Flatten Artifacts
+        run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Combine
+        run: ./gradlew publish -Pthirdparty
+        working-directory: combiner
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Maven
+          path: ~/releases
