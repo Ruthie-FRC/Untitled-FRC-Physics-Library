@@ -1,31 +1,50 @@
-# WPILib Vendor Template
+# RenSim Vendordep
 
-This is the base WPILib vendor template for 2025.
+This package exposes RenSim physics as a WPILib vendordep with both Java and C++ entry points.
 
-## Layout
+## Implemented API Surface
 
-The build is split into 3 libraries. A java library is built. This has access to all of wpilib, and also can JNI load the driver library.
+### Java
 
-A driver library is built. This should contain all low level code you want to access from both C++, Java and any other text based language. This will not work with LabVIEW. This library has access to the WPILib HAL and wpiutil. This library can only export C symbols. It cannot export C++ symbols at all, and all C symbols must be explicitly listed in the symbols.txt file in the driver folder. JNI symbols must be listed in this file as well. This library however can be written in C++. If you attempt to change this library to have access to all of wpilib, you will break JNI access and it will no longer work.
+Use `com.vendor.physics.PhysicsWorld` and `com.vendor.physics.PhysicsBody` for rigid-body simulation:
 
-A native C++ library is built. This has access to all of wpilib, and access to the driver library. This should implment the standard wpilib interfaces.
+```java
+try (PhysicsWorld world = new PhysicsWorld(0.01, true)) {
+	PhysicsBody body = world.createBody(1.0);
+	body.setPosition(new Vec3(0.0, 0.0, 1.0));
+	body.setLinearVelocity(new Vec3(3.0, 0.0, 2.0));
 
-## Customizing
-For Java, the library name will be the folder name the build is started from, so rename the folder to the name of your choosing. 
+	for (int i = 0; i < 100; ++i) {
+		world.step();
+	}
 
-For the native impl, you need to change the library name in the exportsConfigs block of build.gradle, the components block of build.gradle, and the taskList input array name in publish.gradle.
+	Vec3 position = body.position();
+}
+```
 
-For the driver, change the library name in privateExportsConfigs, the driver name in components, and the driverTaskList input array name. In addition, you'll need to change the `lib library` in the native C++ impl component, and the JNI library name in the JNI java class.
+Current Java API includes:
+- Create/destroy worlds
+- Create bodies
+- Set body position and linear velocity
+- Enable/disable per-body gravity
+- Set global gravity vector
+- Step simulation by N steps
+- Read body position/velocity
 
-For the maven artifact names, those are all in publish.gradle about 40 lines down.
+### C++
 
-## Building and editing
-This uses gradle, and uses the same base setup as a standard GradleRIO robot project. This means you build with `./gradlew build`, and can install the native toolchain with `./gradlew installRoboRIOToolchain`. If you open this project in VS Code with the wpilib extension installed, you will get intellisense set up for both C++ and Java.
+Use `rensim::PhysicsWorld` from `src/main/native/include/header.h`.
 
-By default, this template builds against the latest WPILib development build. To build against the last WPILib tagged release, build with `./gradlew build -PreleaseMode`.
+## Build Notes
 
-## Checking Vendordep
-After you've published your library to maven, you can use the [vendordep checker](https://github.com/wpilibsuite/vendor-json-repo/blob/main/check.py) to check for common errors, such as not publishing all dependencies, and ensuring that all architectures are correct.
+- Native CMake build and tests for core physics pass via the top-level project.
+- Vendordep Gradle build requires a WPILib-compatible JDK (typically Java 17 or 21 depending on WPILib release).
 
-## Listing Vendordep in VS Code Dependency Manager
-Follow the directions at [WPILib Vendor JSON Repository](https://github.com/wpilibsuite/vendor-json-repo/blob/main/README.md) to get a Vendordep included in the [VS Code Dependency Manager](https://docs.wpilib.org/en/stable/docs/software/vscode-overview/3rd-party-libraries.html#installing-libraries)
+## Release Packaging
+
+`RenSim.json` is configured to publish Java, JNI driver, and C++ artifacts.
+Before prerelease publishing:
+
+1. Set desired version in `publish.gradle` (`pubVersion`).
+2. Run `./gradlew build` in this folder on a supported JDK.
+3. Validate artifacts in `build/outputs` and `build/repos`.
