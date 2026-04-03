@@ -8,6 +8,8 @@ ext.licenseFile = files("$rootDir/../LICENSE.txt")
 def templateVendorFile = "RenSim.json"
 
 def pubVersion = '2026.04.03.0-prerelease'
+def artifactGroupId = (project.findProperty('artifactGroupId') ?: 'com.vendor.frc').toString()
+def baseArtifactId = (project.findProperty('baseArtifactId') ?: 'Vendor').toString()
 
 def outputsFolder = file("$buildDir/outputs")
 
@@ -46,8 +48,6 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from(task.archiveFile)
 }
 
-def artifactGroupId = 'com.vendor.frc'
-def baseArtifactId = 'Vendor'
 def driverZipBaseName = "_GROUP_rensim_ID_${baseArtifactId}-driver_CLS"
 def zipBaseName = "_GROUP_rensim_ID_${baseArtifactId}-cpp_CLS"
 def javaBaseName = "_GROUP_rensim_ID_${baseArtifactId}-java_CLS"
