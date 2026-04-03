@@ -38,6 +38,12 @@ class PhysicsWorld {
 
 		void addGlobalForceGenerator(const std::shared_ptr<ForceGenerator>& generator);
 
+		std::vector<RigidBody>& bodies() { return bodies_; }
+		const std::vector<RigidBody>& bodies() const { return bodies_; }
+
+		std::vector<RigidAssembly>& assemblies() { return assemblies_; }
+		const std::vector<RigidAssembly>& assemblies() const { return assemblies_; }
+
 		void step();
 
 		std::size_t stepCount() const { return step_count_; }

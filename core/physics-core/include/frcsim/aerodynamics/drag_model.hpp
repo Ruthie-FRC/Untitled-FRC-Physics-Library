@@ -42,11 +42,12 @@ class DragModel {
 
 		Vector3 computeForce(const Vector3& velocity_mps) const {
 				auto details = computeForceDetailed(velocity_mps);
-				return details.force;
+				return Vector3(details.force.x, details.force.y, details.force.z);
 		}
 
 		Vector3 computeForce(const RigidBody& body) const {
-				return computeForceDetailed(body).force;
+				auto details = computeForceDetailed(body);
+				return Vector3(details.force.x, details.force.y, details.force.z);
 		}
 
 		DragGravityComparison compareToEffectiveGravity(
@@ -56,7 +57,7 @@ class DragModel {
 				comparison.body_mass_kg = body.massKg();
 
 				const auto details = computeForceDetailed(body);
-				comparison.drag_force = details.force;
+				comparison.drag_force = Vector3(details.force.x, details.force.y, details.force.z);
 				comparison.drag_force_magnitude_n = details.drag_force_magnitude_n;
 				comparison.drag_acceleration_mps2 = (comparison.body_mass_kg > 0.0)
 					? comparison.drag_force_magnitude_n / comparison.body_mass_kg
