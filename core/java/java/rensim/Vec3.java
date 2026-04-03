@@ -1,4 +1,4 @@
-package com.vendor.physics;
+package rensim;
 
 /**
  * Immutable 3D vector used for positions, velocities, and accelerations.

@@ -75,7 +75,6 @@ vendor/
 # Test binaries (keep source test files, ignore compiled binaries)
 frcsim_*
 !vendordep/tests/*.cpp
-!core/java/java/frcsim_physics/
 
 # Build metadata artifacts
 compile_commands.json

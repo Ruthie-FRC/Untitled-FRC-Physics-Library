@@ -1,4 +1,4 @@
-package frcsim_physics;
+package rensim;
 
 import com.vendor.jni.VendorJNI;
 

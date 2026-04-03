@@ -6,9 +6,13 @@ This package exposes RenSim physics as a WPILib vendordep with both Java and C++
 
 ### Java
 
-Use `com.vendor.physics.PhysicsWorld` and `com.vendor.physics.PhysicsBody` for rigid-body simulation:
+Use `rensim.PhysicsWorld` and `rensim.PhysicsBody` for rigid-body simulation:
 
 ```java
+import rensim.PhysicsBody;
+import rensim.PhysicsWorld;
+import rensim.Vec3;
+
 try (PhysicsWorld world = new PhysicsWorld(0.01, true)) {
 	PhysicsBody body = world.createBody(1.0);
 	body.setPosition(new Vec3(0.0, 0.0, 1.0));
