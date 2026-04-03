@@ -21,23 +21,27 @@ RenSim is a modular FRC physics library for simulation, analysis, and robotics w
 
 ## Quick Start
 
-### C++
+### Build and Test
+
+```bash
+scripts/run-tests.sh
+```
+
+### Direct Gradle Workflow
 
 ```bash
 cd vendordep
 ./gradlew test
 ```
 
-### Python
+`scripts/run-tests.sh` is the recommended path from repository root and expects Java 21.
 
-```bash
-pip install frcsim-physics
-python examples/python/simple_world_demo.py
-```
+### Run Examples
 
-### Java
+- C++: `examples/cpp/minimal_world.cpp`
+- Python: `examples/python/simple_world_demo.py`
+- Java: `examples/java/ShooterPredictionExample.java`
 
-Use the example in `examples/java/ShooterPredictionExample.java` as a starting point.
 
 ## Documentation Map
 

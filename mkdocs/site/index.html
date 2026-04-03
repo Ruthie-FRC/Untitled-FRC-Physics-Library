@@ -356,10 +356,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#c" class="md-nav__link">
+  <a href="#build-and-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        C++
+        Build and Test
       
     </span>
   </a>
@@ -367,10 +367,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#python" class="md-nav__link">
+  <a href="#direct-gradle-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Python
+        Direct Gradle Workflow
       
     </span>
   </a>
@@ -378,10 +378,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#java" class="md-nav__link">
+  <a href="#run-examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Java
+        Run Examples
       
     </span>
   </a>
@@ -1066,10 +1066,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#c" class="md-nav__link">
+  <a href="#build-and-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        C++
+        Build and Test
       
     </span>
   </a>
@@ -1077,10 +1077,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#python" class="md-nav__link">
+  <a href="#direct-gradle-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Python
+        Direct Gradle Workflow
       
     </span>
   </a>
@@ -1088,10 +1088,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#java" class="md-nav__link">
+  <a href="#run-examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Java
+        Run Examples
       
     </span>
   </a>
@@ -1172,16 +1172,20 @@
 <li>Open source: community-driven and MIT-licensed</li>
 </ul>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<h3 id="c">C++<a class="headerlink" href="#c" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>bash<span class="w"> </span>scripts/build.sh
-bash<span class="w"> </span>scripts/run-tests.sh
+<h3 id="build-and-test">Build and Test<a class="headerlink" href="#build-and-test" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>scripts/run-tests.sh
 </code></pre></div>
-<h3 id="python">Python<a class="headerlink" href="#python" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>frcsim-physics
-python<span class="w"> </span>examples/python/simple_world_demo.py
+<h3 id="direct-gradle-workflow">Direct Gradle Workflow<a class="headerlink" href="#direct-gradle-workflow" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>vendordep
+./gradlew<span class="w"> </span><span class="nb">test</span>
 </code></pre></div>
-<h3 id="java">Java<a class="headerlink" href="#java" title="Permanent link">&para;</a></h3>
-<p>Use the example in <code>examples/java/ShooterPredictionExample.java</code> as a starting point.</p>
+<p><code>scripts/run-tests.sh</code> is the recommended path from repository root and expects Java 21.</p>
+<h3 id="run-examples">Run Examples<a class="headerlink" href="#run-examples" title="Permanent link">&para;</a></h3>
+<ul>
+<li>C++: <code>examples/cpp/minimal_world.cpp</code></li>
+<li>Python: <code>examples/python/simple_world_demo.py</code></li>
+<li>Java: <code>examples/java/ShooterPredictionExample.java</code></li>
+</ul>
 <h2 id="documentation-map">Documentation Map<a class="headerlink" href="#documentation-map" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="api_usage/">API Usage</a>: integrating RenSim into applications</li>

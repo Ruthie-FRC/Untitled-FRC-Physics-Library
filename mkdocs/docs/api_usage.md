@@ -20,13 +20,12 @@ Typical flow:
 ## Python
 
 ```bash
-pip install frcsim-physics
 python examples/python/simple_world_demo.py
 ```
 
 Typical flow:
 
-- Import bindings and create a simulation world.
+- Import bindings/runtime modules and create a simulation world.
 - Configure bodies and environment.
 - Step simulation in a loop and read back state.
 

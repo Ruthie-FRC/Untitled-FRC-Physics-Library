@@ -1080,14 +1080,19 @@
 <p>RenSim is organized as a modular monorepo with clear separation between core physics, bindings, runtime applications, and documentation.</p>
 <h2 id="high-level-structure">High-Level Structure<a class="headerlink" href="#high-level-structure" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>core/physics-core/</code>: C++ physics engine implementation.</li>
-<li><code>core/bindings-python/</code>: Python bindings.</li>
-<li><code>core/bindings-java/</code>: Java bindings.</li>
-<li><code>core/gamepiece-models/</code>: Gamepiece models for simulation.</li>
+<li><code>core/driver/</code>: Primary C++ engine headers and implementation.</li>
+<li><code>core/physics-core/</code>: Shared C++ physics modules.</li>
+<li><code>core/python/</code>: Python-side bindings and integration code.</li>
+<li><code>core/java/</code>: Java-side bindings and API surface.</li>
+<li><code>core/bindings-java/</code>: Java/JNI binding support.</li>
+<li><code>core/gamepiece-models/</code>: Gamepiece and simulation object models.</li>
+<li><code>physics-core/</code>: Additional top-level physics include/source tree.</li>
 <li><code>apps/sim-runtime/</code>: Runtime integration for robot simulation workflows.</li>
 <li><code>apps/viewer-plugin/</code>: Visualization and timeline tooling.</li>
+<li><code>cad-import/</code>: CAD/geometry import utilities (URDF/STL processing).</li>
 <li><code>examples/</code>: Language-specific examples.</li>
-<li><code>vendordep/tests/</code>: Unit and integration tests.</li>
+<li><code>scripts/</code>: Project scripts including test orchestration.</li>
+<li><code>vendordep/tests/</code>: Native unit and integration test sources.</li>
 </ul>
 <h2 id="physics-core-design">Physics Core Design<a class="headerlink" href="#physics-core-design" title="Permanent link">&para;</a></h2>
 <p>Key components include:</p>
@@ -1101,8 +1106,8 @@
 <h2 id="build-and-test">Build and Test<a class="headerlink" href="#build-and-test" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Gradle drives native, JNI, and Java builds.</li>
-<li>Gradle test tasks execute native and Java test binaries.</li>
-<li>Helper scripts streamline configure/build/test workflows.</li>
+<li><code>vendordep/gradlew test</code> executes Java tests and native verification binaries.</li>
+<li><code>scripts/run-tests.sh</code> enforces Java 21 and runs the vendordep test workflow from repo root.</li>
 </ul>
 <h2 id="documentation-strategy">Documentation Strategy<a class="headerlink" href="#documentation-strategy" title="Permanent link">&para;</a></h2>
 <p>Documentation is authored in Markdown under <code>mkdocs/docs/</code> and published with MkDocs Material.</p>
