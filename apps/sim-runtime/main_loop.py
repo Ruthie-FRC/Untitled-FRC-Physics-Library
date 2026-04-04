@@ -1,17 +1,26 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 from typing import List, Tuple
 
 
 ROOT = Path(__file__).resolve().parents[2]
-from graphics_bridge import BodyFrame, SimFrame, Timeline, render_timeline_matplotlib
+from graphics_bridge import (
+	BodyFrame,
+	SimFrame,
+	Timeline,
+	render_timeline_matplotlib,
+	write_control_bindings_html,
+	write_sim_dashboard_html,
+)
 from math_primitives import add, dot, mul, norm, normalized, sub
 
 from robot_loader import BodySpec, SimulationScenario, load_default_scenario
 from runtime_defaults import DEFAULT_FIXED_DT_S, DEFAULT_SUB_TICKS_PER_ROBOT_PERIOD, ROBOT_PERIOD_S
 from sensor_pipeline import build_sensor_packet
+from sim_options import GraphicsQuality, SimulationFeatures, SimulationRunOptions
 from telemetry_schema import SensorPacket
 from wpilib_bridge import export_packets_jsonl, flatten_for_networktables, summarize_packets
 
@@ -116,15 +125,14 @@ def _step_bodies(
 def run_simulation(
 	scenario: SimulationScenario,
 	*,
-	dt_s: float = DEFAULT_FIXED_DT_S,
-	duration_s: float = 8.0,
+	run_options: SimulationRunOptions | None = None,
 ) -> Tuple[Timeline, List[SensorPacket]]:
 	"""Runs the rigid-body simulation and returns timeline plus sensor packets."""
 
-	if not (dt_s > 0.0):
-		raise ValueError("dt_s must be > 0")
-	if not (duration_s > 0.0):
-		raise ValueError("duration_s must be > 0")
+	options = run_options or SimulationRunOptions()
+	options.validate()
+	dt_s = options.dt_s
+	duration_s = options.duration_s
 
 	bodies = _spawn_bodies(scenario.bodies)
 	timeline = Timeline()
@@ -165,29 +173,92 @@ def run_simulation(
 	return timeline, packets
 
 
+def _serialize_timeline(timeline: Timeline) -> list[dict[str, object]]:
+	out: list[dict[str, object]] = []
+	for frame in timeline.frames():
+		out.append(
+			{
+				"tick": frame.tick,
+				"time_s": frame.time_s,
+				"contacts": list(frame.contacts),
+				"bodies": [
+					{
+						"name": body.name,
+						"x_m": body.position_m[0],
+						"y_m": body.position_m[1],
+						"vx_mps": body.velocity_mps[0],
+						"vy_mps": body.velocity_mps[1],
+						"radius_m": body.radius_m,
+						"color": body.color,
+					}
+					for body in frame.bodies
+				],
+			}
+		)
+	return out
+
+
 def main() -> None:
 	scenario = load_default_scenario()
 	duration_s = ROBOT_PERIOD_S * DEFAULT_SUB_TICKS_PER_ROBOT_PERIOD * 80
-	timeline, packets = run_simulation(scenario, duration_s=duration_s)
+	default_features = SimulationFeatures(
+		show_grid=True,
+		show_paths=True,
+		show_velocity_vectors=True,
+		show_labels=True,
+		show_legend=True,
+		show_contact_text=True,
+		show_overlay_hud=True,
+	)
+	run_options = SimulationRunOptions(
+		dt_s=DEFAULT_FIXED_DT_S,
+		duration_s=duration_s,
+		quality=GraphicsQuality.MEDIUM,
+		features=default_features,
+	)
+	timeline, packets = run_simulation(scenario, run_options=run_options)
 
 	out_dir = ROOT / "build" / "sim-visual"
 	out_dir.mkdir(parents=True, exist_ok=True)
 
 	image_path = out_dir / "arena_frame.png"
 	packets_path = out_dir / "sensor_packets.jsonl"
+	timeline_path = out_dir / "timeline_frames.json"
+	dashboard_path = out_dir / "dashboard.html"
+	bindings_path = out_dir / "control_bindings.html"
 
 	render_timeline_matplotlib(
 		timeline,
 		field_width_m=scenario.field_width_m,
 		field_height_m=scenario.field_height_m,
 		output_png=str(image_path),
+		quality=run_options.quality.value,
+		show_grid=run_options.features.show_grid,
+		show_paths=run_options.features.show_paths,
+		show_velocity_vectors=run_options.features.show_velocity_vectors,
+		show_labels=run_options.features.show_labels,
+		show_legend=run_options.features.show_legend,
+		show_contact_text=run_options.features.show_contact_text,
+		show_overlay_hud=run_options.features.show_overlay_hud,
 	)
 	export_packets_jsonl(packets, str(packets_path))
+	timeline_path.write_text(json.dumps(_serialize_timeline(timeline), separators=(",", ":")), encoding="utf-8")
+	write_control_bindings_html(output_html=bindings_path)
+	write_sim_dashboard_html(
+		timeline=timeline,
+		field_width_m=scenario.field_width_m,
+		field_height_m=scenario.field_height_m,
+		output_html=dashboard_path,
+		bindings_html_name=bindings_path.name,
+	)
 
 	summary = summarize_packets(packets)
 	nt_preview = flatten_for_networktables(packets[-1])
 	print(f"Scenario: {scenario.name}")
 	print(f"Rendered frame: {image_path}")
+	print(f"Interactive dashboard: {dashboard_path}")
+	print(f"Control bindings page: {bindings_path}")
+	print(f"Timeline JSON: {timeline_path}")
 	print(f"Sensor packets: {packets_path}")
 	print(f"Summary: {summary}")
 	print(f"NT preview keys: {len(nt_preview)}")

@@ -66,6 +66,14 @@ mkdocs serve --config-file mkdocs/mkdocs.yml
 - `apps/sim-runtime/`: Python runtime integration app
 - `apps/viewer-plugin/`: visualization and rendering plugin
 
+Running `apps/sim-runtime/main_loop.py` now emits:
+
+- `build/sim-visual/arena_frame.png`
+- `build/sim-visual/sensor_packets.jsonl`
+- `build/sim-visual/timeline_frames.json`
+- `build/sim-visual/dashboard.html` (settings sidebar with quality/toggles)
+- `build/sim-visual/control_bindings.html` (driver/co-driver binding reassignment page)
+
 ### Integration Contracts
 
 - Runtime telemetry contract: `apps/sim-runtime/telemetry_schema.py`

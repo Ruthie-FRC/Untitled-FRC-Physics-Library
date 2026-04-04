@@ -11,6 +11,7 @@ if str(VIEWER_PLUGIN_DIR) not in sys.path:
 
 from renderer import render_timeline_matplotlib  # noqa: E402
 from timeline import BodyFrame, SimFrame, Timeline  # noqa: E402
+from dashboard import write_control_bindings_html, write_sim_dashboard_html  # noqa: E402
 
 
 __all__ = [
@@ -18,4 +19,6 @@ __all__ = [
 	"SimFrame",
 	"Timeline",
 	"render_timeline_matplotlib",
+	"write_sim_dashboard_html",
+	"write_control_bindings_html",
 ]

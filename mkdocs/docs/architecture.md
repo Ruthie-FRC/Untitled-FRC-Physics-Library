@@ -29,6 +29,12 @@ RenSim is organized as a modular monorepo with clear separation between core phy
 	- `sim/tick`, `sim/time_s`, `sim/contact_count`
 	- `sim/body/{i}/x_m`, `sim/body/{i}/y_m`, `sim/body/{i}/vx_mps`, `sim/body/{i}/vy_mps`, `sim/body/{i}/speed_mps`
 
+### Visualization Controls
+
+- Runtime options expose graphics quality profiles (`low`, `medium`, `high`) and per-feature render toggles.
+- Generated dashboard page includes a sidebar for quality and feature toggles during playback.
+- Generated control-bindings page allows driver/co-driver button mapping reassignment via browser local storage.
+
 ## Physics Core Design
 
 Key components include:
