@@ -437,7 +437,9 @@ public abstract class SimulatedArena {
   private double totalScoreBlue() {
     int sum = 0;
     for (Goal goal : goals) {
-      sum += goal.scoredCount();
+      if (goal.ownerAlliance() == Alliance.BLUE) {
+        sum += goal.scoredCount();
+      }
     }
     return sum;
   }
@@ -445,7 +447,9 @@ public abstract class SimulatedArena {
   private double totalScoreRed() {
     int sum = 0;
     for (Goal goal : goals) {
-      sum += goal.scoredCount();
+      if (goal.ownerAlliance() == Alliance.RED) {
+        sum += goal.scoredCount();
+      }
     }
     return sum;
   }

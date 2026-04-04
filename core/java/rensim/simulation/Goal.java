@@ -12,6 +12,7 @@ import rensim.Vec3;
 public class Goal implements SimulatedArena.Simulatable {
   private final SimulatedArena arena;
   private final String acceptedType;
+  private final Alliance ownerAlliance;
   private final Vec3 min;
   private final Vec3 max;
   private final Predicate<GamePieceOnFieldSimulation> velocityValidator;
@@ -22,8 +23,17 @@ public class Goal implements SimulatedArena.Simulatable {
    */
   public Goal(SimulatedArena arena, String acceptedType, Vec3 min, Vec3 max,
       Predicate<GamePieceOnFieldSimulation> velocityValidator) {
+    this(arena, acceptedType, Alliance.NEUTRAL, min, max, velocityValidator);
+  }
+
+  /**
+   * Creates a goal with explicit alliance ownership.
+   */
+  public Goal(SimulatedArena arena, String acceptedType, Alliance ownerAlliance, Vec3 min, Vec3 max,
+      Predicate<GamePieceOnFieldSimulation> velocityValidator) {
     this.arena = Objects.requireNonNull(arena);
     this.acceptedType = Objects.requireNonNull(acceptedType);
+    this.ownerAlliance = Objects.requireNonNull(ownerAlliance);
     this.min = Objects.requireNonNull(min);
     this.max = Objects.requireNonNull(max);
     this.velocityValidator = Objects.requireNonNull(velocityValidator);
@@ -33,7 +43,14 @@ public class Goal implements SimulatedArena.Simulatable {
    * Convenience goal accepting all entry velocities.
    */
   public Goal(SimulatedArena arena, String acceptedType, Vec3 min, Vec3 max) {
-    this(arena, acceptedType, min, max, piece -> true);
+    this(arena, acceptedType, Alliance.NEUTRAL, min, max, piece -> true);
+  }
+
+  /**
+   * Convenience goal with explicit alliance and accepting all entry velocities.
+   */
+  public Goal(SimulatedArena arena, String acceptedType, Alliance ownerAlliance, Vec3 min, Vec3 max) {
+    this(arena, acceptedType, ownerAlliance, min, max, piece -> true);
   }
 
   @Override
@@ -64,6 +81,13 @@ public class Goal implements SimulatedArena.Simulatable {
    */
   public int scoredCount() {
     return scoredCount;
+  }
+
+  /**
+   * Returns owning alliance for this goal.
+   */
+  public Alliance ownerAlliance() {
+    return ownerAlliance;
   }
 
   private boolean contains(Vec3 p) {

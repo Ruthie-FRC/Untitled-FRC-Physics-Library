@@ -6,6 +6,7 @@ import rensim.Vec3;
 import rensim.simulation.GamePieceOnFieldSimulation;
 import rensim.simulation.GamePieceProjectile;
 import rensim.simulation.Goal;
+import rensim.simulation.Alliance;
 import rensim.simulation.Pose2;
 import rensim.simulation.SimulatedArena;
 import rensim.simulation.SimulationOptions;
@@ -38,8 +39,8 @@ public final class Arena2025Reefscape extends SimulatedArena {
 
   public Arena2025Reefscape(SimulationOptions options) {
     super(options, new ReefscapeFieldObstacleMap());
-    blueReef = new Goal(this, CORAL, new Vec3(3.3, 3.0, 0.0), new Vec3(5.7, 5.0, 2.5));
-    redReef = new Goal(this, CORAL, new Vec3(10.9, 3.0, 0.0), new Vec3(13.2, 5.0, 2.5));
+    blueReef = new Goal(this, CORAL, Alliance.BLUE, new Vec3(3.3, 3.0, 0.0), new Vec3(5.7, 5.0, 2.5));
+    redReef = new Goal(this, CORAL, Alliance.RED, new Vec3(10.9, 3.0, 0.0), new Vec3(13.2, 5.0, 2.5));
     addGoal(blueReef);
     addGoal(redReef);
   }

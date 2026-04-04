@@ -5,6 +5,7 @@ import rensim.Vec3;
 import rensim.simulation.GamePieceOnFieldSimulation;
 import rensim.simulation.GamePieceProjectile;
 import rensim.simulation.Goal;
+import rensim.simulation.Alliance;
 import rensim.simulation.Pose2;
 import rensim.simulation.SimulatedArena;
 import rensim.simulation.SimulationOptions;
@@ -34,12 +35,12 @@ public final class Arena2024Crescendo extends SimulatedArena {
 
   public Arena2024Crescendo(SimulationOptions options) {
     super(options, new CrescendoFieldObstaclesMap());
-    blueSpeaker = new Goal(this, NOTE, new Vec3(0.0, 4.7, 0.0), new Vec3(1.0, 6.2, 3.0));
-    redSpeaker = new Goal(this, NOTE,
+    blueSpeaker = new Goal(this, NOTE, Alliance.BLUE, new Vec3(0.0, 4.7, 0.0), new Vec3(1.0, 6.2, 3.0));
+    redSpeaker = new Goal(this, NOTE, Alliance.RED,
         new Vec3(options.boundaries().widthMeters() - 1.0, 4.7, 0.0),
         new Vec3(options.boundaries().widthMeters(), 6.2, 3.0));
-    blueAmp = new Goal(this, NOTE, new Vec3(1.6, 7.0, 0.0), new Vec3(2.5, 8.02, 2.0));
-    redAmp = new Goal(this, NOTE,
+    blueAmp = new Goal(this, NOTE, Alliance.BLUE, new Vec3(1.6, 7.0, 0.0), new Vec3(2.5, 8.02, 2.0));
+    redAmp = new Goal(this, NOTE, Alliance.RED,
         new Vec3(options.boundaries().widthMeters() - 2.5, 7.0, 0.0),
         new Vec3(options.boundaries().widthMeters() - 1.6, 8.02, 2.0));
     addGoal(blueSpeaker);

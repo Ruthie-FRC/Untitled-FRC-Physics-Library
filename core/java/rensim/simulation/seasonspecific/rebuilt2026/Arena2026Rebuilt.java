@@ -6,6 +6,7 @@ import rensim.Vec3;
 import rensim.simulation.GamePieceOnFieldSimulation;
 import rensim.simulation.GamePieceProjectile;
 import rensim.simulation.Goal;
+import rensim.simulation.Alliance;
 import rensim.simulation.Pose2;
 import rensim.simulation.SimulatedArena;
 import rensim.simulation.SimulationOptions;
@@ -39,10 +40,10 @@ public final class Arena2026Rebuilt extends SimulatedArena {
   public Arena2026Rebuilt(SimulationOptions options, boolean addRampCollider) {
     super(options, new RebuiltFieldObstacleMap(addRampCollider));
     double w = options.boundaries().widthMeters();
-    blueHub = new Goal(this, PIECE, new Vec3(0.5, 3.2, 0.0), new Vec3(1.8, 4.8, 2.8));
-    redHub = new Goal(this, PIECE, new Vec3(w - 1.8, 3.2, 0.0), new Vec3(w - 0.5, 4.8, 2.8));
-    blueOutpost = new Goal(this, PIECE, new Vec3(3.4, 0.4, 0.0), new Vec3(4.6, 1.6, 2.0));
-    redOutpost = new Goal(this, PIECE, new Vec3(w - 4.6, 0.4, 0.0), new Vec3(w - 3.4, 1.6, 2.0));
+    blueHub = new Goal(this, PIECE, Alliance.BLUE, new Vec3(0.5, 3.2, 0.0), new Vec3(1.8, 4.8, 2.8));
+    redHub = new Goal(this, PIECE, Alliance.RED, new Vec3(w - 1.8, 3.2, 0.0), new Vec3(w - 0.5, 4.8, 2.8));
+    blueOutpost = new Goal(this, PIECE, Alliance.BLUE, new Vec3(3.4, 0.4, 0.0), new Vec3(4.6, 1.6, 2.0));
+    redOutpost = new Goal(this, PIECE, Alliance.RED, new Vec3(w - 4.6, 0.4, 0.0), new Vec3(w - 3.4, 1.6, 2.0));
     addGoal(blueHub);
     addGoal(redHub);
     addGoal(blueOutpost);

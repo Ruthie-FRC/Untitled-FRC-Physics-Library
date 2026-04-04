@@ -1,6 +1,7 @@
 package rensim.utils;
 
 import rensim.simulation.Pose2;
+import rensim.simulation.Alliance;
 import rensim.Vec3;
 
 /**
@@ -20,10 +21,34 @@ public final class FieldMirroringUtils {
   }
 
   /**
+   * Mirrors pose only for red alliance, leaves blue/neutral unchanged.
+   */
+  public static Pose2 forAlliance(Pose2 pose, Alliance alliance) {
+    if (alliance == Alliance.RED) {
+      return flip(pose);
+    }
+    return pose;
+  }
+
+  /**
    * Mirrors a 3D translation (x mirrored, y/z retained).
    */
   public static Vec3 flip(Vec3 translation) {
     return new Vec3(FIELD_WIDTH_METERS - translation.x(), translation.y(), translation.z());
+  }
+
+  /**
+   * Mirrors translation only for red alliance, leaves blue/neutral unchanged.
+   */
+  public static Vec3 forAlliance(Vec3 translation, Alliance alliance) {
+    if (alliance == Alliance.RED) {
+      return flip(translation);
+    }
+    return translation;
+  }
+
+  public static double flipX(double xMeters) {
+    return FIELD_WIDTH_METERS - xMeters;
   }
 
   private static double normalizeAngle(double angle) {
