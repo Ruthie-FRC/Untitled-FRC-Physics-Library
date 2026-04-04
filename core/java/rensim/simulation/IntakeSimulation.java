@@ -12,8 +12,20 @@ import rensim.Vec3;
  * Simple intake simulator that collects nearby grounded game pieces.
  */
 public final class IntakeSimulation {
+  /** Intake mounting side relative to robot heading. */
+  public enum IntakeSide {
+    FRONT,
+    BACK,
+    LEFT,
+    RIGHT
+  }
+
   private final Predicate<GamePieceOnFieldSimulation> filter;
   private final Queue<GamePieceOnFieldSimulation> obtained = new ArrayDeque<>();
+  private boolean active = true;
+  private double intakeWidthMeters = 0.8;
+  private double intakeReachMeters = 0.5;
+  private IntakeSide intakeSide = IntakeSide.FRONT;
 
   /**
    * Creates an intake simulation with custom filtering logic.
@@ -30,12 +42,58 @@ public final class IntakeSimulation {
   }
 
   /**
+   * Factory for in-the-frame intake style.
+   */
+  public static IntakeSimulation InTheFrameIntake(Predicate<GamePieceOnFieldSimulation> filter,
+      IntakeSide side, double widthMeters, double reachMeters) {
+    IntakeSimulation intake = new IntakeSimulation(filter);
+    intake.intakeSide = Objects.requireNonNull(side);
+    intake.intakeWidthMeters = Math.max(widthMeters, 0.01);
+    intake.intakeReachMeters = Math.max(reachMeters, 0.01);
+    return intake;
+  }
+
+  /**
+   * Factory for over-the-bumper intake style.
+   */
+  public static IntakeSimulation OverTheBumperIntake(Predicate<GamePieceOnFieldSimulation> filter,
+      IntakeSide side, double widthMeters, double reachMeters) {
+    IntakeSimulation intake = InTheFrameIntake(filter, side, widthMeters, reachMeters);
+    intake.intakeReachMeters = Math.max(reachMeters * 1.2, 0.01);
+    return intake;
+  }
+
+  /**
+   * Activates the intake collector.
+   */
+  public void startIntake() {
+    active = true;
+  }
+
+  /**
+   * Deactivates the intake collector.
+   */
+  public void stopIntake() {
+    active = false;
+  }
+
+  /**
+   * Returns current intake activation state.
+   */
+  public boolean isActive() {
+    return active;
+  }
+
+  /**
    * Scans and removes pieces within intake radius around robot pose.
    */
   public List<GamePieceOnFieldSimulation> removeObtainedGamePieces(SimulatedArena arena, Pose2 intakePose,
       double intakeRadiusMeters) {
     Objects.requireNonNull(arena);
     Objects.requireNonNull(intakePose);
+    if (!active) {
+      return List.of();
+    }
     if (!(intakeRadiusMeters > 0.0)) {
       throw new IllegalArgumentException("intakeRadiusMeters must be > 0");
     }
@@ -46,8 +104,9 @@ public final class IntakeSimulation {
       if (!filter.test(piece)) {
         continue;
       }
+      double effectiveRadius = Math.max(intakeRadiusMeters, 0.5 * (intakeWidthMeters + intakeReachMeters));
       double distance = piece.pose().positionMeters().subtract(intakeCenter).norm();
-      if (distance <= intakeRadiusMeters) {
+      if (distance <= effectiveRadius) {
         arena.removePiece(piece);
         obtained.offer(piece);
         removed.add(piece);

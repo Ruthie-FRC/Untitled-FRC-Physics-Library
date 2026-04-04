@@ -15,6 +15,7 @@ import rensim.simulation.drivesims.SwerveDriveSimulation;
 import rensim.simulation.gamepiece.GamePieceData;
 import rensim.simulation.projectile.ProjectileLaunchPlan;
 import rensim.simulation.projectile.ProjectileTargetingSolver;
+import rensim.simulation.seasonspecific.crescendo2024.Arena2024Crescendo;
 
 /**
  * Maple-style simulation world orchestrator using RenSim physics primitives.
@@ -22,6 +23,21 @@ import rensim.simulation.projectile.ProjectileTargetingSolver;
 public abstract class SimulatedArena {
   private static int simulationSubTicksInOnePeriod = 5;
   private static double robotPeriodSeconds = 0.02;
+  private static SimulatedArena instance = new Arena2024Crescendo();
+
+  /**
+   * Returns global simulation arena instance.
+   */
+  public static synchronized SimulatedArena getInstance() {
+    return instance;
+  }
+
+  /**
+   * Replaces global simulation arena instance.
+   */
+  public static synchronized void overrideInstance(SimulatedArena newInstance) {
+    instance = Objects.requireNonNull(newInstance);
+  }
 
   /**
    * Overrides global simulation timing settings.
@@ -242,6 +258,13 @@ public abstract class SimulatedArena {
   }
 
   /**
+   * Maple-style alias for projectile registration.
+   */
+  public synchronized void addGamePieceProjectile(GamePieceProjectile projectile) {
+    addProjectile(projectile);
+  }
+
+  /**
    * Launches a projectile toward a target using fixed launch speed.
    */
   public synchronized GamePieceProjectile launchPieceAtTarget(GamePieceData data, Pose2 launchPose,
@@ -294,6 +317,49 @@ public abstract class SimulatedArena {
    */
   public synchronized Set<GamePieceProjectile> gamePieceLaunched() {
     return Set.copyOf(gamePieceProjectiles);
+  }
+
+  /**
+   * Returns all pieces (grounded + projectiles) filtered by type.
+   */
+  public synchronized List<GamePiece> getGamePiecesByType(String type) {
+    Objects.requireNonNull(type);
+    List<GamePiece> pieces = new ArrayList<>();
+    for (GamePieceOnFieldSimulation grounded : gamePiecesOnField) {
+      if (grounded.type().equals(type)) {
+        pieces.add(grounded);
+      }
+    }
+    for (GamePieceProjectile projectile : gamePieceProjectiles) {
+      if (projectile.type().equals(type)) {
+        pieces.add(projectile);
+      }
+    }
+    return List.copyOf(pieces);
+  }
+
+  /**
+   * Returns all piece poses by type as array for dashboard APIs.
+   */
+  public synchronized Pose3[] getGamePiecesArrayByType(String type) {
+    List<Pose3> poses = getGamePiecesPosesByType(type);
+    return poses.toArray(Pose3[]::new);
+  }
+
+  /**
+   * Clears all active game pieces from field and projectile sets.
+   */
+  public synchronized void clearGamePieces() {
+    gamePiecesOnField.clear();
+    gamePieceProjectiles.clear();
+  }
+
+  /**
+   * Resets field objects to autonomous starting state.
+   */
+  public synchronized void resetFieldForAuto() {
+    clearGamePieces();
+    placeGamePiecesOnField();
   }
 
   /**
