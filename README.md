@@ -66,6 +66,12 @@ mkdocs serve --config-file mkdocs/mkdocs.yml
 - `apps/sim-runtime/`: Python runtime integration app
 - `apps/viewer-plugin/`: visualization and rendering plugin
 
+### Integration Contracts
+
+- Runtime telemetry contract: `apps/sim-runtime/telemetry_schema.py`
+- Java telemetry IO/parsing: `core/java/rensim/simulation/telemetry/`
+- Shared NT-style flattened key layout: `sim/tick`, `sim/time_s`, `sim/contact_count`, `sim/body/{i}/*`
+
 ### Tooling and Integration
 
 - `cad-import/`: CAD and geometry import utilities

@@ -18,6 +18,15 @@ RenSim is organized as a modular monorepo with clear separation between core phy
 - `scripts/`: Project scripts including test orchestration.
 - `vendordep/tests/`: Native unit and integration test sources.
 
+## Simulation Integration Pipeline
+
+- Python runtime simulation produces typed telemetry packets in `apps/sim-runtime/telemetry_schema.py`.
+- Graphics rendering consumes timeline frames via `apps/sim-runtime/graphics_bridge.py` and `apps/viewer-plugin/`.
+- Java consumers parse the same JSONL telemetry format through `core/java/rensim/simulation/telemetry/SensorPacketIO.java`.
+- Flattened NetworkTables-style key layout is shared across Python and Java:
+	- `sim/tick`, `sim/time_s`, `sim/contact_count`
+	- `sim/body/{i}/x_m`, `sim/body/{i}/y_m`, `sim/body/{i}/vx_mps`, `sim/body/{i}/vy_mps`, `sim/body/{i}/speed_mps`
+
 ## Physics Core Design
 
 Key components include:

@@ -2,20 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-import sys
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 
 ROOT = Path(__file__).resolve().parents[2]
-VIEWER_PLUGIN_DIR = ROOT / "apps" / "viewer-plugin"
-if str(VIEWER_PLUGIN_DIR) not in sys.path:
-	sys.path.insert(0, str(VIEWER_PLUGIN_DIR))
-
-from renderer import render_timeline_matplotlib  # noqa: E402
-from timeline import BodyFrame, SimFrame, Timeline  # noqa: E402
+from graphics_bridge import BodyFrame, SimFrame, Timeline, render_timeline_matplotlib
 
 from robot_loader import BodySpec, SimulationScenario, load_default_scenario
 from sensor_pipeline import build_sensor_packet
+from telemetry_schema import SensorPacket
 from wpilib_bridge import export_packets_jsonl, flatten_for_networktables, summarize_packets
 
 
@@ -148,7 +143,7 @@ def run_simulation(
 	*,
 	dt_s: float = 0.02,
 	duration_s: float = 8.0,
-) -> Tuple[Timeline, List[Dict[str, object]]]:
+) -> Tuple[Timeline, List[SensorPacket]]:
 	"""Runs the rigid-body simulation and returns timeline plus sensor packets."""
 
 	if not (dt_s > 0.0):
@@ -158,7 +153,7 @@ def run_simulation(
 
 	bodies = _spawn_bodies(scenario.bodies)
 	timeline = Timeline()
-	packets: List[Dict[str, object]] = []
+	packets: List[SensorPacket] = []
 
 	total_steps = int(duration_s / dt_s)
 	time_s = 0.0
