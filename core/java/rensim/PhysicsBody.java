@@ -22,6 +22,15 @@ public final class PhysicsBody {
   }
 
   /**
+   * Gets the body mass in kilograms.
+   *
+   * @return body mass in kilograms
+   */
+  public double massKg() {
+    return world.getBodyMassKg(bodyIndex);
+  }
+
+  /**
    * Sets the body's world-space position in meters.
    *
    * @param positionMeters the new position in meters
@@ -49,6 +58,23 @@ public final class PhysicsBody {
   }
 
   /**
+   * Assigns a sphere collider used by the Java-side starter collision solver.
+   *
+   * @param radiusMeters collider radius in meters
+   * @param restitution coefficient of restitution in [0, 1]
+   */
+  public void setSphereCollider(double radiusMeters, double restitution) {
+    world.setBodySphereCollider(bodyIndex, new SphereCollider(radiusMeters, restitution));
+  }
+
+  /**
+   * Removes this body's sphere collider from the Java-side collision pass.
+   */
+  public void clearSphereCollider() {
+    world.clearBodySphereCollider(bodyIndex);
+  }
+
+  /**
    * Gets the current world-space position in meters.
    *
    * @return the body position
@@ -64,5 +90,14 @@ public final class PhysicsBody {
    */
   public Vec3 linearVelocity() {
     return world.getBodyLinearVelocity(bodyIndex);
+  }
+
+  /**
+   * Captures an immutable state snapshot for rendering/telemetry.
+   *
+   * @return body state snapshot
+   */
+  public BodyStateView state() {
+    return world.getBodyState(bodyIndex);
   }
 }
