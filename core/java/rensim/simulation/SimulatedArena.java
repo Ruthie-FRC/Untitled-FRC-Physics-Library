@@ -475,6 +475,20 @@ public abstract class SimulatedArena {
   }
 
   /**
+   * Maple-style alias for pose query by type.
+   */
+  public synchronized List<Pose3> getGamePiecePosesByType(String type) {
+    return getGamePiecesPosesByType(type);
+  }
+
+  /**
+   * Returns active projectile pieces.
+   */
+  public synchronized Set<GamePieceProjectile> getGamePieceProjectiles() {
+    return gamePieceLaunched();
+  }
+
+  /**
    * Provides access to the underlying world for advanced integrations.
    */
   public PhysicsWorld world() {

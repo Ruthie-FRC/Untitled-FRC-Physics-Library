@@ -46,6 +46,14 @@ public final class IntakeSimulation {
    */
   public static IntakeSimulation InTheFrameIntake(Predicate<GamePieceOnFieldSimulation> filter,
       IntakeSide side, double widthMeters, double reachMeters) {
+    return inTheFrameIntake(filter, side, widthMeters, reachMeters);
+  }
+
+  /**
+   * Repo-style lowerCamel alias for in-frame intake factory.
+   */
+  public static IntakeSimulation inTheFrameIntake(Predicate<GamePieceOnFieldSimulation> filter,
+      IntakeSide side, double widthMeters, double reachMeters) {
     IntakeSimulation intake = new IntakeSimulation(filter);
     intake.intakeSide = Objects.requireNonNull(side);
     intake.intakeWidthMeters = Math.max(widthMeters, 0.01);
@@ -58,7 +66,15 @@ public final class IntakeSimulation {
    */
   public static IntakeSimulation OverTheBumperIntake(Predicate<GamePieceOnFieldSimulation> filter,
       IntakeSide side, double widthMeters, double reachMeters) {
-    IntakeSimulation intake = InTheFrameIntake(filter, side, widthMeters, reachMeters);
+    return overTheBumperIntake(filter, side, widthMeters, reachMeters);
+  }
+
+  /**
+   * Repo-style lowerCamel alias for over-the-bumper intake factory.
+   */
+  public static IntakeSimulation overTheBumperIntake(Predicate<GamePieceOnFieldSimulation> filter,
+      IntakeSide side, double widthMeters, double reachMeters) {
+    IntakeSimulation intake = inTheFrameIntake(filter, side, widthMeters, reachMeters);
     intake.intakeReachMeters = Math.max(reachMeters * 1.2, 0.01);
     return intake;
   }
@@ -99,7 +115,7 @@ public final class IntakeSimulation {
     }
 
     List<GamePieceOnFieldSimulation> removed = new ArrayList<>();
-    Vec3 intakeCenter = new Vec3(intakePose.xMeters(), intakePose.yMeters(), 0.0);
+    Vec3 intakeCenter = intakeCenter(intakePose);
     for (GamePieceOnFieldSimulation piece : List.copyOf(arena.gamePiecesOnField())) {
       if (!filter.test(piece)) {
         continue;
@@ -124,5 +140,41 @@ public final class IntakeSimulation {
       drained.add(obtained.poll());
     }
     return drained;
+  }
+
+  private Vec3 intakeCenter(Pose2 intakePose) {
+    double yaw = intakePose.yawRad();
+    double frontX = Math.cos(yaw);
+    double frontY = Math.sin(yaw);
+    double leftX = -frontY;
+    double leftY = frontX;
+
+    double offsetX;
+    double offsetY;
+    double reachOffset = 0.5 * intakeReachMeters;
+    double sideOffset = 0.5 * intakeWidthMeters;
+    switch (intakeSide) {
+      case FRONT -> {
+        offsetX = frontX * reachOffset;
+        offsetY = frontY * reachOffset;
+      }
+      case BACK -> {
+        offsetX = -frontX * reachOffset;
+        offsetY = -frontY * reachOffset;
+      }
+      case LEFT -> {
+        offsetX = leftX * sideOffset;
+        offsetY = leftY * sideOffset;
+      }
+      case RIGHT -> {
+        offsetX = -leftX * sideOffset;
+        offsetY = -leftY * sideOffset;
+      }
+      default -> {
+        offsetX = 0.0;
+        offsetY = 0.0;
+      }
+    }
+    return new Vec3(intakePose.xMeters() + offsetX, intakePose.yMeters() + offsetY, 0.0);
   }
 }
