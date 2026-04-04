@@ -2,8 +2,10 @@ package rensim.simulation;
 
 import frcsim_physics.RigidBody;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import rensim.PhysicsBody;
@@ -15,6 +17,38 @@ import rensim.simulation.drivesims.SwerveDriveSimulation;
  * Maple-style simulation world orchestrator using RenSim physics primitives.
  */
 public abstract class SimulatedArena {
+  private static int simulationSubTicksInOnePeriod = 5;
+  private static double robotPeriodSeconds = 0.02;
+
+  /**
+   * Overrides global simulation timing settings.
+   */
+  public static synchronized void overrideSimulationTimings(double robotPeriodSeconds,
+      int simulationSubTicksInOnePeriod) {
+    if (!(robotPeriodSeconds > 0.0)) {
+      throw new IllegalArgumentException("robotPeriodSeconds must be > 0");
+    }
+    if (simulationSubTicksInOnePeriod < 1) {
+      throw new IllegalArgumentException("simulationSubTicksInOnePeriod must be >= 1");
+    }
+    SimulatedArena.robotPeriodSeconds = robotPeriodSeconds;
+    SimulatedArena.simulationSubTicksInOnePeriod = simulationSubTicksInOnePeriod;
+  }
+
+  /**
+   * Gets configured simulation sub-ticks in one robot period.
+   */
+  public static synchronized int getSimulationSubTicksInOnePeriod() {
+    return simulationSubTicksInOnePeriod;
+  }
+
+  /**
+   * Gets configured robot period in seconds.
+   */
+  public static synchronized double getRobotPeriodSeconds() {
+    return robotPeriodSeconds;
+  }
+
   /**
    * Custom simulation callback run each sub-tick.
    */
@@ -65,6 +99,8 @@ public abstract class SimulatedArena {
   protected final SimulationOptions options;
   protected final FieldMap fieldMap;
   protected final PhysicsWorld world;
+  protected final Map<String, Double> blueMatchBreakdown = new LinkedHashMap<>();
+  protected final Map<String, Double> redMatchBreakdown = new LinkedHashMap<>();
 
   protected final List<SwerveDriveSimulation> driveTrainSimulations = new ArrayList<>();
   protected final List<Simulatable> customSimulations = new ArrayList<>();
@@ -73,6 +109,8 @@ public abstract class SimulatedArena {
   protected final Set<GamePieceOnFieldSimulation> gamePiecesOnField = new HashSet<>();
   protected final Set<GamePieceProjectile> gamePieceProjectiles = new HashSet<>();
   private final List<RoundBody> roundBodies = new ArrayList<>();
+  private double matchClockSeconds = 135.0;
+  private boolean publishMatchBreakdown;
 
   /**
    * Creates a simulated arena with configurable options and field map.
@@ -92,6 +130,8 @@ public abstract class SimulatedArena {
     for (int subTick = 0; subTick < options.timing().subTicksPerRobotPeriod(); subTick++) {
       simulationSubTick(subTick);
     }
+
+    matchClockSeconds = Math.max(0.0, matchClockSeconds - getRobotPeriodSeconds());
   }
 
   /**
@@ -132,6 +172,9 @@ public abstract class SimulatedArena {
     for (Goal goal : goals) {
       goal.simulationSubTick(subTickNum);
     }
+
+    replaceValueInMatchBreakdown(true, "TotalScore", totalScoreBlue());
+    replaceValueInMatchBreakdown(false, "TotalScore", totalScoreRed());
   }
 
   /**
@@ -212,6 +255,58 @@ public abstract class SimulatedArena {
    */
   public synchronized List<Goal> goals() {
     return List.copyOf(goals);
+  }
+
+  /**
+   * Enables/disables match breakdown publishing.
+   */
+  public synchronized void setPublishMatchBreakdown(boolean enabled) {
+    publishMatchBreakdown = enabled;
+  }
+
+  /**
+   * Returns whether match breakdown publishing is enabled.
+   */
+  public synchronized boolean publishMatchBreakdownEnabled() {
+    return publishMatchBreakdown;
+  }
+
+  /**
+   * Updates match breakdown metric for one alliance.
+   */
+  protected synchronized void replaceValueInMatchBreakdown(boolean blueAlliance, String key,
+      double value) {
+    if (blueAlliance) {
+      blueMatchBreakdown.put(key, value);
+    } else {
+      redMatchBreakdown.put(key, value);
+    }
+  }
+
+  /**
+   * Returns a published breakdown snapshot for both alliances.
+   */
+  public synchronized Map<String, Map<String, Double>> publishBreakdown() {
+    Map<String, Map<String, Double>> out = new LinkedHashMap<>();
+    out.put("blue", new LinkedHashMap<>(blueMatchBreakdown));
+    out.put("red", new LinkedHashMap<>(redMatchBreakdown));
+    out.get("blue").put("MatchClock", matchClockSeconds);
+    out.get("red").put("MatchClock", matchClockSeconds);
+    return out;
+  }
+
+  /**
+   * Sets match clock in seconds.
+   */
+  public synchronized void setMatchClockSeconds(double matchClockSeconds) {
+    this.matchClockSeconds = Math.max(0.0, matchClockSeconds);
+  }
+
+  /**
+   * Gets current match clock in seconds.
+   */
+  public synchronized double matchClockSeconds() {
+    return matchClockSeconds;
   }
 
   /**
@@ -337,5 +432,21 @@ public abstract class SimulatedArena {
       return new Pose2(0.0, 0.0, 0.0);
     }
     return driveTrainSimulations.get(0).pose();
+  }
+
+  private double totalScoreBlue() {
+    int sum = 0;
+    for (Goal goal : goals) {
+      sum += goal.scoredCount();
+    }
+    return sum;
+  }
+
+  private double totalScoreRed() {
+    int sum = 0;
+    for (Goal goal : goals) {
+      sum += goal.scoredCount();
+    }
+    return sum;
   }
 }
