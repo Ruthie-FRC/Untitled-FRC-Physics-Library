@@ -81,6 +81,13 @@ public class GamePieceOnFieldSimulation implements GamePiece {
   }
 
   /**
+   * Returns immutable metadata used to construct this piece.
+   */
+  public GamePieceInfo info() {
+    return info;
+  }
+
+  /**
    * Gets 2D pose on field plane.
    */
   public Pose2 poseOnField() {

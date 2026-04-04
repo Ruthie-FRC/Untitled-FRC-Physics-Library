@@ -361,6 +361,13 @@ public abstract class SimulatedArena {
   }
 
   /**
+   * Returns the simulation options backing this arena.
+   */
+  public SimulationOptions simulationOptions() {
+    return options;
+  }
+
+  /**
    * Convenience helper for creating rigid body wrappers in arena context.
    */
   protected RigidBody createRigidBody(double massKg, Pose2 pose) {
