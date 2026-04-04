@@ -3,6 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Tuple
 
+from runtime_defaults import (
+	DEFAULT_RESTITUTION,
+	DEFAULT_TOPDOWN_GRAVITY_MPS2,
+	FIELD_HEIGHT_M,
+	FIELD_WIDTH_M,
+)
+
 
 Vec2 = Tuple[float, float]
 
@@ -36,10 +43,10 @@ def load_default_scenario() -> SimulationScenario:
 
 	return SimulationScenario(
 		name="maple_style_arena_demo",
-		field_width_m=16.54,
-		field_height_m=8.02,
-		gravity_mps2=(0.0, 0.0),
-		restitution=0.45,
+		field_width_m=FIELD_WIDTH_M,
+		field_height_m=FIELD_HEIGHT_M,
+		gravity_mps2=DEFAULT_TOPDOWN_GRAVITY_MPS2,
+		restitution=DEFAULT_RESTITUTION,
 		bodies=[
 			BodySpec(
 				name="robot",

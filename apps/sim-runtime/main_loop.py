@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 from graphics_bridge import BodyFrame, SimFrame, Timeline, render_timeline_matplotlib
 
 from robot_loader import BodySpec, SimulationScenario, load_default_scenario
+from runtime_defaults import DEFAULT_FIXED_DT_S, DEFAULT_SUB_TICKS_PER_ROBOT_PERIOD, ROBOT_PERIOD_S
 from sensor_pipeline import build_sensor_packet
 from telemetry_schema import SensorPacket
 from wpilib_bridge import export_packets_jsonl, flatten_for_networktables, summarize_packets
@@ -141,7 +142,7 @@ def _step_bodies(
 def run_simulation(
 	scenario: SimulationScenario,
 	*,
-	dt_s: float = 0.02,
+	dt_s: float = DEFAULT_FIXED_DT_S,
 	duration_s: float = 8.0,
 ) -> Tuple[Timeline, List[SensorPacket]]:
 	"""Runs the rigid-body simulation and returns timeline plus sensor packets."""
@@ -192,7 +193,8 @@ def run_simulation(
 
 def main() -> None:
 	scenario = load_default_scenario()
-	timeline, packets = run_simulation(scenario)
+	duration_s = ROBOT_PERIOD_S * DEFAULT_SUB_TICKS_PER_ROBOT_PERIOD * 80
+	timeline, packets = run_simulation(scenario, duration_s=duration_s)
 
 	out_dir = ROOT / "build" / "sim-visual"
 	out_dir.mkdir(parents=True, exist_ok=True)
