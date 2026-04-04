@@ -1,9 +1,13 @@
 package rensim.simulation.telemetry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -74,5 +78,23 @@ public class SensorPacketIOTest {
         "\"velocity_frame_tag\":\"w\"}]}";
 
     assertThrows(IllegalArgumentException.class, () -> SensorPacketIO.parseJsonLines(json));
+  }
+
+  @Test
+  void goldenFixtureParsesAndFlattens() throws IOException {
+    InputStream stream = getClass().getResourceAsStream("/telemetry/golden_packets.jsonl");
+    assertNotNull(stream, "golden telemetry fixture is missing from test resources");
+
+    String jsonl = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+    List<SensorPacket> packets = SensorPacketIO.parseJsonLines(jsonl);
+    assertEquals(2, packets.size());
+
+    Map<String, Double> flatFirst = SensorPacketIO.flattenForNetworkTables(packets.get(0));
+    Map<String, Double> flatLast = SensorPacketIO.flattenForNetworkTables(packets.get(1));
+
+    assertEquals(1.0, flatFirst.get("sim/tick"));
+    assertEquals(2.0, flatLast.get("sim/tick"));
+    assertEquals(1.0, flatLast.get("sim/contact_count"));
+    assertTrue(flatLast.containsKey("sim/body/1/speed_mps"));
   }
 }

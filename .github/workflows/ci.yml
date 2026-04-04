@@ -49,6 +49,22 @@ jobs:
       - name: Run root build script
         run: bash scripts/build-all.sh
 
+  telemetry-contract:
+    needs: [validation]
+    name: "Telemetry Contract"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify Python+Java telemetry contract
+        run: bash scripts/check-telemetry-contract.sh
+
   build-docker:
     needs: [validation]
     strategy:

@@ -30,5 +30,7 @@ else
 	exit 1
 fi
 
+python "${ROOT_DIR}/apps/sim-runtime/contract_check.py"
+
 cd "${ROOT_DIR}/vendordep"
 bash ./gradlew test "$@"
