@@ -7,6 +7,7 @@ from typing import List, Tuple
 
 ROOT = Path(__file__).resolve().parents[2]
 from graphics_bridge import BodyFrame, SimFrame, Timeline, render_timeline_matplotlib
+from math_primitives import add, dot, mul, norm, normalized, sub
 
 from robot_loader import BodySpec, SimulationScenario, load_default_scenario
 from runtime_defaults import DEFAULT_FIXED_DT_S, DEFAULT_SUB_TICKS_PER_ROBOT_PERIOD, ROBOT_PERIOD_S
@@ -16,33 +17,6 @@ from wpilib_bridge import export_packets_jsonl, flatten_for_networktables, summa
 
 
 Vec2 = Tuple[float, float]
-
-
-def add(a: Vec2, b: Vec2) -> Vec2:
-	return (a[0] + b[0], a[1] + b[1])
-
-
-def sub(a: Vec2, b: Vec2) -> Vec2:
-	return (a[0] - b[0], a[1] - b[1])
-
-
-def mul(a: Vec2, scalar: float) -> Vec2:
-	return (a[0] * scalar, a[1] * scalar)
-
-
-def dot(a: Vec2, b: Vec2) -> float:
-	return a[0] * b[0] + a[1] * b[1]
-
-
-def norm(a: Vec2) -> float:
-	return (a[0] * a[0] + a[1] * a[1]) ** 0.5
-
-
-def normalized(a: Vec2) -> Vec2:
-	n = norm(a)
-	if n < 1e-12:
-		return (1.0, 0.0)
-	return (a[0] / n, a[1] / n)
 
 
 @dataclass

@@ -31,6 +31,7 @@ else
 fi
 
 python "${ROOT_DIR}/apps/sim-runtime/contract_check.py"
+python "${ROOT_DIR}/apps/sim-runtime/math_contract_check.py"
 
 cd "${ROOT_DIR}/vendordep"
 bash ./gradlew test "$@"

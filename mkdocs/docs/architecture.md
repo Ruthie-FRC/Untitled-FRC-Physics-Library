@@ -40,6 +40,13 @@ Key components include:
 
 The architecture is designed to support extension through additional force models, body types, and runtime integrations.
 
+### Math Standard Alignment
+
+- Java `rensim.Vec3` now mirrors core C++ `frcsim::Vector3` utility surfaces used by simulation math.
+- Java `frcsim_physics.RigidBody.Quaternion` follows C++ `frcsim::Quaternion` multiplication and angular integration shape (`q_dot = 0.5 * omega_quat * q`).
+- Parity tests in vendordep verify Java-side vector/quaternion behavior stays consistent with C++ math conventions.
+- A shared fixture at `vendordep/src/test/resources/math/cpp_math_contract.json` acts as a C++ math contract consumed by both Java and Python validation checks.
+
 ## Build and Test
 
 - Gradle drives native, JNI, and Java builds.

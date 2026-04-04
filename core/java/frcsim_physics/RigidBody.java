@@ -20,7 +20,7 @@ public final class RigidBody {
 	public record RenderPose(Vec3 positionMeters, Quaternion orientation) {}
 
 	/**
-	 * Minimal quaternion implementation suitable for rendering transforms.
+	 * Quaternion implementation aligned with C++ frcsim::Quaternion behavior.
 	 *
 	 * @param w scalar component
 	 * @param x x component
@@ -31,17 +31,47 @@ public final class RigidBody {
 		/** Identity rotation quaternion. */
 		public static final Quaternion IDENTITY = new Quaternion(1.0, 0.0, 0.0, 0.0);
 
+		/** Squared quaternion norm. */
+		public double normSquared() {
+			return (w * w) + (x * x) + (y * y) + (z * z);
+		}
+
+		/** Quaternion norm magnitude. */
+		public double norm() {
+			return Math.sqrt(normSquared());
+		}
+
+		/** Returns true for finite identity quaternion within epsilon. */
+		public boolean isIdentity(double epsilon) {
+			return Math.abs(w - 1.0) < epsilon && Math.abs(x) < epsilon && Math.abs(y) < epsilon
+					&& Math.abs(z) < epsilon;
+		}
+
+		/** Returns true when any component is NaN. */
+		public boolean hasNaN() {
+			return Double.isNaN(w) || Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z);
+		}
+
 		/**
 		 * Returns a normalized quaternion.
 		 *
 		 * @return normalized quaternion
 		 */
 		public Quaternion normalized() {
-			double n = Math.sqrt((w * w) + (x * x) + (y * y) + (z * z));
+			double n = norm();
 			if (n < 1.0e-12) {
 				return IDENTITY;
 			}
 			return new Quaternion(w / n, x / n, y / n, z / n);
+		}
+
+		/** Normalizes only when needed by epsilon threshold. */
+		public Quaternion normalizeIfNeeded(double epsilon) {
+			double n2 = normSquared();
+			if (Math.abs(n2 - 1.0) <= epsilon) {
+				return this;
+			}
+			return normalized();
 		}
 
 		/**
@@ -58,6 +88,53 @@ public final class RigidBody {
 					(w * rhs.z) + (x * rhs.y) - (y * rhs.x) + (z * rhs.w));
 		}
 
+		/** Returns quaternion sum. */
+		public Quaternion add(Quaternion rhs) {
+			return new Quaternion(w + rhs.w, x + rhs.x, y + rhs.y, z + rhs.z);
+		}
+
+		/** Returns quaternion scaled by scalar. */
+		public Quaternion scale(double scalar) {
+			return new Quaternion(w * scalar, x * scalar, y * scalar, z * scalar);
+		}
+
+		/** Returns conjugate quaternion. */
+		public Quaternion conjugate() {
+			return new Quaternion(w, -x, -y, -z);
+		}
+
+		/** Returns quaternion inverse. */
+		public Quaternion inverse() {
+			double n2 = normSquared();
+			if (n2 < 1.0e-12) {
+				return IDENTITY;
+			}
+			Quaternion c = conjugate();
+			return new Quaternion(c.w / n2, c.x / n2, c.y / n2, c.z / n2);
+		}
+
+		/** Rotates vector using q * v * q_conjugate. */
+		public Vec3 rotate(Vec3 v) {
+			Quaternion qv = new Quaternion(0.0, v.x(), v.y(), v.z());
+			Quaternion res = multiply(qv).multiply(conjugate());
+			return new Vec3(res.x, res.y, res.z);
+		}
+
+		/** Builds quaternion from axis-angle. */
+		public static Quaternion fromAxisAngle(Vec3 axis, double angleRad) {
+			Vec3 nAxis = axis.normalized();
+			double half = 0.5 * angleRad;
+			double s = Math.sin(half);
+			return new Quaternion(Math.cos(half), nAxis.x() * s, nAxis.y() * s, nAxis.z() * s);
+		}
+
+		/** Builds quaternion from angular velocity over dt. */
+		public static Quaternion fromAngularVelocity(Vec3 omegaRadPerSec, double dtSeconds) {
+			double angle = omegaRadPerSec.norm() * dtSeconds;
+			Vec3 axis = angle > 1.0e-12 ? omegaRadPerSec.normalized() : Vec3.unitX();
+			return fromAxisAngle(axis, angle);
+		}
+
 		/**
 		 * Integrates orientation from angular velocity.
 		 *
@@ -71,13 +148,9 @@ public final class RigidBody {
 					angularVelocityRadPerSec.x(),
 					angularVelocityRadPerSec.y(),
 					angularVelocityRadPerSec.z());
-			Quaternion qDot = omega.multiply(this);
-			Quaternion integrated = new Quaternion(
-					w + (0.5 * qDot.w * dtSeconds),
-					x + (0.5 * qDot.x * dtSeconds),
-					y + (0.5 * qDot.y * dtSeconds),
-					z + (0.5 * qDot.z * dtSeconds));
-			return integrated.normalized();
+			Quaternion dq = omega.multiply(this).scale(0.5);
+			Quaternion integrated = add(dq.scale(dtSeconds));
+			return integrated.normalizeIfNeeded(1.0e-12);
 		}
 	}
 
