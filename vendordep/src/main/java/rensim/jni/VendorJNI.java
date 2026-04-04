@@ -1,4 +1,4 @@
-package com.vendor.jni;
+package rensim.jni;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -16,7 +16,7 @@ public class VendorJNI {
   public static class Helper {
     private Helper() {}
 
-    private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
+    private static final AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
 
     /**
      * Returns whether the driver loads during static initialization.

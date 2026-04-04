@@ -75,6 +75,8 @@ vendor/
 # Test binaries (keep source test files, ignore compiled binaries)
 frcsim_*
 !vendordep/tests/*.cpp
+!vendordep/src/main/java/rensim/jni/
+!vendordep/src/main/java/rensim/jni/*.java
 
 # Build metadata artifacts
 compile_commands.json

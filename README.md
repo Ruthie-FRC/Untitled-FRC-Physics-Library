@@ -19,6 +19,12 @@ This repository is organized as a monorepo containing the core simulation engine
 ### Build and Test (Gradle)
 
 ```bash
+./scripts/build-all.sh
+```
+
+For vendordep-only builds:
+
+```bash
 cd vendordep
 ./gradlew test
 ```
@@ -33,6 +39,8 @@ cd vendordep
 ```
 
 This command runs Java tests plus the standalone native verification suite in `vendordep/tests/` through Gradle.
+
+Vendordep build tooling currently requires Java 21.
 
 ### Preview Docs Locally
 

@@ -7,6 +7,8 @@ ext.licenseFile = files("$rootDir/../LICENSE.txt")
 
 def templateVendorFile = "RenSim.json"
 
+def artifactGroupId = 'rensim'
+def baseArtifactId = 'RenSim'
 ext.pubVersion = System.getenv("releaseVersion") ?: System.getenv("releaseName") ?: "test"
 
 def outputsFolder = file("$buildDir/outputs")
@@ -43,8 +45,7 @@ copyAllOutputs.dependsOn outputVersions
 
 ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.dependsOn task
-    copyAllOutputs.inputs.file task.archiveFile
-    copyAllOutputs.from task.archiveFile
+    copyAllOutputs.from(task.archiveFile)
 }
 
 def driverZipBaseName = "_GROUP_rensim_ID_${baseArtifactId}-driver_CLS"
@@ -137,12 +138,14 @@ task vendordepJson() {
     group = 'Build'
     outputs.file("$buildDir/repos/$templateVendorFile")
 
-    copy {
-        from templateVendorFile
-        into "$buildDir/repos/"
-        expand(version: pubVersion,
-                groupId: artifactGroupId,
-                artifactId: baseArtifactId)
+    doLast {
+        copy {
+            from templateVendorFile
+            into "$buildDir/repos/"
+            expand(version: pubVersion,
+                    groupId: artifactGroupId,
+                    artifactId: baseArtifactId)
+        }
     }
 }
 

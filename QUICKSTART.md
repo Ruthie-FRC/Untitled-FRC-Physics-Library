@@ -27,14 +27,15 @@ Complete vendordep package with:
 
 ## Building
 
-### Core Build and Native Tests (Gradle)
+### Core Build and Native Tests
 ```bash
-cd vendordep
-./gradlew test
+./scripts/build-all.sh
 ```
 
+This script is safe to run from any working directory and handles both native and vendordep builds.
+
 ### Vendordep (Java)
-Requires Java 17+ and a compatible JDK:
+Requires Java 21:
 ```bash
 cd vendordep
 ./gradlew build
@@ -43,9 +44,9 @@ cd vendordep
 ## Java Usage Example
 
 ```java
-import com.vendor.physics.PhysicsWorld;
-import com.vendor.physics.PhysicsBody;
-import com.vendor.physics.Vec3;
+import rensim.PhysicsWorld;
+import rensim.PhysicsBody;
+import rensim.Vec3;
 
 try (PhysicsWorld world = new PhysicsWorld(0.01, true)) {
     // Create a 1 kg body at (0, 0, 1) m

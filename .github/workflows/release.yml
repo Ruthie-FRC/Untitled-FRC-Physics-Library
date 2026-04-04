@@ -44,10 +44,21 @@ jobs:
       - name: Publish vendordep
         run: ./gradlew publish
         working-directory: ${{ env.workingDirectory }}
-      - name: Create new vendor JSON
-        run: cp ${{ env.workingDirectory }}/build/maven/RenSim.json ${{ env.workingDirectory }}/build/maven/RenSim-${{inputs.releaseVersion}}.json
-      - name: Upload pages
-        run: git add . && git commit -m "Automatically add RenSim version ${{inputs.releaseVersion}}" && git push
+      - name: Stage Maven repo and vendordep JSON for Pages
+        run: |
+          mkdir -p ${{ env.workingDirectory }}/build/maven/maven/
+          rsync -a --delete ${{ env.workingDirectory }}/build/repos/releases/ ${{ env.workingDirectory }}/build/maven/maven/
+          cp ${{ env.workingDirectory }}/build/repos/RenSim.json ${{ env.workingDirectory }}/build/maven/RenSim.json
+          cp ${{ env.workingDirectory }}/build/repos/RenSim.json ${{ env.workingDirectory }}/build/maven/RenSim-${{inputs.releaseVersion}}.json
+      - name: Commit and push Pages content
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No pages changes to commit"
+            exit 0
+          fi
+          git commit -m "Automatically add RenSim version ${{inputs.releaseVersion}}"
+          git push
         working-directory: ${{ env.workingDirectory }}/build/maven/
       - name: Setup Pages
         id: pages

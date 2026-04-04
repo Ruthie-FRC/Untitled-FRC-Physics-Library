@@ -1,6 +1,6 @@
-import com.vendor.physics.PhysicsBody;
-import com.vendor.physics.PhysicsWorld;
-import com.vendor.physics.Vec3;
+import rensim.PhysicsBody;
+import rensim.PhysicsWorld;
+import rensim.Vec3;
 
 public final class ShooterPredictionExample {
 	private ShooterPredictionExample() {}

@@ -31,10 +31,23 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
       - name: Check Java docs
         working-directory: vendordep
         run: ./gradlew javadoc
+
+  build-all-script:
+    needs: [validation]
+    name: "Build All Script"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - name: Run root build script
+        run: bash scripts/build-all.sh
 
   build-docker:
     needs: [validation]
@@ -101,7 +114,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           architecture: ${{ matrix.architecture }}
       - name: Build with Gradle
         working-directory: vendordep
@@ -130,7 +143,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
       - name: Combine
         run: ./gradlew publish -Pthirdparty
         working-directory: combiner
