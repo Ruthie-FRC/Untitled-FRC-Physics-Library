@@ -6,7 +6,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/Ruthie-FRC/RenSim)](https://github.com/Ruthie-FRC/RenSim/releases)
 [![Open Issues](https://img.shields.io/github/issues/Ruthie-FRC/RenSim)](https://github.com/Ruthie-FRC/RenSim/issues)
 
-RenSim is a modular FRC physics library for simulation, analysis, and robotics workflow integration.
+RenSim is an open source, modular FRC physics library for simulation, analysis, and robotics workflow integration.
 
 **Status**: 2026.04.04.0-prerelease — Core rigid-body dynamics and joint constraints.  
 
