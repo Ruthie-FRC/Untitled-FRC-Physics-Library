@@ -45,6 +45,7 @@ class BallGamepieceSim {
 
         double radius_m{0.45};
         bool intake_enabled{false};
+        std::size_t intake_capacity{1};
         double intake_radius_m{0.28};
         Vector3 intake_offset_m{0.45, 0.0, 0.10};
         Vector3 carry_offset_m{0.25, 0.0, 0.25};
@@ -192,6 +193,28 @@ class BallGamepieceSim {
             return;
         }
 
+        const int substeps = std::max(1, simulation_substeps_);
+        const double dt_substep_s = dt_s / static_cast<double>(substeps);
+
+        for (int i = 0; i < substeps; ++i) {
+            stepSingle(dt_substep_s);
+        }
+    }
+
+    void setSimulationSubsteps(int simulation_substeps) {
+        simulation_substeps_ = std::max(1, simulation_substeps);
+    }
+
+    int simulationSubsteps() const {
+        return simulation_substeps_;
+    }
+
+  private:
+    void stepSingle(double dt_s) {
+        if (dt_s <= 0.0) {
+            return;
+        }
+
         integrateRobots(dt_s);
         resolveRobotRobotImpedance();
 
@@ -212,7 +235,6 @@ class BallGamepieceSim {
         }
     }
 
-  private:
     static Vector3 rotateYaw(const Vector3& local, double yaw_rad) {
         const double c = std::cos(yaw_rad);
         const double s = std::sin(yaw_rad);
@@ -295,7 +317,7 @@ class BallGamepieceSim {
 
     void updateIntakeStates() {
         for (auto& robot : robots_) {
-            if (!robot.intake_enabled || robot.carried_ball_index != kNoBall) {
+            if (!robot.intake_enabled || robot.intake_capacity == 0 || robot.carried_ball_index != kNoBall) {
                 continue;
             }
 
@@ -546,6 +568,7 @@ class BallGamepieceSim {
     std::vector<RobotState> robots_{};
     std::vector<BallEntity> balls_{};
     std::vector<EnvironmentalBoundary> field_elements_{};
+    int simulation_substeps_{4};
 };
 
 }  // namespace frcsim

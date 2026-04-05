@@ -10,13 +10,8 @@ int main() {
     wheel.viscous_friction_nm_per_radps = 0.0007;
     wheel.ball_coupling = 0.9;
 
-    frcsim::ShooterWheelSim::MotorConfig high_torque;
-    high_torque.free_speed_radps = 520.0;
-    high_torque.stall_torque_nm = 3.2;
-
-    frcsim::ShooterWheelSim::MotorConfig high_speed;
-    high_speed.free_speed_radps = 760.0;
-    high_speed.stall_torque_nm = 1.9;
+    const auto high_torque = frcsim::ShooterWheelSim::MotorConfig::krakenX60(1);
+    const auto high_speed = frcsim::ShooterWheelSim::MotorConfig::falcon500(1);
 
     frcsim::ShooterWheelSim torque_sim(high_torque, wheel);
     frcsim::ShooterWheelSim speed_sim(high_speed, wheel);
@@ -25,6 +20,8 @@ int main() {
     cmd.velocity_closed_loop = true;
     cmd.target_speed_radps = 400.0;
     cmd.velocity_kp = 0.06;
+    cmd.current_limit_a = 90.0;
+    cmd.friction_voltage_v = 0.2;
 
     for (int i = 0; i < 250; ++i) {
         torque_sim.step(0.01, cmd);
@@ -35,6 +32,9 @@ int main() {
     assert(speed_sim.angularSpeedRadps() > 0.0);
     assert(torque_sim.estimatedExitVelocityMps() > 0.0);
     assert(speed_sim.estimatedExitVelocityMps() > 0.0);
+
+    // Different motor configs should produce distinguishable settled speeds under same control.
+    assert(std::abs(torque_sim.angularSpeedRadps() - speed_sim.angularSpeedRadps()) > 1e-3);
 
     frcsim::TurretShooterSim turret;
     frcsim::BallPhysicsSim3D::BallState preload;

@@ -14,8 +14,41 @@ class ShooterWheelSim {
 		// Stall torque at nominal voltage.
 		double stall_torque_nm{2.0};
 
+		// Approximate stall current for simple current limiting.
+		double stall_current_a{120.0};
+
 		// Applied supply voltage for normalization.
 		double nominal_voltage_v{12.0};
+
+		static MotorConfig falcon500(int motor_count = 1) {
+			const int count = std::max(1, motor_count);
+			MotorConfig cfg{};
+			cfg.free_speed_radps = 668.0;
+			cfg.stall_torque_nm = 4.69 * static_cast<double>(count);
+			cfg.stall_current_a = 257.0 * static_cast<double>(count);
+			cfg.nominal_voltage_v = 12.0;
+			return cfg;
+		}
+
+		static MotorConfig neoV1_1(int motor_count = 1) {
+			const int count = std::max(1, motor_count);
+			MotorConfig cfg{};
+			cfg.free_speed_radps = 594.0;
+			cfg.stall_torque_nm = 3.36 * static_cast<double>(count);
+			cfg.stall_current_a = 166.0 * static_cast<double>(count);
+			cfg.nominal_voltage_v = 12.0;
+			return cfg;
+		}
+
+		static MotorConfig krakenX60(int motor_count = 1) {
+			const int count = std::max(1, motor_count);
+			MotorConfig cfg{};
+			cfg.free_speed_radps = 628.0;
+			cfg.stall_torque_nm = 7.09 * static_cast<double>(count);
+			cfg.stall_current_a = 366.0 * static_cast<double>(count);
+			cfg.nominal_voltage_v = 12.0;
+			return cfg;
+		}
 	};
 
 	struct WheelConfig {
@@ -35,6 +68,12 @@ class ShooterWheelSim {
 		bool velocity_closed_loop{false};
 		double target_speed_radps{0.0};
 		double velocity_kp{0.03};
+
+		// Optional stator current clamp, <=0 disables limiting.
+		double current_limit_a{0.0};
+
+		// Voltage needed to overcome static friction at very low speeds.
+		double friction_voltage_v{0.0};
 	};
 
 	ShooterWheelSim() = default;
@@ -75,11 +114,26 @@ class ShooterWheelSim {
 		}
 		voltage = std::clamp(voltage, -effective_nominal_v, effective_nominal_v);
 
+		if (std::abs(omega_radps_) < 1e-3) {
+			const double v_deadband = std::max(0.0, control.friction_voltage_v);
+			if (std::abs(voltage) <= v_deadband) {
+				voltage = 0.0;
+			} else {
+				voltage = std::copysign(std::max(0.0, std::abs(voltage) - v_deadband), voltage);
+			}
+		}
+
 		// Linearized DC motor: omega = free_speed*(1 - tau/stall_torque) for given normalized voltage.
 		const double voltage_scale = voltage / effective_nominal_v;
 		const double no_load_speed = effective_free_speed * voltage_scale;
 		const double speed_error = no_load_speed - omega_radps_;
-		const double available_torque = motor_.stall_torque_nm * speed_error / effective_free_speed;
+		double available_torque = motor_.stall_torque_nm * speed_error / effective_free_speed;
+
+		if (control.current_limit_a > 0.0 && motor_.stall_current_a > 0.0) {
+			const double torque_per_amp = motor_.stall_torque_nm / motor_.stall_current_a;
+			const double max_torque_from_limit = torque_per_amp * control.current_limit_a;
+			available_torque = std::clamp(available_torque, -max_torque_from_limit, max_torque_from_limit);
+		}
 
 		const double friction_torque = wheel_.viscous_friction_nm_per_radps * omega_radps_;
 		const double net_torque = available_torque - friction_torque;

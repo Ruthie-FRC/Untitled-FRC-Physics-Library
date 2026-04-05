@@ -99,6 +99,9 @@ tasks.register('compileLegacyNativeTests') {
     def outputDir = layout.buildDirectory.dir('legacy-native-tests').get().asFile
     outputDir.mkdirs()
 
+    // Remove stale executables from deleted/renamed tests to keep source/executable counts aligned.
+    outputDir.listFiles()?.findAll { it.isFile() }?.each { it.delete() }
+
     def sortedTestFiles = legacyNativeTestSources.files.sort { a, b -> a.name <=> b.name }
     if (sortedTestFiles.isEmpty()) {
       throw new GradleException('No legacy native test sources were found in vendordep/tests (*.cpp).')
