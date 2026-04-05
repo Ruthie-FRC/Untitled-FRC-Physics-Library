@@ -13,6 +13,7 @@ int main() {
     config.phase_delay_s = 0.03;
     config.tof_scale = 1.0;
     config.recent_pose_band_m = 0.5;
+    config.ballistic_refinement_enabled = false;
 
     frcsim::ShotCalculator3D calculator(config);
     calculator.setLookupTable(std::vector<frcsim::ShotCalculator3D::TablePoint>{
