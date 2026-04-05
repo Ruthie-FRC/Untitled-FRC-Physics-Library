@@ -47,7 +47,9 @@ class ShotCalculator3D {
         double time_of_flight_s{0.0};
     };
 
-    explicit ShotCalculator3D(const Config& config = Config()) : config_(config) {}
+    ShotCalculator3D() = default;
+
+    explicit ShotCalculator3D(const Config& config) : config_(config) {}
 
     const Config& config() const { return config_; }
     void setConfig(const Config& config) { config_ = config; }

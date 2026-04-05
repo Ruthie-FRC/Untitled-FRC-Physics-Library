@@ -29,7 +29,9 @@ class TurretShooterSim {
         Vector3 carry_offset_local_m{0.05, 0.0, -0.02};
     };
 
-    explicit TurretShooterSim(const Config& config = Config())
+    TurretShooterSim() = default;
+
+    explicit TurretShooterSim(const Config& config)
         : config_(config), differential_(config.differential), ball_(config.ball_config, config.ball_properties) {}
 
     const Config& config() const { return config_; }

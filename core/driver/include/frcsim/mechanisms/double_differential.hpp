@@ -51,7 +51,9 @@ class DoubleDifferentialMechanism {
         bool valid{true};
     };
 
-    explicit DoubleDifferentialMechanism(const Config& config = Config()) : config_(config) {}
+    DoubleDifferentialMechanism() = default;
+
+    explicit DoubleDifferentialMechanism(const Config& config) : config_(config) {}
 
     const Config& config() const { return config_; }
     void setConfig(const Config& config) { config_ = config; }
