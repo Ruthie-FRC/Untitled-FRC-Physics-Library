@@ -30,7 +30,7 @@ int main() {
     robot.intake_capacity = 2;
     const std::size_t robot_id = arena.gamepieceSim().addRobot(robot);
 
-    frcsim::BallGamepieceSim::BallState loose_ball;
+    frcsim::BallPhysicsSim3D::BallState loose_ball;
     loose_ball.position_m = frcsim::Vector3(1.1, 2.0, 0.08);
     arena.gamepieceSim().addBall(loose_ball,
                                  frcsim::BallGamepieceSim::season2026BallConfig(),

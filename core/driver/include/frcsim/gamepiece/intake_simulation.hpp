@@ -28,7 +28,9 @@ class IntakeSimulation {
         Phase phase{Phase::kBegin};
     };
 
-    explicit IntakeSimulation(const Config& config = Config()) : config_(config) {}
+    IntakeSimulation() = default;
+
+    explicit IntakeSimulation(const Config& config) : config_(config) {}
 
     void setConfig(const Config& config) { config_ = config; }
     const Config& config() const { return config_; }
