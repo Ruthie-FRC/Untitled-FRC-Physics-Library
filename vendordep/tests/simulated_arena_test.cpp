@@ -25,7 +25,7 @@ int main() {
 
     frcsim::BallGamepieceSim::RobotState robot;
     robot.position_m = frcsim::Vector3(1.0, 2.0, 0.0);
-    robot.intake_enabled = true;
+    robot.intake_enabled = false;
     robot.intake_radius_m = 0.4;
     robot.intake_capacity = 2;
     const std::size_t robot_id = arena.gamepieceSim().addRobot(robot);
@@ -43,13 +43,14 @@ int main() {
     auto& intake = arena.addIntakeSimulation(intake_cfg);
     intake.setRunning(true);
 
+    intake.update(arena.gamepieceSim());
+    assert(intake.gamePiecesInIntakeCount() >= 1);
+    assert(arena.gamepieceSim().countBalls() == 0);
+
     int callback_ticks = 0;
     arena.addCustomSimulation([&callback_ticks](int, frcsim::SimulatedArena&) { ++callback_ticks; });
 
     arena.simulationPeriodic();
-
-    assert(intake.gamePiecesInIntakeCount() >= 1);
-    assert(arena.gamepieceSim().countBalls() == 0);
     assert(callback_ticks == timings.simulation_subticks_per_period);
 
     frcsim::BallGamepieceSim::FireCommand shot;
