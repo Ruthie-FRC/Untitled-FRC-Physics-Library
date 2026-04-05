@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <limits>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -67,6 +69,42 @@ class BallGamepieceSim {
         double estimated_exit_velocity_mps{-1.0};
 
         Vector3 spin_radps{};
+
+        std::string gamepiece_type{"Ball"};
+    };
+
+    struct GamePieceInfo {
+        std::string type{"Ball"};
+        BallPhysicsSim3D::Config physics_config{};
+        BallPhysicsSim3D::BallProperties ball_properties{};
+        bool spawn_on_ground_after_projectile{true};
+    };
+
+    struct ProjectileEntity {
+        std::string type{"Ball"};
+        Vector3 position_m{};
+        Vector3 velocity_mps{};
+        Vector3 spin_radps{};
+        double gravity_mps2{9.81};
+        double age_s{0.0};
+        bool active{true};
+        bool spawn_on_ground_after_touch{true};
+        bool hit_target{false};
+        std::function<void()> hit_target_callback{};
+    };
+
+    struct GoalZone {
+        enum class Shape {
+            kBox,
+            kSphere,
+        };
+
+        Shape shape{Shape::kBox};
+        Vector3 center_m{};
+        Vector3 half_extents_m{0.2, 0.2, 0.2};
+        double radius_m{0.25};
+        std::string accepted_type{"Ball"};
+        bool require_positive_vertical_velocity{false};
     };
 
     struct BallEntity {
@@ -77,6 +115,18 @@ class BallGamepieceSim {
     BallGamepieceSim() = default;
 
     explicit BallGamepieceSim(const FieldConfig& field) : field_(field) {}
+
+    static FieldConfig evergreenFieldConfig() {
+        return FieldConfig{};
+    }
+
+    static FieldConfig season2026FieldConfig() {
+        FieldConfig config = evergreenFieldConfig();
+        config.net_boundary_user_id = 2026;
+        config.wall_restitution = 0.22;
+        config.wall_friction = 0.25;
+        return config;
+    }
 
     static BallPhysicsSim3D::BallProperties defaultBallProperties() {
         BallPhysicsSim3D::BallProperties properties{};
@@ -129,7 +179,55 @@ class BallGamepieceSim {
         entity.sim = BallPhysicsSim3D(config, properties);
         entity.sim.setState(state);
         balls_.push_back(entity);
+        ball_types_.push_back("Ball");
         return balls_.size() - 1;
+    }
+
+    std::size_t addProjectile(const ProjectileEntity& projectile) {
+        projectiles_.push_back(projectile);
+        return projectiles_.size() - 1;
+    }
+
+    GoalZone& addGoalZone(const GoalZone& goal_zone) {
+        goals_.push_back(goal_zone);
+        return goals_.back();
+    }
+
+    GamePieceInfo& registerGamePieceType(const GamePieceInfo& info) {
+        gamepiece_types_.push_back(info);
+        return gamepiece_types_.back();
+    }
+
+    void clearGamePieceTypes() {
+        gamepiece_types_.clear();
+    }
+
+    void configureEvergreenField() {
+        field_ = evergreenFieldConfig();
+        field_elements_.clear();
+        goals_.clear();
+    }
+
+    void configureSeason2026Field() {
+        field_ = season2026FieldConfig();
+        field_elements_.clear();
+        goals_.clear();
+
+        EnvironmentalBoundary net{};
+        net.type = BoundaryType::kBox;
+        net.user_id = 2026;
+        net.position_m = Vector3(7.0, 4.1, 1.7);
+        net.half_extents_m = Vector3(0.4, 0.4, 0.5);
+        net.is_active = true;
+        field_elements_.push_back(net);
+
+        GoalZone hub_goal{};
+        hub_goal.shape = GoalZone::Shape::kBox;
+        hub_goal.center_m = net.position_m;
+        hub_goal.half_extents_m = Vector3(0.35, 0.35, 0.45);
+        hub_goal.accepted_type = "Ball";
+        hub_goal.require_positive_vertical_velocity = false;
+        goals_.push_back(hub_goal);
     }
 
     EnvironmentalBoundary& addFieldElement(const EnvironmentalBoundary& boundary) {
@@ -143,10 +241,26 @@ class BallGamepieceSim {
     std::vector<BallEntity>& balls() { return balls_; }
     const std::vector<BallEntity>& balls() const { return balls_; }
 
+    std::vector<ProjectileEntity>& projectiles() { return projectiles_; }
+    const std::vector<ProjectileEntity>& projectiles() const { return projectiles_; }
+
+    std::vector<GoalZone>& goals() { return goals_; }
+    const std::vector<GoalZone>& goals() const { return goals_; }
+
     std::vector<EnvironmentalBoundary>& fieldElements() { return field_elements_; }
     const std::vector<EnvironmentalBoundary>& fieldElements() const { return field_elements_; }
 
     std::size_t countBalls() const { return balls_.size(); }
+
+    std::size_t countProjectiles() const {
+        std::size_t count = 0;
+        for (const auto& projectile : projectiles_) {
+            if (projectile.active) {
+                ++count;
+            }
+        }
+        return count;
+    }
 
     std::size_t countScoredBalls() const {
         std::size_t count = 0;
@@ -185,7 +299,45 @@ class BallGamepieceSim {
         ball.sim.shoot(launch_position, launch_velocity, command.spin_radps);
         ball.scored_in_net = false;
         robot.carried_ball_index = kNoBall;
+
+        if (!ball_types_.empty()) {
+            const std::size_t ball_index = static_cast<std::size_t>(&ball - &balls_[0]);
+            if (ball_index < ball_types_.size()) {
+                ball_types_[ball_index] = command.gamepiece_type;
+            }
+        }
         return true;
+    }
+
+    std::size_t fireProjectile(std::size_t robot_index, const FireCommand& command,
+                               bool spawn_on_ground_after_touch = true,
+                               const std::function<void()>& hit_target_callback = {}) {
+        if (robot_index >= robots_.size()) {
+            return kNoBall;
+        }
+
+        const RobotState& robot = robots_[robot_index];
+        const double launch_speed = command.estimated_exit_velocity_mps > 0.0
+                                        ? command.estimated_exit_velocity_mps
+                                        : std::max(0.0, command.mechanism_speed_mps);
+
+        const double yaw_world = robot.yaw_rad + command.yaw_offset_rad;
+        const double cos_pitch = std::cos(command.pitch_rad);
+        const Vector3 direction_world(std::cos(yaw_world) * cos_pitch,
+                                      std::sin(yaw_world) * cos_pitch,
+                                      std::sin(command.pitch_rad));
+
+        ProjectileEntity projectile{};
+        projectile.type = command.gamepiece_type;
+        projectile.position_m = robot.position_m + rotateYaw(command.launch_offset_m, robot.yaw_rad);
+        projectile.velocity_mps = robot.velocity_mps + direction_world * launch_speed;
+        projectile.spin_radps = command.spin_radps;
+        projectile.gravity_mps2 = std::max(0.0, -defaultBallConfig().gravity_mps2.z);
+        projectile.spawn_on_ground_after_touch = spawn_on_ground_after_touch;
+        projectile.hit_target_callback = hit_target_callback;
+
+        projectiles_.push_back(projectile);
+        return projectiles_.size() - 1;
     }
 
     void step(double dt_s) {
@@ -217,6 +369,7 @@ class BallGamepieceSim {
 
         integrateRobots(dt_s);
         resolveRobotRobotImpedance();
+        updateProjectiles(dt_s);
 
         updateIntakeStates();
 
@@ -233,6 +386,79 @@ class BallGamepieceSim {
                 resolveFieldBounds(ball);
             }
         }
+    }
+
+    void updateProjectiles(double dt_s) {
+        const double floor_z = defaultBallConfig().ground_height_m;
+
+        for (auto& projectile : projectiles_) {
+            if (!projectile.active) {
+                continue;
+            }
+
+            projectile.age_s += dt_s;
+            projectile.velocity_mps.z -= projectile.gravity_mps2 * dt_s;
+            projectile.position_m += projectile.velocity_mps * dt_s;
+
+            if (checkProjectileGoalHit(projectile)) {
+                projectile.hit_target = true;
+                projectile.active = false;
+                if (projectile.hit_target_callback) {
+                    projectile.hit_target_callback();
+                }
+                continue;
+            }
+
+            if (projectile.position_m.z <= floor_z) {
+                if (projectile.spawn_on_ground_after_touch) {
+                    BallPhysicsSim3D::BallState state{};
+                    state.position_m = Vector3(projectile.position_m.x, projectile.position_m.y,
+                                               season2026BallProperties().radius_m);
+                    state.velocity_mps = projectile.velocity_mps;
+                    state.spin_radps = projectile.spin_radps;
+                    addBall(state, defaultBallConfig(), defaultBallProperties());
+                }
+                projectile.active = false;
+                continue;
+            }
+
+            if (isProjectileOutOfField(projectile)) {
+                projectile.active = false;
+            }
+        }
+    }
+
+    bool checkProjectileGoalHit(const ProjectileEntity& projectile) const {
+        for (const auto& goal : goals_) {
+            if (!goal.accepted_type.empty() && goal.accepted_type != projectile.type) {
+                continue;
+            }
+            if (goal.require_positive_vertical_velocity && projectile.velocity_mps.z <= 0.0) {
+                continue;
+            }
+
+            if (goal.shape == GoalZone::Shape::kBox) {
+                const Vector3 delta = projectile.position_m - goal.center_m;
+                if (std::abs(delta.x) <= goal.half_extents_m.x &&
+                    std::abs(delta.y) <= goal.half_extents_m.y &&
+                    std::abs(delta.z) <= goal.half_extents_m.z) {
+                    return true;
+                }
+            } else {
+                if ((projectile.position_m - goal.center_m).norm() <= goal.radius_m) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool isProjectileOutOfField(const ProjectileEntity& projectile) const {
+        const double tolerance_m = 2.0;
+        return projectile.position_m.x < field_.min_corner_m.x - tolerance_m ||
+               projectile.position_m.x > field_.max_corner_m.x + tolerance_m ||
+               projectile.position_m.y < field_.min_corner_m.y - tolerance_m ||
+               projectile.position_m.y > field_.max_corner_m.y + tolerance_m;
     }
 
     static Vector3 rotateYaw(const Vector3& local, double yaw_rad) {
@@ -567,6 +793,10 @@ class BallGamepieceSim {
     FieldConfig field_{};
     std::vector<RobotState> robots_{};
     std::vector<BallEntity> balls_{};
+    std::vector<std::string> ball_types_{};
+    std::vector<ProjectileEntity> projectiles_{};
+    std::vector<GoalZone> goals_{};
+    std::vector<GamePieceInfo> gamepiece_types_{};
     std::vector<EnvironmentalBoundary> field_elements_{};
     int simulation_substeps_{4};
 };

@@ -8,6 +8,7 @@ int main() {
     field.net_boundary_user_id = 2026;
 
     frcsim::BallGamepieceSim sim(field);
+    sim.setSimulationSubsteps(5);
 
     frcsim::BallGamepieceSim::RobotState robot_a;
     robot_a.position_m = frcsim::Vector3(1.0, 2.0, 0.0);
@@ -82,6 +83,37 @@ int main() {
 
     assert(sim.countBalls() == 8);
     assert(sim.countScoredBalls() <= sim.countBalls());
+
+    // Maple-style projectile lifecycle: in-flight projectile can hit goal or become grounded piece.
+    frcsim::BallGamepieceSim projectile_sim;
+    projectile_sim.configureEvergreenField();
+
+    frcsim::BallGamepieceSim::RobotState launcher;
+    launcher.position_m = frcsim::Vector3(1.0, 1.0, 0.0);
+    launcher.yaw_rad = 0.0;
+    const std::size_t launcher_id = projectile_sim.addRobot(launcher);
+
+    frcsim::BallGamepieceSim::GoalZone goal;
+    goal.shape = frcsim::BallGamepieceSim::GoalZone::Shape::kSphere;
+    goal.center_m = frcsim::Vector3(3.0, 1.0, 1.1);
+    goal.radius_m = 0.6;
+    goal.accepted_type = "Ball";
+    projectile_sim.addGoalZone(goal);
+
+    frcsim::BallGamepieceSim::FireCommand projectile_fire;
+    projectile_fire.launch_offset_m = frcsim::Vector3(0.3, 0.0, 0.8);
+    projectile_fire.pitch_rad = 0.6;
+    projectile_fire.mechanism_speed_mps = 7.0;
+    projectile_fire.gamepiece_type = "Ball";
+
+    projectile_sim.fireProjectile(launcher_id, projectile_fire, true);
+    for (int i = 0; i < 200; ++i) {
+        projectile_sim.step(0.01);
+    }
+
+    // Either scored in flight or converted to grounded piece after touch-ground.
+    assert(projectile_sim.countProjectiles() == 0);
+    assert(projectile_sim.countScoredBalls() > 0 || projectile_sim.countBalls() > 0);
 
     sim.robots()[robot_a_id].position_m = frcsim::Vector3(16.50, 2.0, 0.0);
     sim.robots()[robot_a_id].velocity_mps = frcsim::Vector3(2.0, 0.0, 0.0);
