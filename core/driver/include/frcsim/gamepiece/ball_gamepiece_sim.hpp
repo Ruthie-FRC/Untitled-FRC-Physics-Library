@@ -105,6 +105,7 @@ class BallGamepieceSim {
         double radius_m{0.25};
         std::string accepted_type{"Ball"};
         bool require_positive_vertical_velocity{false};
+        std::function<bool(const Vector3&)> custom_velocity_validator{};
     };
 
     struct BallEntity {
@@ -246,6 +247,39 @@ class BallGamepieceSim {
 
     std::vector<BallEntity>& balls() { return balls_; }
     const std::vector<BallEntity>& balls() const { return balls_; }
+
+    const std::string& ballType(std::size_t ball_index) const {
+        static const std::string empty;
+        if (ball_index >= ball_types_.size()) {
+            return empty;
+        }
+        return ball_types_[ball_index];
+    }
+
+    void setBallType(std::size_t ball_index, const std::string& type) {
+        if (ball_index >= ball_types_.size()) {
+            return;
+        }
+        ball_types_[ball_index] = type;
+    }
+
+    bool removeBall(std::size_t ball_index) {
+        if (ball_index >= balls_.size() || ball_index >= ball_types_.size()) {
+            return false;
+        }
+
+        balls_.erase(balls_.begin() + static_cast<std::ptrdiff_t>(ball_index));
+        ball_types_.erase(ball_types_.begin() + static_cast<std::ptrdiff_t>(ball_index));
+
+        for (auto& robot : robots_) {
+            if (robot.carried_ball_index == ball_index) {
+                robot.carried_ball_index = kNoBall;
+            } else if (robot.carried_ball_index != kNoBall && robot.carried_ball_index > ball_index) {
+                --robot.carried_ball_index;
+            }
+        }
+        return true;
+    }
 
     std::vector<ProjectileEntity>& projectiles() { return projectiles_; }
     const std::vector<ProjectileEntity>& projectiles() const { return projectiles_; }
@@ -447,6 +481,9 @@ class BallGamepieceSim {
                 continue;
             }
             if (goal.require_positive_vertical_velocity && projectile.velocity_mps.z <= 0.0) {
+                continue;
+            }
+            if (goal.custom_velocity_validator && !goal.custom_velocity_validator(projectile.velocity_mps)) {
                 continue;
             }
 
