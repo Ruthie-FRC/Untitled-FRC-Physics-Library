@@ -194,6 +194,12 @@ class BallGamepieceSim {
     }
 
     GamePieceInfo& registerGamePieceType(const GamePieceInfo& info) {
+        for (auto& existing : gamepiece_types_) {
+            if (existing.type == info.type) {
+                existing = info;
+                return existing;
+            }
+        }
         gamepiece_types_.push_back(info);
         return gamepiece_types_.back();
     }
@@ -411,12 +417,19 @@ class BallGamepieceSim {
 
             if (projectile.position_m.z <= floor_z) {
                 if (projectile.spawn_on_ground_after_touch) {
+                    const GamePieceInfo* info = findGamePieceInfo(projectile.type);
+                    const auto& physics_cfg = (info != nullptr) ? info->physics_config : defaultBallConfig();
+                    const auto& physics_props = (info != nullptr) ? info->ball_properties : defaultBallProperties();
+
                     BallPhysicsSim3D::BallState state{};
                     state.position_m = Vector3(projectile.position_m.x, projectile.position_m.y,
-                                               season2026BallProperties().radius_m);
+                                               std::max(physics_props.radius_m, physics_cfg.ground_height_m));
                     state.velocity_mps = projectile.velocity_mps;
                     state.spin_radps = projectile.spin_radps;
-                    addBall(state, defaultBallConfig(), defaultBallProperties());
+                    addBall(state, physics_cfg, physics_props);
+                    if (!ball_types_.empty()) {
+                        ball_types_.back() = projectile.type;
+                    }
                 }
                 projectile.active = false;
                 continue;
@@ -459,6 +472,15 @@ class BallGamepieceSim {
                projectile.position_m.x > field_.max_corner_m.x + tolerance_m ||
                projectile.position_m.y < field_.min_corner_m.y - tolerance_m ||
                projectile.position_m.y > field_.max_corner_m.y + tolerance_m;
+    }
+
+    const GamePieceInfo* findGamePieceInfo(const std::string& type) const {
+        for (const auto& info : gamepiece_types_) {
+            if (info.type == type) {
+                return &info;
+            }
+        }
+        return nullptr;
     }
 
     static Vector3 rotateYaw(const Vector3& local, double yaw_rad) {

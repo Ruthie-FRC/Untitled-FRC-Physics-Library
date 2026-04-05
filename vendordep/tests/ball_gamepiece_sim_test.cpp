@@ -88,22 +88,22 @@ int main() {
     frcsim::BallGamepieceSim projectile_sim;
     projectile_sim.configureEvergreenField();
 
+    frcsim::BallGamepieceSim::GamePieceInfo projectile_ball_type;
+    projectile_ball_type.type = "Ball";
+    projectile_ball_type.physics_config = frcsim::BallGamepieceSim::season2026BallConfig();
+    projectile_ball_type.ball_properties = frcsim::BallGamepieceSim::season2026BallProperties();
+    projectile_ball_type.spawn_on_ground_after_projectile = true;
+    projectile_sim.registerGamePieceType(projectile_ball_type);
+
     frcsim::BallGamepieceSim::RobotState launcher;
     launcher.position_m = frcsim::Vector3(1.0, 1.0, 0.0);
     launcher.yaw_rad = 0.0;
     const std::size_t launcher_id = projectile_sim.addRobot(launcher);
 
-    frcsim::BallGamepieceSim::GoalZone goal;
-    goal.shape = frcsim::BallGamepieceSim::GoalZone::Shape::kSphere;
-    goal.center_m = frcsim::Vector3(3.0, 1.0, 1.1);
-    goal.radius_m = 0.6;
-    goal.accepted_type = "Ball";
-    projectile_sim.addGoalZone(goal);
-
     frcsim::BallGamepieceSim::FireCommand projectile_fire;
     projectile_fire.launch_offset_m = frcsim::Vector3(0.3, 0.0, 0.8);
-    projectile_fire.pitch_rad = 0.6;
-    projectile_fire.mechanism_speed_mps = 7.0;
+    projectile_fire.pitch_rad = 0.35;
+    projectile_fire.mechanism_speed_mps = 2.5;
     projectile_fire.gamepiece_type = "Ball";
 
     projectile_sim.fireProjectile(launcher_id, projectile_fire, true);
@@ -111,9 +111,9 @@ int main() {
         projectile_sim.step(0.01);
     }
 
-    // Either scored in flight or converted to grounded piece after touch-ground.
+    // Maple-style conversion: projectile becomes grounded piece after touch-ground.
     assert(projectile_sim.countProjectiles() == 0);
-    assert(projectile_sim.countScoredBalls() > 0 || projectile_sim.countBalls() > 0);
+    assert(projectile_sim.countBalls() > 0);
 
     sim.robots()[robot_a_id].position_m = frcsim::Vector3(16.50, 2.0, 0.0);
     sim.robots()[robot_a_id].velocity_mps = frcsim::Vector3(2.0, 0.0, 0.0);
