@@ -3,7 +3,6 @@
 [![CI](https://github.com/Ruthie-FRC/RenSim/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ruthie-FRC/RenSim/actions/workflows/ci.yml)
 [![Deploy to rensim.dev](https://github.com/Ruthie-FRC/RenSim/actions/workflows/deploy-mkdocs.yml/badge.svg?branch=main)](https://github.com/Ruthie-FRC/RenSim/actions/workflows/deploy-mkdocs.yml)
 [![License](https://img.shields.io/github/license/Ruthie-FRC/RenSim)](LICENSE.txt)
-[![Latest Release](https://img.shields.io/github/v/release/Ruthie-FRC/RenSim)](https://github.com/Ruthie-FRC/RenSim/releases)
 [![Open Issues](https://img.shields.io/github/issues/Ruthie-FRC/RenSim)](https://github.com/Ruthie-FRC/RenSim/issues)
 
 RenSim is an open source, modular FRC physics library for simulation, analysis, and robotics workflow integration.
