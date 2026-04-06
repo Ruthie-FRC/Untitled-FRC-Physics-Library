@@ -1,22 +1,13 @@
 #pragma once
 
-#include "frcsim/arena/simulated_arena.hpp"
+#include "frcsim/arena/season_2026_arena_base.hpp"
 #include "frcsim/field/field_wall.hpp"
 
 namespace frcsim {
 
-class Rebuilt2026Arena : public SimulatedArena {
+class Rebuilt2026Arena : public Season2026ArenaBase {
   public:
-    Rebuilt2026Arena() : SimulatedArena(BallGamepieceSim::season2026FieldConfig()) {
-        gamepieceSim().configureSeason2026Field();
-
-        BallGamepieceSim::GamePieceInfo season_ball;
-        season_ball.type = "Ball";
-        season_ball.physics_config = BallGamepieceSim::season2026BallConfig();
-        season_ball.ball_properties = BallGamepieceSim::season2026BallProperties();
-        season_ball.spawn_on_ground_after_projectile = true;
-        gamepieceSim().registerGamePieceType(season_ball);
-
+        Rebuilt2026Arena() : Season2026ArenaBase() {
         applyFieldMap(rebuiltFieldMap());
 
         Timings t;
@@ -29,8 +20,8 @@ class Rebuilt2026Arena : public SimulatedArena {
         FieldMap map;
 
         auto walls = FieldWall::makeAxisAlignedPerimeter(
-            BallGamepieceSim::season2026FieldConfig().min_corner_m,
-            BallGamepieceSim::season2026FieldConfig().max_corner_m,
+            seasonFieldConfig().min_corner_m,
+            seasonFieldConfig().max_corner_m,
             1.0,
             0.22,
             0.65);
