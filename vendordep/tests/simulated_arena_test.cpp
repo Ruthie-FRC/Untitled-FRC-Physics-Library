@@ -19,7 +19,7 @@ int main() {
     goal.shape = frcsim::GoalStructure::Shape::kSphere;
     goal.center_m = frcsim::Vector3(4.0, 2.0, 1.1);
     goal.radius_m = 0.8;
-    goal.accepted_type = "Ball";
+    goal.accepted_type = frcsim::GoalStructure::AcceptedType::kBall;
     map.goals.push_back(goal);
 
     arena.applyFieldMap(map);
