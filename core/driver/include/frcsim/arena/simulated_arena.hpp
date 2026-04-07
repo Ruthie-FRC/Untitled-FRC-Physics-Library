@@ -11,17 +11,30 @@
 
 namespace frcsim {
 
+/**
+ * @brief High-level arena wrapper that coordinates game piece simulation, intake helpers, and custom subtick hooks.
+ */
 class SimulatedArena {
   public:
+    /** @brief Loop timing parameters for robot-period and internal simulation subticks. */
     struct Timings {
+        /** External control-period duration in seconds. */
         double robot_period_s{0.02};
+        /** Number of simulation updates performed inside each robot period. */
         int simulation_subticks_per_period{5};
     };
 
+    /** @brief Convenience field-description bundle converted into BallGamepieceSim entities. */
     struct FieldMap {
+        /** Obstacles converted to field boundaries. */
         std::vector<FieldObstacle> obstacles{};
+        /** Scoring regions converted to goal zones. */
         std::vector<GoalStructure> goals{};
 
+        /**
+             * @brief Applies map content into the provided game-piece simulator instance.
+             * @param sim Simulator to receive converted obstacles/goals.
+             */
         void applyTo(BallGamepieceSim& sim) const {
             for (const auto& obstacle : obstacles) {
                 sim.addFieldElement(obstacle.boundary);
@@ -46,6 +59,7 @@ class SimulatedArena {
     using RobotRegisteredCallback =
         std::function<void(std::size_t robot_index, const BallGamepieceSim::RobotState&, SimulatedArena&)>;
 
+    /** @brief Constructs arena with default field config and callback plumbing. */
     SimulatedArena() {
         gamepiece_sim_.setRobotAddedCallback(
             [this](std::size_t robot_index, const BallGamepieceSim::RobotState& robot) {
@@ -55,6 +69,10 @@ class SimulatedArena {
             });
     }
 
+    /**
+     * @brief Constructs arena with explicit field configuration and callback plumbing.
+     * @param field_config Initial field configuration for the internal gamepiece simulator.
+     */
     explicit SimulatedArena(const BallGamepieceSim::FieldConfig& field_config)
         : gamepiece_sim_(field_config) {
         gamepiece_sim_.setRobotAddedCallback(
@@ -65,42 +83,69 @@ class SimulatedArena {
             });
     }
 
+    /** @brief Mutable access to underlying game-piece simulator. @return Mutable simulator reference. */
     BallGamepieceSim& gamepieceSim() { return gamepiece_sim_; }
+    /** @brief Immutable access to underlying game-piece simulator. @return Const simulator reference. */
     const BallGamepieceSim& gamepieceSim() const { return gamepiece_sim_; }
 
+    /**
+     * @brief Adds a robot to the underlying game-piece simulator.
+     * @param robot Robot state to insert.
+     * @return Inserted robot index.
+     */
     std::size_t addRobot(const BallGamepieceSim::RobotState& robot) {
         return gamepiece_sim_.addRobot(robot);
     }
 
+    /**
+     * @brief Sets callback fired after a robot is registered through this arena.
+     * @param callback Callback to invoke on robot registration.
+     */
     void setRobotRegisteredCallback(const RobotRegisteredCallback& callback) {
         robot_registered_callback_ = callback;
     }
 
+    /** @brief Updates timing parameters with safety clamps for minimum valid values. @param timings New timing values. */
     void setTimings(const Timings& timings) {
         timings_.robot_period_s = std::max(1e-6, timings.robot_period_s);
         timings_.simulation_subticks_per_period = std::max(1, timings.simulation_subticks_per_period);
     }
 
+    /** @brief Returns active timing parameters. @return Immutable Timings reference. */
     const Timings& timings() const { return timings_; }
 
+    /** @brief Applies obstacles and goals from a field-map bundle. @param field_map Map to apply. */
     void applyFieldMap(const FieldMap& field_map) {
         field_map.applyTo(gamepiece_sim_);
     }
 
+    /** @brief Adds a custom per-subtick callback if callable is non-empty. @param custom_simulation Callback to append. */
     void addCustomSimulation(const CustomSimulation& custom_simulation) {
         if (custom_simulation) {
             custom_simulations_.push_back(custom_simulation);
         }
     }
 
+    /**
+     * @brief Creates and stores an intake simulation helper from config.
+     * @param config Intake simulation configuration.
+     * @return Mutable reference to inserted intake simulation.
+     */
     IntakeSimulation& addIntakeSimulation(const IntakeSimulation::Config& config) {
         intake_simulations_.emplace_back(config);
         return intake_simulations_.back();
     }
 
+    /** @brief Mutable intake simulation list. @return Mutable list reference. */
     std::vector<IntakeSimulation>& intakeSimulations() { return intake_simulations_; }
+    /** @brief Immutable intake simulation list. @return Const list reference. */
     const std::vector<IntakeSimulation>& intakeSimulations() const { return intake_simulations_; }
 
+    /**
+     * @brief Executes one robot-period worth of simulation.
+     *
+     * Per subtick order: gamepiece physics, intake updates, custom callbacks.
+     */
     void simulationPeriodic() {
         const int subticks = std::max(1, timings_.simulation_subticks_per_period);
         const double dt = timings_.robot_period_s / static_cast<double>(subticks);
@@ -123,7 +168,7 @@ class SimulatedArena {
     BallGamepieceSim gamepiece_sim_{};
     std::vector<IntakeSimulation> intake_simulations_{};
     std::vector<CustomSimulation> custom_simulations_{};
-        RobotRegisteredCallback robot_registered_callback_{};
+    RobotRegisteredCallback robot_registered_callback_{};
 };
 
 }  // namespace frcsim

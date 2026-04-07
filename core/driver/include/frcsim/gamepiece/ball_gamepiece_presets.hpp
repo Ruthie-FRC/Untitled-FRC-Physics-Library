@@ -4,7 +4,10 @@
 
 namespace frcsim::BallGamepiecePresets {
 
-/** @brief Baseline evergreen ball properties for open-ended sandbox use. */
+/**
+ * @brief Baseline evergreen ball properties for open-ended sandbox use.
+ * @return Ball physical constants tuned for evergreen defaults.
+ */
 inline BallPhysicsSim3D::BallProperties evergreenBallProperties() {
     BallPhysicsSim3D::BallProperties properties{};
     properties.mass_kg = 0.24;
@@ -15,7 +18,10 @@ inline BallPhysicsSim3D::BallProperties evergreenBallProperties() {
     return properties;
 }
 
-/** @brief Baseline evergreen ball physics config for open-ended sandbox use. */
+/**
+ * @brief Baseline evergreen ball physics config for open-ended sandbox use.
+ * @return BallPhysicsSim3D::Config with default environment/drag values.
+ */
 inline BallPhysicsSim3D::Config evergreenBallConfig() {
     BallPhysicsSim3D::Config config{};
     config.gravity_mps2 = Vector3(0.0, 0.0, -9.81);
@@ -27,7 +33,10 @@ inline BallPhysicsSim3D::Config evergreenBallConfig() {
     return config;
 }
 
-/** @brief Season 2026 field config with net boundary tuning enabled. */
+/**
+ * @brief Season 2026 field config with net boundary tuning enabled.
+ * @return Field configuration specialized for the 2026 season preset.
+ */
 inline BallGamepieceSim::FieldConfig season2026FieldConfig() {
     BallGamepieceSim::FieldConfig config = BallGamepieceSim::evergreenFieldConfig();
     config.net_boundary_user_id = 2026;
@@ -36,7 +45,10 @@ inline BallGamepieceSim::FieldConfig season2026FieldConfig() {
     return config;
 }
 
-/** @brief Season 2026 game ball properties: 15 cm diameter, 0.216 kg. */
+/**
+ * @brief Season 2026 game ball properties: 15 cm diameter, 0.216 kg.
+ * @return Ball physical constants for the 2026 gamepiece.
+ */
 inline BallPhysicsSim3D::BallProperties season2026BallProperties() {
     BallPhysicsSim3D::BallProperties properties{};
     properties.mass_kg = 0.216;
@@ -47,7 +59,10 @@ inline BallPhysicsSim3D::BallProperties season2026BallProperties() {
     return properties;
 }
 
-/** @brief Season 2026 ball config derived from evergreen baseline. */
+/**
+ * @brief Season 2026 ball config derived from evergreen baseline.
+ * @return Ball physics environment tuned for 2026 gameplay.
+ */
 inline BallPhysicsSim3D::Config season2026BallConfig() {
     BallPhysicsSim3D::Config config = evergreenBallConfig();
     config.magnus_coefficient = 1.2e-4;
@@ -57,6 +72,7 @@ inline BallPhysicsSim3D::Config season2026BallConfig() {
 
 /**
  * @brief Applies the built-in Season 2026 net boundary and goal zone to a simulator instance.
+ * @param sim Simulator instance to mutate.
  */
 inline void configureSeason2026Field(BallGamepieceSim& sim) {
     sim.setFieldConfig(season2026FieldConfig());

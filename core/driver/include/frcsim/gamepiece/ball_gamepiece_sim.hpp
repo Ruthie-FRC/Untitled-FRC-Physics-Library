@@ -19,8 +19,15 @@ namespace frcsim {
 /**
  * @brief Simulates robot interaction with spherical game pieces and free-flight projectiles.
  *
- * The simulator owns robot, grounded ball, projectile, goal-zone, and field-boundary state.
- * Seasonal presets are intentionally provided outside this class so this type stays reusable.
+ * Owns robot, grounded-ball, projectile, goal-zone, and field-boundary state.
+ *
+ * Coordinate conventions:
+ * - Position vectors are world-frame meters.
+ * - Velocity vectors are world-frame meters/second.
+ * - Robot yaw is radians about +Z.
+ *
+ * Seasonal field/gamepiece presets are intentionally defined outside this class so this
+ * simulator remains reusable for custom games and offseason field variants.
  */
 class BallGamepieceSim {
   public:
@@ -29,38 +36,59 @@ class BallGamepieceSim {
 
     /** @brief Global field and contact tuning parameters. */
     struct FieldConfig {
+        /** Minimum field corner in world coordinates. */
         Vector3 min_corner_m{0.0, 0.0, 0.0};
+        /** Maximum field corner in world coordinates. */
         Vector3 max_corner_m{16.54, 8.21, 3.0};
+        /** Coefficient applied to wall-normal bounce response. */
         double wall_restitution{0.25};
+        /** Fractional tangential damping applied on wall contacts. */
         double wall_friction{0.2};
 
-        // If >= 0, box boundaries with this user_id behave as net/catcher volumes.
+        /** If >= 0, box boundaries with this user_id behave as net/catcher volumes. */
         int net_boundary_user_id{-1};
+        /** Effective slack around net box volumes when determining entry. */
         double net_entry_slack_scale{0.7};
+        /** Planar velocity scale applied each step while a ball is in a net volume. */
         double net_velocity_decay{0.2};
+        /** Spin decay multiplier applied while a ball is in a net volume. */
         double net_spin_decay{0.8};
+        /** Additional downward acceleration bias for captured net balls. */
         double net_downward_bias_mps2{2.0};
 
-        // Robot-ball contact/plowing tuning.
+        /** Restitution used for robot-ball collision impulse. */
         double robot_ball_contact_restitution{0.45};
+        /** Friction used for robot-ball collision impulse. */
         double robot_ball_contact_friction{0.2};
+        /** Ball planar velocity retention during robot plowing interaction. */
         double plow_ball_velocity_retention{0.7};
+        /** Gain from robot planar velocity into plowed ball velocity. */
         double plow_robot_velocity_gain{0.6};
     };
 
     /** @brief Per-robot state used by game piece interaction and collision routines. */
     struct RobotState {
+        /** Robot center position in world coordinates. */
         Vector3 position_m{};
+        /** Robot linear velocity in world frame. */
         Vector3 velocity_mps{};
+        /** Robot heading about +Z in radians. */
         double yaw_rad{0.0};
 
+        /** Approximate planar collision radius. */
         double radius_m{0.45};
+        /** Enables intake capture logic when true. */
         bool intake_enabled{false};
+        /** Maximum number of simultaneously carried balls (currently 0 or 1 behavior). */
         std::size_t intake_capacity{1};
+        /** Intake capture radius from intake origin. */
         double intake_radius_m{0.28};
+        /** Intake origin offset in robot frame. */
         Vector3 intake_offset_m{0.45, 0.0, 0.10};
+        /** Held-ball anchor offset in robot frame. */
         Vector3 carry_offset_m{0.25, 0.0, 0.25};
 
+        /** Index of carried ball or kNoBall when not carrying. */
         std::size_t carried_ball_index{kNoBall};
     };
 
@@ -68,20 +96,23 @@ class BallGamepieceSim {
      * @brief Exit trajectory and metadata used when launching a carried ball or a projectile.
      */
     struct ExitTrajectoryParameters {
-        // Relative launch translation from robot center in robot frame.
+        /** Relative launch translation from robot center in robot frame. */
         Vector3 launch_offset_m{0.45, 0.0, 0.55};
 
-        // Launch angles in robot frame.
+        /** Additional yaw offset from robot heading, in radians. */
         double yaw_offset_rad{0.0};
+        /** Launch pitch angle in radians in robot frame. */
         double pitch_rad{0.8};
 
-        // Mechanism speed scalar and measured/estimated exit scalar.
-        // If estimated_exit_velocity_mps > 0, it is used as launch scalar.
+        /** Nominal launch speed command used when no estimated speed is provided. */
         double mechanism_speed_mps{14.0};
+        /** If > 0, overrides mechanism_speed_mps for launch speed. */
         double estimated_exit_velocity_mps{-1.0};
 
+        /** Spin vector to assign at launch. */
         Vector3 spin_radps{};
 
+        /** Type label applied to launched entity. */
         std::string gamepiece_type{"Ball"};
     };
 
@@ -90,70 +121,104 @@ class BallGamepieceSim {
 
     /** @brief Registration record for a named game piece type. */
     struct GamePieceInfo {
+        /** Unique gamepiece type string key. */
         std::string type{"Ball"};
+        /** Physics configuration used when this type is materialized as a grounded ball. */
         BallPhysicsSim3D::Config physics_config{};
+        /** Ball properties used when this type is materialized as a grounded ball. */
         BallPhysicsSim3D::BallProperties ball_properties{};
+        /** Whether projectile touchdown should spawn a grounded ball for this type. */
         bool spawn_on_ground_after_projectile{true};
     };
 
     /** @brief In-flight entity not currently represented by BallPhysicsSim3D. */
     struct ProjectileEntity {
+        /** Type label for acceptance checks and spawn behavior. */
         std::string type{"Ball"};
+        /** Current projectile position in world coordinates. */
         Vector3 position_m{};
+        /** Current projectile velocity in world frame. */
         Vector3 velocity_mps{};
+        /** Projectile spin in world frame. */
         Vector3 spin_radps{};
+        /** Downward gravity magnitude used by this projectile. */
         double gravity_mps2{9.81};
+        /** Accumulated projectile age in seconds. */
         double age_s{0.0};
+        /** False when projectile is retired from simulation. */
         bool active{true};
+        /** If true, touchdown spawns a grounded ball entity. */
         bool spawn_on_ground_after_touch{true};
+        /** Set true when a goal hit is detected. */
         bool hit_target{false};
+        /** Optional callback invoked when the projectile hits a goal. */
         std::function<void()> hit_target_callback{};
     };
 
     /** @brief Goal capture region and validation logic. */
     struct GoalZone {
+        /** @brief Supported built-in goal geometries. */
         enum class Shape {
             kBox,
             kSphere,
         };
 
+        /** Geometry mode for this zone. */
         Shape shape{Shape::kBox};
+        /** Zone center in world coordinates. */
         Vector3 center_m{};
+        /** Half extents for box zones. */
         Vector3 half_extents_m{0.2, 0.2, 0.2};
+        /** Radius for sphere zones. */
         double radius_m{0.25};
+        /** Accepted gamepiece type string; empty accepts all. */
         std::string accepted_type{"Ball"};
+        /** Requires upward velocity at score time when true. */
         bool require_positive_vertical_velocity{false};
+        /** Optional velocity-rule override. */
         std::function<bool(const Vector3&)> custom_velocity_validator{};
     };
 
     /** @brief Grounded game piece entity with its own ball physics instance. */
     struct BallEntity {
+        /** Per-ball physics simulator state. */
         BallPhysicsSim3D sim{};
+        /** True once this ball has entered a configured net volume. */
         bool scored_in_net{false};
     };
 
     /** @brief Constructs a simulator with default evergreen field bounds and contact tuning. */
     BallGamepieceSim() = default;
 
-    /** @brief Constructs a simulator with the provided field configuration. */
+    /**
+     * @brief Constructs a simulator with the provided field configuration.
+     * @param field Initial field configuration.
+     */
     explicit BallGamepieceSim(const FieldConfig& field) : field_(field) {}
 
-    /** @brief Returns baseline evergreen field bounds and wall-contact coefficients. */
+    /**
+     * @brief Returns baseline evergreen field bounds and wall-contact coefficients.
+     * @return Default evergreen field configuration.
+     */
     static FieldConfig evergreenFieldConfig() {
         return FieldConfig{};
     }
 
-    /** @brief Replaces field configuration while preserving dynamic simulation entities. */
+    /**
+     * @brief Replaces field configuration while preserving dynamic simulation entities.
+     * @param field New field configuration.
+     */
     void setFieldConfig(const FieldConfig& field) {
         field_ = field;
     }
 
+    /** @brief Callback type invoked when a robot is added to this simulator. */
     using RobotAddedCallback = std::function<void(std::size_t robot_index, const RobotState& robot)>;
 
     /**
      * @brief Adds a robot and returns its index.
-     *
-     * If a robot-added callback is configured, it is invoked after insertion.
+        * @param robot Robot state to insert.
+        * @return Inserted robot index.
      */
     std::size_t addRobot(const RobotState& robot) {
         robots_.push_back(robot);
@@ -164,13 +229,19 @@ class BallGamepieceSim {
         return robot_index;
     }
 
-    /** @brief Sets a callback invoked whenever addRobot inserts a robot. */
+    /**
+     * @brief Sets a callback invoked whenever addRobot inserts a robot.
+     * @param callback Callback invoked after insertion.
+     */
     void setRobotAddedCallback(const RobotAddedCallback& callback) {
         robot_added_callback_ = callback;
     }
 
     /**
      * @brief Adds a grounded ball with explicit physics configuration.
+     * @param state Initial grounded ball state.
+     * @param config Ball physics configuration.
+     * @param properties Ball physical properties.
      * @return Index of the inserted ball entity.
      */
     std::size_t addBall(const BallPhysicsSim3D::BallState& state,
@@ -184,13 +255,21 @@ class BallGamepieceSim {
         return balls_.size() - 1;
     }
 
-    /** @brief Adds a projectile entity and returns its index. */
+    /**
+     * @brief Adds a projectile entity and returns its index.
+     * @param projectile Projectile to append.
+     * @return Inserted projectile index.
+     */
     std::size_t addProjectile(const ProjectileEntity& projectile) {
         projectiles_.push_back(projectile);
         return projectiles_.size() - 1;
     }
 
-    /** @brief Adds a goal zone and returns a mutable reference to the stored copy. */
+    /**
+     * @brief Adds a goal zone and returns a mutable reference to the stored copy.
+     * @param goal_zone Goal zone definition to append.
+     * @return Mutable reference to stored goal zone.
+     */
     GoalZone& addGoalZone(const GoalZone& goal_zone) {
         goals_.push_back(goal_zone);
         return goals_.back();
@@ -198,6 +277,7 @@ class BallGamepieceSim {
 
     /**
      * @brief Registers or replaces a named game piece type.
+        * @param info Type definition to insert or overwrite.
      * @return Mutable reference to stored registration.
      */
     GamePieceInfo& registerGamePieceType(const GamePieceInfo& info) {
@@ -216,23 +296,31 @@ class BallGamepieceSim {
         gamepiece_types_.clear();
     }
 
-    /** @brief Adds a field element and returns a mutable reference to the stored copy. */
+    /**
+     * @brief Adds a field element and returns a mutable reference to the stored copy.
+     * @param boundary Boundary to append.
+     * @return Mutable reference to stored boundary.
+     */
     EnvironmentalBoundary& addFieldElement(const EnvironmentalBoundary& boundary) {
         field_elements_.push_back(boundary);
         return field_elements_.back();
     }
 
-    /** @brief Mutable robot state list. */
+    /** @brief Mutable robot state list. @return Mutable robot vector reference. */
     std::vector<RobotState>& robots() { return robots_; }
-    /** @brief Immutable robot state list. */
+    /** @brief Immutable robot state list. @return Const robot vector reference. */
     const std::vector<RobotState>& robots() const { return robots_; }
 
-    /** @brief Mutable grounded-ball list. */
+    /** @brief Mutable grounded-ball list. @return Mutable ball vector reference. */
     std::vector<BallEntity>& balls() { return balls_; }
-    /** @brief Immutable grounded-ball list. */
+    /** @brief Immutable grounded-ball list. @return Const ball vector reference. */
     const std::vector<BallEntity>& balls() const { return balls_; }
 
-    /** @brief Returns the registered type string for a ball index, or empty string if out of range. */
+    /**
+     * @brief Returns the registered type string for a ball index, or empty string if out of range.
+     * @param ball_index Ball index to query.
+     * @return Type string reference, or reference to empty string when invalid.
+     */
     const std::string& ballType(std::size_t ball_index) const {
         static const std::string empty;
         if (ball_index >= ball_types_.size()) {
@@ -243,6 +331,8 @@ class BallGamepieceSim {
 
     /**
      * @brief Updates the type label for an existing ball.
+        * @param ball_index Ball index to modify.
+        * @param type Replacement type label.
      * @return true if the ball index was valid and updated.
      */
     bool setBallType(std::size_t ball_index, std::string type) {
@@ -255,6 +345,7 @@ class BallGamepieceSim {
 
     /**
      * @brief Removes a ball by index and remaps carried-ball indices accordingly.
+        * @param ball_index Ball index to remove.
      * @return true when removal succeeded.
      */
     bool removeBall(std::size_t ball_index) {
@@ -275,25 +366,25 @@ class BallGamepieceSim {
         return true;
     }
 
-    /** @brief Mutable projectile list. */
+    /** @brief Mutable projectile list. @return Mutable projectile vector reference. */
     std::vector<ProjectileEntity>& projectiles() { return projectiles_; }
-    /** @brief Immutable projectile list. */
+    /** @brief Immutable projectile list. @return Const projectile vector reference. */
     const std::vector<ProjectileEntity>& projectiles() const { return projectiles_; }
 
-    /** @brief Mutable goal-zone list. */
+    /** @brief Mutable goal-zone list. @return Mutable goal vector reference. */
     std::vector<GoalZone>& goals() { return goals_; }
-    /** @brief Immutable goal-zone list. */
+    /** @brief Immutable goal-zone list. @return Const goal vector reference. */
     const std::vector<GoalZone>& goals() const { return goals_; }
 
-    /** @brief Mutable field-element list. */
+    /** @brief Mutable field-element list. @return Mutable boundary vector reference. */
     std::vector<EnvironmentalBoundary>& fieldElements() { return field_elements_; }
-    /** @brief Immutable field-element list. */
+    /** @brief Immutable field-element list. @return Const boundary vector reference. */
     const std::vector<EnvironmentalBoundary>& fieldElements() const { return field_elements_; }
 
-    /** @brief Returns total grounded ball count (including scored-in-net balls). */
+    /** @brief Returns total grounded ball count (including scored-in-net balls). @return Grounded ball count. */
     std::size_t countBalls() const { return balls_.size(); }
 
-    /** @brief Returns count of currently active projectiles. */
+    /** @brief Returns count of currently active projectiles. @return Active projectile count. */
     std::size_t countProjectiles() const {
         std::size_t count = 0;
         for (const auto& projectile : projectiles_) {
@@ -304,7 +395,7 @@ class BallGamepieceSim {
         return count;
     }
 
-    /** @brief Returns count of grounded balls marked as scored in configured net volume(s). */
+    /** @brief Returns count of grounded balls marked as scored in configured net volume(s). @return Scored ball count. */
     std::size_t countScoredBalls() const {
         std::size_t count = 0;
         for (const auto& ball : balls_) {
@@ -317,6 +408,8 @@ class BallGamepieceSim {
 
     /**
      * @brief Launches the robot's carried ball using exit trajectory parameters.
+        * @param robot_index Robot index that owns the carried ball.
+        * @param command Launch parameters.
      * @return true if a carried ball existed and was launched.
      */
     bool fireBall(std::size_t robot_index, const ExitTrajectoryParameters& command) {
@@ -358,6 +451,10 @@ class BallGamepieceSim {
 
     /**
      * @brief Spawns a projectile using robot pose and exit trajectory parameters.
+        * @param robot_index Robot index used as launch source.
+        * @param command Launch parameters.
+        * @param spawn_on_ground_after_touch If true, touchdown spawns a grounded ball.
+        * @param hit_target_callback Callback fired on goal hit.
      * @return Projectile index, or kNoBall when robot index is invalid.
      */
     std::size_t fireProjectile(std::size_t robot_index, const ExitTrajectoryParameters& command,
@@ -391,7 +488,10 @@ class BallGamepieceSim {
         return projectiles_.size() - 1;
     }
 
-    /** @brief Advances simulation by dt using configured internal substep count. */
+    /**
+     * @brief Advances simulation by dt using configured internal substep count.
+     * @param dt_s External timestep in seconds.
+     */
     void step(double dt_s) {
         if (dt_s <= 0.0) {
             return;
@@ -405,18 +505,21 @@ class BallGamepieceSim {
         }
     }
 
-    /** @brief Sets simulation substeps per external step; values below 1 clamp to 1. */
+    /**
+     * @brief Sets simulation substeps per external step; values below 1 clamp to 1.
+     * @param simulation_substeps Requested substep count.
+     */
     void setSimulationSubsteps(int simulation_substeps) {
         simulation_substeps_ = std::max(1, simulation_substeps);
     }
 
-    /** @brief Returns current simulation substeps-per-step value. */
+    /** @brief Returns current simulation substeps-per-step value. @return Substep count. */
     int simulationSubsteps() const {
         return simulation_substeps_;
     }
 
   private:
-        /** @brief Executes one fixed simulation substep. */
+    /** @brief Executes one fixed simulation substep. */
     void stepSingle(double dt_s) {
         if (dt_s <= 0.0) {
             return;

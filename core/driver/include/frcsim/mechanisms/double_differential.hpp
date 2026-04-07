@@ -6,8 +6,14 @@
 
 namespace frcsim {
 
+/**
+ * @brief Kinematic mapping utility for a two-motor double differential turret mechanism.
+ *
+ * The configured 2x2 matrix maps motor shaft states to yaw/pitch joint states.
+ */
 class DoubleDifferentialMechanism {
   public:
+    /** @brief Optional soft limits applied to joint coordinates. */
     struct Limits {
         double min_yaw_rad{-std::numeric_limits<double>::infinity()};
         double max_yaw_rad{std::numeric_limits<double>::infinity()};
@@ -15,6 +21,7 @@ class DoubleDifferentialMechanism {
         double max_pitch_rad{std::numeric_limits<double>::infinity()};
     };
 
+    /** @brief Mapping coefficients and inversion thresholds. */
     struct Config {
         // Mapping from motor shaft position [a, b] to joint coordinates [yaw, pitch].
         // yaw = m00 * a + m01 * b
@@ -32,6 +39,7 @@ class DoubleDifferentialMechanism {
         double singularity_epsilon{1e-9};
     };
 
+    /** @brief Input state for the two drive motors. */
     struct MotorState {
         double motor_a_position_rad{0.0};
         double motor_b_position_rad{0.0};
@@ -39,6 +47,7 @@ class DoubleDifferentialMechanism {
         double motor_b_velocity_radps{0.0};
     };
 
+    /** @brief Output state for mechanism yaw/pitch joints. */
     struct JointState {
         double yaw_rad{0.0};
         double pitch_rad{0.0};
@@ -46,8 +55,11 @@ class DoubleDifferentialMechanism {
         double pitch_velocity_radps{0.0};
     };
 
+    /** @brief Result from inverse kinematics solve. */
     struct InverseResult {
+        /** Computed motor state if valid is true. */
         MotorState motor_state{};
+        /** False when matrix is singular within configured epsilon. */
         bool valid{true};
     };
 
@@ -55,9 +67,16 @@ class DoubleDifferentialMechanism {
 
     explicit DoubleDifferentialMechanism(const Config& config) : config_(config) {}
 
+    /** @brief Returns current mapping configuration. @return Immutable Config reference. */
     const Config& config() const { return config_; }
+    /** @brief Replaces mapping configuration. @param config New mapping configuration. */
     void setConfig(const Config& config) { config_ = config; }
 
+    /**
+     * @brief Computes joint state from motor state via forward mapping.
+     * @param motor_state Motor positions/velocities in mechanism motor space.
+     * @return Joint state with configured limits applied.
+     */
     JointState forward(const MotorState& motor_state) const {
         JointState out{};
         out.yaw_rad = config_.yaw_scale * (config_.m00 * motor_state.motor_a_position_rad +
@@ -76,6 +95,11 @@ class DoubleDifferentialMechanism {
         return out;
     }
 
+    /**
+     * @brief Solves inverse mapping from desired joint state to motor state.
+      * @param desired_joint_state Requested joint angles/rates.
+     * @return InverseResult with valid=false when configuration is singular.
+     */
     InverseResult inverse(const JointState& desired_joint_state) const {
         InverseResult result{};
 
@@ -108,6 +132,11 @@ class DoubleDifferentialMechanism {
         return result;
     }
 
+    /**
+     * @brief Returns a copy of state clamped to configured joint limits.
+     * @param state Input joint state.
+     * @return Clamped joint state.
+     */
     JointState clampedToLimits(const JointState& state) const {
         JointState out = state;
         applyLimits(out);

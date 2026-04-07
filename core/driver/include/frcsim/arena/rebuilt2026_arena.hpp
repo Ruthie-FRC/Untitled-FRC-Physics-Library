@@ -5,8 +5,14 @@
 
 namespace frcsim {
 
+/**
+ * @brief Arena preset for the 2026 rebuilt field concept.
+ *
+ * This preset extends Season2026ArenaBase and applies additional fixed obstacles/goals.
+ */
 class Rebuilt2026Arena : public Season2026ArenaBase {
   public:
+        /** @brief Constructs the arena and applies rebuilt field map plus default timing values. */
         Rebuilt2026Arena() : Season2026ArenaBase() {
         applyFieldMap(rebuiltFieldMap());
 
@@ -16,6 +22,10 @@ class Rebuilt2026Arena : public Season2026ArenaBase {
         setTimings(t);
     }
 
+    /**
+     * @brief Builds the obstacle/goal map used by this arena preset.
+     * @return FieldMap containing perimeter walls, static structures, and goals.
+     */
     static FieldMap rebuiltFieldMap() {
         FieldMap map;
 

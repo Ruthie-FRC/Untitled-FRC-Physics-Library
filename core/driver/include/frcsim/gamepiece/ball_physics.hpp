@@ -9,39 +9,70 @@
 
 namespace frcsim {
 
+/**
+ * @brief 3D rigid-body style ball simulator with drag, Magnus lift, and ground contact.
+ *
+ * Units are SI: meters, seconds, kilograms, radians.
+ */
 class BallPhysicsSim3D {
   public:
+    /** @brief Runtime physics environment parameters. */
     struct Config {
+        /** Constant gravity vector applied each integration substep. */
         Vector3 gravity_mps2{0.0, 0.0, -9.81};
-                double effective_gravity_scale{1.0};
+        /** Multiplier applied to gravity_mps2 after sanitization. */
+        double effective_gravity_scale{1.0};
+        /** Air density used by drag force computation. */
         double air_density_kgpm3{1.225};
-                double drag_scale{1.0};
+        /** Additional scale factor applied to drag force. */
+        double drag_scale{1.0};
+        /** Coefficient used by Vector3::magnusForce. */
         double magnus_coefficient{1e-4};
-                double magnus_scale{1.0};
+        /** Additional scale factor applied to Magnus force. */
+        double magnus_scale{1.0};
+        /** World Z height for the flat ground plane. */
         double ground_height_m{0.0};
+        /** Exponential-style planar speed decay while on ground, per second. */
         double rolling_friction_per_s{1.2};
+        /** Minimum downward impact speed that triggers a bounce. */
         double min_bounce_speed_mps{0.1};
-                double max_substep_s{0.01};
+        /** Maximum internal integration substep size. */
+        double max_substep_s{0.01};
     };
 
+    /** @brief Physical parameters for the ball body. */
     struct BallProperties {
+        /** Ball mass in kilograms. */
         double mass_kg{0.27};
+        /** Ball radius in meters. */
         double radius_m{0.12};
+        /** Dimensionless drag coefficient. */
         double drag_coefficient{0.47};
+        /** Reference frontal area used for drag in square meters. */
         double reference_area_m2{0.045};
+        /** Coefficient of restitution for ground impacts in [0, 1]. */
         double restitution{0.45};
     };
 
+    /** @brief Dynamic state advanced by step(). */
     struct BallState {
+        /** Ball center position in world coordinates. */
         Vector3 position_m{};
+        /** Ball linear velocity in world frame. */
         Vector3 velocity_mps{};
+        /** Ball spin vector in world frame, rad/s about each axis. */
         Vector3 spin_radps{};
+        /** True when attached to a carrier and not free-flying. */
         bool held{false};
     };
 
+    /** @brief Request payload used to capture a ball into a carrier. */
     struct PickupRequest {
+        /** Intake point in world coordinates used for capture distance checks. */
         Vector3 intake_position_m{};
+        /** Capture radius around intake_position_m. */
         double capture_radius_m{0.2};
+        /** Offset from intake position to held-ball resting position. */
         Vector3 carry_offset_m{};
     };
 
@@ -53,23 +84,39 @@ class BallPhysicsSim3D {
     BallPhysicsSim3D(const Config& config, const BallProperties& ball_properties)
         : config_(sanitizeConfig(config)), ball_properties_(sanitizeBallProperties(ball_properties)) {}
 
+    /** @brief Returns active, sanitized configuration. @return Immutable Config reference. */
     const Config& config() const { return config_; }
+    /** @brief Replaces configuration after value sanitization and clamping. @param config New config input. */
     void setConfig(const Config& config) { config_ = sanitizeConfig(config); }
 
+    /** @brief Returns active, sanitized ball properties. @return Immutable BallProperties reference. */
     const BallProperties& ballProperties() const { return ball_properties_; }
+    /** @brief Replaces ball properties after sanitization. @param props New ball properties. */
     void setBallProperties(const BallProperties& props) { ball_properties_ = sanitizeBallProperties(props); }
 
+    /** @brief Returns current ball state. @return Immutable BallState reference. */
     const BallState& state() const { return state_; }
+    /** @brief Replaces state and sanitizes non-finite values. @param state New state value. */
     void setState(const BallState& state) {
         state_ = state;
         sanitizeState(state_);
     }
 
+    /**
+     * @brief Updates carrier pose used when the ball is in held mode.
+     * @param carrier_position_m Carrier reference position in world frame.
+     * @param carrier_velocity_mps Carrier linear velocity in world frame.
+     */
     void setCarrierPose(const Vector3& carrier_position_m, const Vector3& carrier_velocity_mps = Vector3::zero()) {
         carrier_position_m_ = carrier_position_m;
         carrier_velocity_mps_ = carrier_velocity_mps;
     }
 
+    /**
+     * @brief Attempts to pick up and hold the ball.
+      * @param pickup_request Capture request parameters.
+     * @return true when capture succeeds or ball is already held.
+     */
     bool requestPickup(const PickupRequest& pickup_request) {
         if (state_.held) {
             return true;
@@ -89,10 +136,17 @@ class BallPhysicsSim3D {
         return true;
     }
 
+    /** @brief Releases the ball from held mode without changing velocity. */
     void release() {
         state_.held = false;
     }
 
+    /**
+     * @brief Places the ball at a muzzle pose and sets launch velocity/spin.
+      * @param muzzle_position_m Muzzle world position.
+      * @param muzzle_velocity_mps Launch velocity in world frame.
+      * @param muzzle_spin_radps Launch spin in world frame.
+     */
     void shoot(const Vector3& muzzle_position_m, const Vector3& muzzle_velocity_mps,
                const Vector3& muzzle_spin_radps = Vector3::zero()) {
         state_.held = false;
@@ -102,6 +156,10 @@ class BallPhysicsSim3D {
         sanitizeState(state_);
     }
 
+    /**
+     * @brief Advances simulation by dt seconds.
+      * @param dt_s Simulation timestep in seconds.
+     */
     void step(double dt_s) {
         if (!std::isfinite(dt_s) || dt_s <= 0.0) {
             return;

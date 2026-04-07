@@ -9,41 +9,67 @@
 
 namespace frcsim {
 
+/** @brief Lightweight intake interaction model that consumes nearby balls into robot inventory. */
 class IntakeSimulation {
   public:
+    /** @brief Runtime configuration for intake behavior. */
     struct Config {
+        /** Robot index in BallGamepieceSim::robots(). */
         std::size_t robot_index{0};
+        /** Type string filter; empty matches any type. */
         std::string targeted_type{"Ball"};
+        /** Maximum number of stored pieces in this intake simulation. */
         std::size_t capacity{1};
     };
 
+    /** @brief Contact event generated during update() proximity checks. */
     struct ContactEvent {
+        /** @brief Contact lifecycle phase. */
         enum class Phase {
             kBegin,
             kPersist,
             kEnd,
         };
 
+        /** Index of ball involved in this event. */
         std::size_t ball_index{BallGamepieceSim::kNoBall};
+        /** Contact phase classification. */
         Phase phase{Phase::kBegin};
     };
 
     IntakeSimulation() = default;
 
+    /**
+     * @brief Constructs intake simulation with explicit config.
+     * @param config Intake configuration to store.
+     */
     explicit IntakeSimulation(const Config& config) : config_(config) {}
 
+    /** @brief Replaces intake configuration. @param config New configuration. */
     void setConfig(const Config& config) { config_ = config; }
+    /** @brief Returns current configuration. @return Immutable config reference. */
     const Config& config() const { return config_; }
 
+    /** @brief Enables/disables intake processing. @param running True to enable update processing. */
     void setRunning(bool running) { running_ = running; }
+    /** @brief Returns whether intake processing is active. @return True if running. */
     bool isRunning() const { return running_; }
 
+    /**
+     * @brief Sets optional custom acceptance predicate for candidate balls.
+     * @param predicate Callable receiving ball index and simulator state.
+     */
     void setCustomIntakeCondition(const std::function<bool(std::size_t, const BallGamepieceSim&)>& predicate) {
         custom_condition_ = predicate;
     }
 
+    /** @brief Returns current intake inventory count. @return Number of stored pieces. */
     std::size_t gamePiecesInIntakeCount() const { return intake_count_; }
 
+    /**
+     * @brief Removes one stored piece from intake inventory.
+     * @return True when a piece was available and consumed.
+     */
     bool obtainGamePieceFromIntake() {
         if (intake_count_ == 0) {
             return false;
@@ -52,8 +78,13 @@ class IntakeSimulation {
         return true;
     }
 
+    /** @brief Returns contact events generated during the most recent update call. @return Event deque. */
     const std::deque<ContactEvent>& recentEvents() const { return recent_events_; }
 
+    /**
+     * @brief Performs proximity scanning and intake processing for one simulation step.
+     * @param sim Mutable gamepiece simulator state.
+     */
     void update(BallGamepieceSim& sim) {
         if (!running_) {
             recent_events_.clear();

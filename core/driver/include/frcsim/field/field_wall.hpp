@@ -6,7 +6,23 @@
 
 namespace frcsim {
 
+/**
+ * @brief Helper factory for perimeter wall obstacles.
+ *
+ * Coordinate conventions used throughout frcsim field geometry:
+ * - +X points downfield from the origin corner.
+ * - +Y points across the field width.
+ * - +Z points upward.
+ */
 struct FieldWall {
+    /**
+     * @brief Creates four axis-aligned box walls around a rectangular field footprint.
+     * @param min_corner_m Lower world-space corner of the field bounds.
+     * @param max_corner_m Upper world-space corner of the field bounds.
+     * @param wall_height_m Wall height in meters.
+     * @param restitution Wall restitution for collisions.
+     * @param friction Wall friction coefficient for tangential damping.
+     */
     static std::array<FieldObstacle, 4> makeAxisAlignedPerimeter(const Vector3& min_corner_m,
                                                                  const Vector3& max_corner_m,
                                                                  double wall_height_m,

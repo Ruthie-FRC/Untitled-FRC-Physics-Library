@@ -6,9 +6,21 @@
 
 namespace frcsim {
 
+/**
+ * @brief Convenience wrapper for constructing EnvironmentalBoundary-based obstacles.
+ */
 struct FieldObstacle {
+    /** Underlying boundary object consumed by BallGamepieceSim. */
     EnvironmentalBoundary boundary{};
 
+    /**
+     * @brief Creates an infinite plane obstacle.
+     * @param point_m A point on the plane in world coordinates.
+     * @param orientation Plane orientation; local +Z is treated as outward normal.
+     * @param restitution Normal restitution coefficient.
+     * @param friction Tangential friction coefficient.
+     * @param user_id Optional tag for custom behavior grouping.
+     */
     static FieldObstacle makePlane(const Vector3& point_m,
                                    const Quaternion& orientation,
                                    double restitution = 0.3,
@@ -24,6 +36,17 @@ struct FieldObstacle {
         return obstacle;
     }
 
+    /**
+     * @brief Creates an oriented box obstacle.
+     * @param center_m Box center in world coordinates.
+     * @param half_extents_m Positive half-lengths along local X/Y/Z axes.
+     * @param orientation Box orientation quaternion.
+     * @param restitution Normal restitution coefficient.
+     * @param friction Tangential friction coefficient.
+     * @param user_id Optional tag for custom behavior grouping.
+     *
+     * Quaternion note: use Quaternion::fromEuler(roll, pitch, yaw) to rotate away from axis alignment.
+     */
     static FieldObstacle makeBox(const Vector3& center_m,
                                  const Vector3& half_extents_m,
                                  const Quaternion& orientation = Quaternion(),
@@ -41,6 +64,22 @@ struct FieldObstacle {
         return obstacle;
     }
 
+    /**
+     * @brief Creates an oriented cylinder obstacle aligned to local Z.
+     * @param center_m Cylinder center in world coordinates.
+     * @param radius_m Cylinder radius.
+     * @param half_height_m Half of cylinder height along local Z.
+     * @param orientation Cylinder orientation quaternion.
+     * @param restitution Normal restitution coefficient.
+     * @param friction Tangential friction coefficient.
+     * @param user_id Optional tag for custom behavior grouping.
+     *
+     * Example:
+     * \code{.cpp}
+     * auto q = Quaternion::fromEuler(0.0, 0.0, 1.57079632679); // rotate 90 deg about Z
+     * auto post = FieldObstacle::makeCylinder(Vector3(2.0, 1.0, 0.6), 0.15, 0.6, q);
+     * \endcode
+     */
     static FieldObstacle makeCylinder(const Vector3& center_m,
                                       double radius_m,
                                       double half_height_m,
@@ -61,9 +100,12 @@ struct FieldObstacle {
     }
 };
 
+/** @brief Mutable collection helper for assembling obstacle sets. */
 struct FieldObstacleMap {
+    /** Stored obstacle entries. */
     std::vector<FieldObstacle> obstacles{};
 
+    /** @brief Appends a single obstacle. */
     void add(const FieldObstacle& obstacle) {
         obstacles.push_back(obstacle);
     }

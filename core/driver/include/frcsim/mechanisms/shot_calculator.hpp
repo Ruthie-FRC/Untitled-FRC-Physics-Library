@@ -12,8 +12,12 @@
 
 namespace frcsim {
 
+/**
+ * @brief 3D shot solution generator using table interpolation plus optional ballistic refinement.
+ */
 class ShotCalculator3D {
   public:
+        /** @brief Lookup-table row for distance-indexed shot tuning. */
     struct TablePoint {
         double distance_m{0.0};
         double hood_pitch_rad{0.0};
@@ -21,6 +25,7 @@ class ShotCalculator3D {
         double time_of_flight_s{0.0};
     };
 
+    /** @brief Solver configuration for interpolation, refinement, and historical smoothing behavior. */
     struct Config {
         double min_distance_m{1.3};
         double max_distance_m{5.8};
@@ -64,6 +69,7 @@ class ShotCalculator3D {
         double max_speed_mps{45.0};
     };
 
+    /** @brief Output shot command/result packet. */
     struct ShotParameters {
         bool is_valid{false};
         double turret_yaw_rad{0.0};
@@ -75,16 +81,27 @@ class ShotCalculator3D {
 
     ShotCalculator3D() = default;
 
+    /**
+     * @brief Constructs calculator with explicit configuration.
+     * @param config Initial calculator configuration.
+     */
     explicit ShotCalculator3D(const Config& config) : config_(sanitizeConfig(config)) {}
 
+    /** @brief Returns active sanitized configuration. @return Immutable config reference. */
     const Config& config() const { return config_; }
+    /** @brief Replaces configuration after sanitization. @param config New configuration. */
     void setConfig(const Config& config) { config_ = sanitizeConfig(config); }
 
+    /** @brief Clears learned recent-shot history used for contextual blending. */
     void clearHistory() {
         recent_shot_samples_.clear();
         last_recent_sample_s_ = -std::numeric_limits<double>::infinity();
     }
 
+    /**
+     * @brief Replaces lookup table with validated and distance-sorted points.
+     * @param points Candidate table points to ingest.
+     */
     void setLookupTable(std::vector<TablePoint> points) {
         table_.clear();
         table_.reserve(points.size());
@@ -105,8 +122,17 @@ class ShotCalculator3D {
         });
     }
 
+    /** @brief Returns current lookup table. @return Immutable vector reference of table points. */
     const std::vector<TablePoint>& lookupTable() const { return table_; }
 
+    /**
+     * @brief Computes a shot solution for current robot/target kinematics.
+     * @param shooter_origin_m Shooter origin in world coordinates.
+     * @param robot_velocity_mps Robot chassis velocity in world frame.
+     * @param target_position_m Target center position in world coordinates.
+     * @param now_s Current timestamp in seconds.
+     * @return ShotParameters with validity flag and computed yaw/pitch/speed/time.
+     */
     ShotParameters calculateShot(const Vector3& shooter_origin_m, const Vector3& robot_velocity_mps,
                                  const Vector3& target_position_m, double now_s) {
         ShotParameters result{};

@@ -5,8 +5,10 @@
 
 namespace frcsim {
 
+/** @brief Single-wheel shooter velocity model with optional closed-loop speed command behavior. */
 class ShooterWheelSim {
   public:
+	/** @brief DC motor approximation constants for shooter drive. */
 	struct MotorConfig {
 		// Motor free speed at nominal voltage.
 		double free_speed_radps{600.0};
@@ -20,6 +22,11 @@ class ShooterWheelSim {
 		// Applied supply voltage for normalization.
 		double nominal_voltage_v{12.0};
 
+		/**
+		 * @brief Returns Falcon 500 aggregate motor constants.
+		 * @param motor_count Number of mechanically coupled motors.
+		 * @return MotorConfig scaled for the provided motor count.
+		 */
 		static MotorConfig falcon500(int motor_count = 1) {
 			const int count = std::max(1, motor_count);
 			MotorConfig cfg{};
@@ -30,6 +37,11 @@ class ShooterWheelSim {
 			return cfg;
 		}
 
+		/**
+		 * @brief Returns NEO V1.1 aggregate motor constants.
+		 * @param motor_count Number of mechanically coupled motors.
+		 * @return MotorConfig scaled for the provided motor count.
+		 */
 		static MotorConfig neoV1_1(int motor_count = 1) {
 			const int count = std::max(1, motor_count);
 			MotorConfig cfg{};
@@ -40,6 +52,11 @@ class ShooterWheelSim {
 			return cfg;
 		}
 
+		/**
+		 * @brief Returns Kraken X60 aggregate motor constants.
+		 * @param motor_count Number of mechanically coupled motors.
+		 * @return MotorConfig scaled for the provided motor count.
+		 */
 		static MotorConfig krakenX60(int motor_count = 1) {
 			const int count = std::max(1, motor_count);
 			MotorConfig cfg{};
@@ -51,6 +68,7 @@ class ShooterWheelSim {
 		}
 	};
 
+	/** @brief Shooter wheel inertial/friction and ball-coupling parameters. */
 	struct WheelConfig {
 		double radius_m{0.05};
 		double inertia_kgm2{0.0025};
@@ -60,6 +78,7 @@ class ShooterWheelSim {
 		double ball_coupling{0.88};
 	};
 
+	/** @brief Control inputs for open-loop or simple internal velocity-loop operation. */
 	struct ControlInput {
 		// Open-loop voltage command.
 		double command_voltage_v{0.0};
@@ -78,26 +97,42 @@ class ShooterWheelSim {
 
 	ShooterWheelSim() = default;
 
+	/**
+	 * @brief Constructs a wheel simulator with explicit motor and wheel configuration.
+	 * @param motor Motor configuration constants.
+	 * @param wheel Wheel mechanical configuration.
+	 */
 	ShooterWheelSim(const MotorConfig& motor, const WheelConfig& wheel)
 		: motor_(motor), wheel_(wheel) {}
 
+	/** @brief Sets motor constants. @param motor New motor configuration. */
 	void setMotorConfig(const MotorConfig& motor) { motor_ = motor; }
+	/** @brief Sets wheel constants. @param wheel New wheel configuration. */
 	void setWheelConfig(const WheelConfig& wheel) { wheel_ = wheel; }
 
+	/** @brief Returns motor configuration. @return Immutable MotorConfig reference. */
 	const MotorConfig& motorConfig() const { return motor_; }
+	/** @brief Returns wheel configuration. @return Immutable WheelConfig reference. */
 	const WheelConfig& wheelConfig() const { return wheel_; }
 
+	/** @brief Forces internal angular speed state. @param omega_radps Wheel angular speed in rad/s. */
 	void setAngularSpeedRadps(double omega_radps) { omega_radps_ = omega_radps; }
+	/** @brief Returns current wheel angular speed. @return Angular speed in rad/s. */
 	double angularSpeedRadps() const { return omega_radps_; }
 
-	// Tangential speed at the wheel perimeter.
+	/** @brief Computes tangential speed at wheel perimeter. @return Surface speed in m/s. */
 	double surfaceSpeedMps() const { return omega_radps_ * std::max(0.0, wheel_.radius_m); }
 
-	// Estimated scalar exit speed for a ball leaving this wheel.
+	/** @brief Estimates ball exit speed from current surface speed and coupling factor. @return Exit speed in m/s. */
 	double estimatedExitVelocityMps() const {
 		return std::max(0.0, surfaceSpeedMps() * std::max(0.0, wheel_.ball_coupling));
 	}
 
+	/**
+	 * @brief Advances the shooter wheel state by one step.
+	 * @param dt_s Timestep in seconds.
+	 * @param control Control input for this step.
+	 */
 	void step(double dt_s, const ControlInput& control) {
 		if (dt_s <= 0.0) {
 			return;

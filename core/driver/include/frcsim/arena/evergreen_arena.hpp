@@ -6,8 +6,16 @@
 
 namespace frcsim {
 
+/**
+ * @brief Built-in arena preset representing the Evergreen benchmark field.
+ *
+ * This layout is intentionally static and is not tied to a single official FRC season game manual.
+ * The geometry reflects the 2026 WCP CADathon "Evergreen" concept, which served as a design
+ * exercise and was not physically built as an official field.
+ */
 class EvergreenArena : public SimulatedArena {
   public:
+    /** @brief Constructs Evergreen arena with default ball type registration and map geometry. */
     EvergreenArena() : SimulatedArena(BallGamepieceSim::evergreenFieldConfig()) {
         BallGamepieceSim::GamePieceInfo default_ball;
         default_ball.type = "Ball";
@@ -19,6 +27,7 @@ class EvergreenArena : public SimulatedArena {
         applyFieldMap(defaultFieldMap());
     }
 
+    /** @brief Returns default Evergreen field obstacles and goal structures. */
     static FieldMap defaultFieldMap() {
         FieldMap map;
 
