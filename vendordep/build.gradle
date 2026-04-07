@@ -192,9 +192,6 @@ doxygen {
             // Native C++ headers + sources
             sources "src/main/native/include"
             sources "src/main/native/cpp"
-            sources "$rootDir/../core/driver/src"
-            sources "$rootDir/../core/driver/include"
-
 
             // Java (for JNI + API docs)
             sources "src/main/java"
@@ -232,7 +229,6 @@ spotless {
             include '**/*.hpp', '**/*.cpp', '**/*.c', '**/*.h'
             exclude '**/build/**', '**/build-*/**', '**/bin/**'
         }
-        clangFormat()
     }
     groovyGradle {
         target fileTree('.') {
@@ -319,7 +315,7 @@ model {
             binaries.all {
                 lib library: 'VendorDriver', linkage: 'shared'
             }
-            nativeUtils.useRequiredLibrary(it, 'wpilib_shared')
+            nativeUtils.useRequiredLibrary(it, 'wpimath_shared')
         }
 
         VendorDriver(JniNativeLibrarySpec) {
