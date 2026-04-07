@@ -58,7 +58,7 @@ int main() {
     shot.launch_offset_m = frcsim::Vector3(0.45, 0.0, 0.7);
     shot.pitch_rad = 0.55;
     shot.mechanism_speed_mps = 8.5;
-    shot.gamepiece_type = "Ball";
+    shot.gamepiece_type = frcsim::BallGamepieceSim::GamePieceType::kBall;
 
     bool scored_callback_called = false;
     arena.gamepieceSim().fireProjectile(robot_id, shot, true, [&scored_callback_called]() { scored_callback_called = true; });

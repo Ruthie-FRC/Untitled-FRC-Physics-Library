@@ -104,7 +104,7 @@ class IntakeSimulation {
             if (ball.sim.state().held) {
                 continue;
             }
-            if (!config_.targeted_type.empty() && sim.ballType(i) != config_.targeted_type) {
+            if (!config_.targeted_type.empty() && sim.ballTypeName(i) != config_.targeted_type) {
                 continue;
             }
 

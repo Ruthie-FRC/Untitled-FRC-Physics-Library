@@ -90,7 +90,7 @@ int main() {
     projectile_sim.setFieldConfig(frcsim::BallGamepiecePresets::evergreenFieldConfig());
 
     frcsim::BallGamepieceSim::GamePieceInfo projectile_ball_type;
-    projectile_ball_type.type = "Ball";
+    projectile_ball_type.type = frcsim::BallGamepieceSim::GamePieceType::kBall;
     projectile_ball_type.physics_config = frcsim::BallGamepiecePresets::season2026BallConfig();
     projectile_ball_type.ball_properties = frcsim::BallGamepiecePresets::season2026BallProperties();
     projectile_ball_type.spawn_on_ground_after_projectile = true;
@@ -105,7 +105,7 @@ int main() {
     projectile_fire.launch_offset_m = frcsim::Vector3(0.3, 0.0, 0.8);
     projectile_fire.pitch_rad = 0.35;
     projectile_fire.mechanism_speed_mps = 2.5;
-    projectile_fire.gamepiece_type = "Ball";
+    projectile_fire.gamepiece_type = frcsim::BallGamepieceSim::GamePieceType::kBall;
 
     projectile_sim.fireProjectile(launcher_id, projectile_fire, true);
     for (int i = 0; i < 200; ++i) {

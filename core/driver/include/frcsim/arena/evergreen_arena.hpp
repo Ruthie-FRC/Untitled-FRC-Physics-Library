@@ -18,7 +18,7 @@ class EvergreenArena : public SimulatedArena {
     /** @brief Constructs Evergreen arena with default ball type registration and map geometry. */
     EvergreenArena() : SimulatedArena(BallGamepiecePresets::evergreenFieldConfig()) {
         BallGamepieceSim::GamePieceInfo default_ball;
-        default_ball.type = "Ball";
+        default_ball.type = BallGamepieceSim::GamePieceType::kBall;
         default_ball.physics_config = BallGamepiecePresets::evergreenBallConfig();
         default_ball.ball_properties = BallGamepiecePresets::evergreenBallProperties();
         default_ball.spawn_on_ground_after_projectile = true;

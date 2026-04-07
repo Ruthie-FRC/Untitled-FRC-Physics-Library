@@ -31,6 +31,11 @@ namespace frcsim {
  */
 class BallGamepieceSim {
   public:
+    /** Built-in gamepiece type identifiers used by launch/projectile/registration APIs. */
+    enum class GamePieceType {
+        kBall,
+    };
+
     /** Sentinel index representing no carried ball. */
     static constexpr std::size_t kNoBall = static_cast<std::size_t>(-1);
 
@@ -112,8 +117,8 @@ class BallGamepieceSim {
         /** Spin vector to assign at launch. */
         Vector3 spin_radps{};
 
-        /** Type label applied to launched entity. */
-        std::string gamepiece_type{"Ball"};
+        /** Type applied to launched entity. */
+        GamePieceType gamepiece_type{GamePieceType::kBall};
     };
 
     /** @brief Backward-compatible alias for older call sites. */
@@ -121,8 +126,8 @@ class BallGamepieceSim {
 
     /** @brief Registration record for a named game piece type. */
     struct GamePieceInfo {
-        /** Unique gamepiece type string key. */
-        std::string type{"Ball"};
+        /** Unique gamepiece type key. */
+        GamePieceType type{GamePieceType::kBall};
         /** Physics configuration used when this type is materialized as a grounded ball. */
         BallPhysicsSim3D::Config physics_config{};
         /** Ball properties used when this type is materialized as a grounded ball. */
@@ -133,8 +138,8 @@ class BallGamepieceSim {
 
     /** @brief In-flight entity not currently represented by BallPhysicsSim3D. */
     struct ProjectileEntity {
-        /** Type label for acceptance checks and spawn behavior. */
-        std::string type{"Ball"};
+        /** Type for acceptance checks and spawn behavior. */
+        GamePieceType type{GamePieceType::kBall};
         /** Current projectile position in world coordinates. */
         Vector3 position_m{};
         /** Current projectile velocity in world frame. */
@@ -243,7 +248,7 @@ class BallGamepieceSim {
         entity.sim = BallPhysicsSim3D(config, properties);
         entity.sim.setState(state);
         balls_.push_back(entity);
-        ball_types_.push_back("Ball");
+        ball_types_.push_back(GamePieceType::kBall);
         return balls_.size() - 1;
     }
 
@@ -309,30 +314,51 @@ class BallGamepieceSim {
     const std::vector<BallEntity>& balls() const { return balls_; }
 
     /**
-     * @brief Returns the registered type string for a ball index, or empty string if out of range.
+     * @brief Returns the registered type for a ball index.
      * @param ball_index Ball index to query.
-     * @return Type string reference, or reference to empty string when invalid.
+     * @return Type, or kBall when index is invalid.
      */
-    const std::string& ballType(std::size_t ball_index) const {
-        static const std::string empty;
+    GamePieceType ballType(std::size_t ball_index) const {
         if (ball_index >= ball_types_.size()) {
-            return empty;
+            return GamePieceType::kBall;
         }
         return ball_types_[ball_index];
     }
 
+    /** @brief Returns the registered type label for a ball index, or empty string if out of range. */
+    std::string ballTypeName(std::size_t ball_index) const {
+        if (ball_index >= ball_types_.size()) {
+            return std::string();
+        }
+        return std::string(gamePieceTypeName(ball_types_[ball_index]));
+    }
+
     /**
-     * @brief Updates the type label for an existing ball.
+     * @brief Updates the type for an existing ball.
         * @param ball_index Ball index to modify.
-        * @param type Replacement type label.
+        * @param type Replacement type.
      * @return true if the ball index was valid and updated.
      */
-    bool setBallType(std::size_t ball_index, std::string type) {
+    bool setBallType(std::size_t ball_index, GamePieceType type) {
         if (ball_index >= balls_.size() || ball_index >= ball_types_.size()) {
             return false;
         }
-        ball_types_[ball_index] = std::move(type);
+        ball_types_[ball_index] = type;
         return true;
+    }
+
+    /**
+     * @brief Backward-compatible setter that accepts a type name.
+     * @param ball_index Ball index to modify.
+     * @param type_name Type label ("Ball" supported).
+     * @return true if parsed and applied.
+     */
+    bool setBallType(std::size_t ball_index, const std::string& type_name) {
+        GamePieceType parsed_type{};
+        if (!tryParseGamePieceType(type_name, parsed_type)) {
+            return false;
+        }
+        return setBallType(ball_index, parsed_type);
     }
 
     /**
@@ -587,7 +613,7 @@ class BallGamepieceSim {
 
     bool checkProjectileGoalHit(const ProjectileEntity& projectile) const {
         for (const auto& goal : goals_) {
-            if (!goal.accepted_type.empty() && goal.accepted_type != projectile.type) {
+            if (!goal.accepted_type.empty() && goal.accepted_type != gamePieceTypeName(projectile.type)) {
                 continue;
             }
             if (goal.require_positive_vertical_velocity && projectile.velocity_mps.z <= 0.0) {
@@ -621,13 +647,30 @@ class BallGamepieceSim {
                projectile.position_m.y > field_.max_corner_m.y + tolerance_m;
     }
 
-    const GamePieceInfo* findGamePieceInfo(const std::string& type) const {
+    const GamePieceInfo* findGamePieceInfo(GamePieceType type) const {
         for (const auto& info : gamepiece_types_) {
             if (info.type == type) {
                 return &info;
             }
         }
         return nullptr;
+    }
+
+    static const char* gamePieceTypeName(GamePieceType type) {
+        switch (type) {
+            case GamePieceType::kBall:
+                return "Ball";
+            default:
+                return "Ball";
+        }
+    }
+
+    static bool tryParseGamePieceType(const std::string& type_name, GamePieceType& out_type) {
+        if (type_name == "Ball") {
+            out_type = GamePieceType::kBall;
+            return true;
+        }
+        return false;
     }
 
     static BallPhysicsSim3D::BallProperties fallbackBallProperties() {
@@ -983,7 +1026,7 @@ class BallGamepieceSim {
     FieldConfig field_{};
     std::vector<RobotState> robots_{};
     std::vector<BallEntity> balls_{};
-    std::vector<std::string> ball_types_{};
+    std::vector<GamePieceType> ball_types_{};
     std::vector<ProjectileEntity> projectiles_{};
     std::vector<GoalZone> goals_{};
     std::vector<GamePieceInfo> gamepiece_types_{};

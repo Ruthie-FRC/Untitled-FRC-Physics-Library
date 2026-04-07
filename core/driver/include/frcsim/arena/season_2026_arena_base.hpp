@@ -31,7 +31,7 @@ class Season2026ArenaBase : public SimulatedArena {
      */
     static BallGamepieceSim::GamePieceInfo defaultBallGamePiece() {
         BallGamepieceSim::GamePieceInfo season_ball;
-        season_ball.type = "Ball";
+        season_ball.type = BallGamepieceSim::GamePieceType::kBall;
         season_ball.physics_config = BallGamepiecePresets::season2026BallConfig();
         season_ball.ball_properties = BallGamepiecePresets::season2026BallProperties();
         season_ball.spawn_on_ground_after_projectile = true;

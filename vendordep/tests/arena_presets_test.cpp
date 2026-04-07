@@ -24,7 +24,7 @@ int main() {
     frcsim::BallGamepieceSim::ExitTrajectoryParameters cmd;
     cmd.pitch_rad = 0.45;
     cmd.mechanism_speed_mps = 7.0;
-    cmd.gamepiece_type = "Ball";
+    cmd.gamepiece_type = frcsim::BallGamepieceSim::GamePieceType::kBall;
 
     evergreen.gamepieceSim().fireProjectile(e_robot, cmd, true);
     rebuilt.gamepieceSim().fireProjectile(r_robot, cmd, true);
