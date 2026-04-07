@@ -315,7 +315,7 @@ model {
             binaries.all {
                 lib library: 'VendorDriver', linkage: 'shared'
             }
-            nativeUtils.useRequiredLibrary(it, 'wpilib_shared')
+            nativeUtils.useRequiredLibrary(it, 'wpilib_shared', 'wpimath_shared')
         }
 
         VendorDriver(JniNativeLibrarySpec) {
