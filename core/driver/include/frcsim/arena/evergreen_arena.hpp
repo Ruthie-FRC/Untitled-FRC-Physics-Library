@@ -16,7 +16,7 @@ namespace frcsim {
 class EvergreenArena : public SimulatedArena {
   public:
     /** @brief Constructs Evergreen arena with default ball type registration and map geometry. */
-    EvergreenArena() : SimulatedArena(BallGamepieceSim::evergreenFieldConfig()) {
+    EvergreenArena() : SimulatedArena(BallGamepiecePresets::evergreenFieldConfig()) {
         BallGamepieceSim::GamePieceInfo default_ball;
         default_ball.type = "Ball";
         default_ball.physics_config = BallGamepiecePresets::evergreenBallConfig();
@@ -32,8 +32,8 @@ class EvergreenArena : public SimulatedArena {
         FieldMap map;
 
         auto walls = FieldWall::makeAxisAlignedPerimeter(
-            BallGamepieceSim::evergreenFieldConfig().min_corner_m,
-            BallGamepieceSim::evergreenFieldConfig().max_corner_m,
+            BallGamepiecePresets::evergreenFieldConfig().min_corner_m,
+            BallGamepiecePresets::evergreenFieldConfig().max_corner_m,
             1.0,
             0.25,
             0.6);

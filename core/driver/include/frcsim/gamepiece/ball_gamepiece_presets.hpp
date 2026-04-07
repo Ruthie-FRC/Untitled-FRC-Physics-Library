@@ -34,11 +34,24 @@ inline BallPhysicsSim3D::Config evergreenBallConfig() {
 }
 
 /**
+ * @brief Baseline evergreen field bounds and wall-contact coefficients.
+ * @return Field configuration for the evergreen benchmark arena.
+ */
+inline BallGamepieceSim::FieldConfig evergreenFieldConfig() {
+    BallGamepieceSim::FieldConfig config{};
+    config.min_corner_m = Vector3(0.0, 0.0, 0.0);
+    config.max_corner_m = Vector3(16.54, 8.21, 3.0);
+    config.wall_restitution = 0.25;
+    config.wall_friction = 0.2;
+    return config;
+}
+
+/**
  * @brief Season 2026 field config with net boundary tuning enabled.
  * @return Field configuration specialized for the 2026 season preset.
  */
 inline BallGamepieceSim::FieldConfig season2026FieldConfig() {
-    BallGamepieceSim::FieldConfig config = BallGamepieceSim::evergreenFieldConfig();
+    BallGamepieceSim::FieldConfig config = evergreenFieldConfig();
     config.net_boundary_user_id = 2026;
     config.wall_restitution = 0.22;
     config.wall_friction = 0.25;

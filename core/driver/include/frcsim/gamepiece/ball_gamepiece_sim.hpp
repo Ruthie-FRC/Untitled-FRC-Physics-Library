@@ -197,14 +197,6 @@ class BallGamepieceSim {
     explicit BallGamepieceSim(const FieldConfig& field) : field_(field) {}
 
     /**
-     * @brief Returns baseline evergreen field bounds and wall-contact coefficients.
-     * @return Default evergreen field configuration.
-     */
-    static FieldConfig evergreenFieldConfig() {
-        return FieldConfig{};
-    }
-
-    /**
      * @brief Replaces field configuration while preserving dynamic simulation entities.
      * @param field New field configuration.
      */
