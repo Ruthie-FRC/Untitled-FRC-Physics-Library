@@ -214,7 +214,7 @@ doxygen {
 spotless {
    java {
       target fileTree('.') {
-            include '**/*.java'
+            include '**/*.java', "$rootDir/../core/java/**/*.java"
             exclude '**/build/**', '**/build-*/**', '**/bin/**'
       }
       toggleOffOn()
@@ -224,7 +224,7 @@ spotless {
       endWithNewline()
    }
    cpp {
-    target 'src/native/**', 'src/driver/**' 
+    target 'src/native/**', 'src/driver/**', "$rootDir/../core/**/*.hpp", "$rootDir/../core/**/*.cpp", "$rootDir/../core/**/*.h"
    }
    groovyGradle {
       target fileTree('.') {
