@@ -43,14 +43,38 @@ class SimulatedArena {
     };
 
     using CustomSimulation = std::function<void(int sub_tick_index, SimulatedArena&)>;
+    using RobotRegisteredCallback =
+        std::function<void(std::size_t robot_index, const BallGamepieceSim::RobotState&, SimulatedArena&)>;
 
-    SimulatedArena() = default;
+    SimulatedArena() {
+        gamepiece_sim_.setRobotAddedCallback(
+            [this](std::size_t robot_index, const BallGamepieceSim::RobotState& robot) {
+                if (robot_registered_callback_) {
+                    robot_registered_callback_(robot_index, robot, *this);
+                }
+            });
+    }
 
     explicit SimulatedArena(const BallGamepieceSim::FieldConfig& field_config)
-        : gamepiece_sim_(field_config) {}
+        : gamepiece_sim_(field_config) {
+        gamepiece_sim_.setRobotAddedCallback(
+            [this](std::size_t robot_index, const BallGamepieceSim::RobotState& robot) {
+                if (robot_registered_callback_) {
+                    robot_registered_callback_(robot_index, robot, *this);
+                }
+            });
+    }
 
     BallGamepieceSim& gamepieceSim() { return gamepiece_sim_; }
     const BallGamepieceSim& gamepieceSim() const { return gamepiece_sim_; }
+
+    std::size_t addRobot(const BallGamepieceSim::RobotState& robot) {
+        return gamepiece_sim_.addRobot(robot);
+    }
+
+    void setRobotRegisteredCallback(const RobotRegisteredCallback& callback) {
+        robot_registered_callback_ = callback;
+    }
 
     void setTimings(const Timings& timings) {
         timings_.robot_period_s = std::max(1e-6, timings.robot_period_s);
@@ -99,6 +123,7 @@ class SimulatedArena {
     BallGamepieceSim gamepiece_sim_{};
     std::vector<IntakeSimulation> intake_simulations_{};
     std::vector<CustomSimulation> custom_simulations_{};
+        RobotRegisteredCallback robot_registered_callback_{};
 };
 
 }  // namespace frcsim

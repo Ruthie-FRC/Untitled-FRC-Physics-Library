@@ -29,7 +29,7 @@ int main() {
     robot.intake_enabled = false;
     robot.intake_radius_m = 0.4;
     robot.intake_capacity = 2;
-    const std::size_t robot_id = arena.gamepieceSim().addRobot(robot);
+    const std::size_t robot_id = arena.addRobot(robot);
 
     frcsim::BallPhysicsSim3D::BallState loose_ball;
     loose_ball.position_m = frcsim::Vector3(1.1, 2.0, 0.08);

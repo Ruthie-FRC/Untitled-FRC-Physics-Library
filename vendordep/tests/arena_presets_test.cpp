@@ -18,8 +18,8 @@ int main() {
     frcsim::BallGamepieceSim::RobotState robot;
     robot.position_m = frcsim::Vector3(1.0, 1.0, 0.0);
 
-    const auto e_robot = evergreen.gamepieceSim().addRobot(robot);
-    const auto r_robot = rebuilt.gamepieceSim().addRobot(robot);
+    const auto e_robot = evergreen.addRobot(robot);
+    const auto r_robot = rebuilt.addRobot(robot);
 
     frcsim::BallGamepieceSim::ExitTrajectoryParameters cmd;
     cmd.pitch_rad = 0.45;

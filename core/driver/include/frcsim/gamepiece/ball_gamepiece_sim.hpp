@@ -148,10 +148,25 @@ class BallGamepieceSim {
         field_ = field;
     }
 
-    /** @brief Adds a robot and returns its index. */
+    using RobotAddedCallback = std::function<void(std::size_t robot_index, const RobotState& robot)>;
+
+    /**
+     * @brief Adds a robot and returns its index.
+     *
+     * If a robot-added callback is configured, it is invoked after insertion.
+     */
     std::size_t addRobot(const RobotState& robot) {
         robots_.push_back(robot);
-        return robots_.size() - 1;
+        const std::size_t robot_index = robots_.size() - 1;
+        if (robot_added_callback_) {
+            robot_added_callback_(robot_index, robots_[robot_index]);
+        }
+        return robot_index;
+    }
+
+    /** @brief Sets a callback invoked whenever addRobot inserts a robot. */
+    void setRobotAddedCallback(const RobotAddedCallback& callback) {
+        robot_added_callback_ = callback;
     }
 
     /**
@@ -885,6 +900,7 @@ class BallGamepieceSim {
     std::vector<GoalZone> goals_{};
     std::vector<GamePieceInfo> gamepiece_types_{};
     std::vector<EnvironmentalBoundary> field_elements_{};
+    RobotAddedCallback robot_added_callback_{};
     int simulation_substeps_{4};
 };
 
