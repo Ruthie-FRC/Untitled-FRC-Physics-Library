@@ -245,11 +245,11 @@ class BallGamepieceSim {
      * @brief Updates the type label for an existing ball.
      * @return true if the ball index was valid and updated.
      */
-    bool setBallType(std::size_t ball_index, const std::string& type) {
-        if (ball_index >= ball_types_.size()) {
+    bool setBallType(std::size_t ball_index, std::string type) {
+        if (ball_index >= balls_.size() || ball_index >= ball_types_.size()) {
             return false;
         }
-        ball_types_[ball_index] = type;
+        ball_types_[ball_index] = std::move(type);
         return true;
     }
 
