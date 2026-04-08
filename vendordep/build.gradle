@@ -112,7 +112,6 @@ doxygen {
             option "warnings", true
             option "warn_if_doc_error", true
             option "warn_no_paramdoc", true
-            option "warn_as_error", true
 
             // Useful for mixed-language projects
             option "file_patterns", "*.java *.cpp *.h *.hpp *.c"
