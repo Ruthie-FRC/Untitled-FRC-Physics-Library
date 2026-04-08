@@ -112,59 +112,6 @@ doxygen {
     }
 }
 
-spotless {
-    java {
-        target fileTree('.') {
-            include '**/*.java'
-            exclude '**/build/**', '**/build-*/**', '**/bin/**'
-        }
-        target fileTree("$rootDir/../core/java") {
-            include '**/*.java'
-            exclude '**/build/**', '**/build-*/**', '**/bin/**'
-        }
-        toggleOffOn()
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    cpp {
-        target fileTree('.') {
-            include '**/*.hpp', '**/*.cpp', '**/*.c', '**/*.h'
-            exclude '**/build/**', '**/build-*/**', '**/bin/**'
-        }
-    }
-    groovyGradle {
-        target fileTree('.') {
-            include '**/*.gradle'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        greclipse()
-        indentWithSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    format 'xml', {
-        target fileTree('.') {
-            include '**/*.xml'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        eclipseWtp('xml')
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-    format 'misc', {
-        target fileTree('.') {
-            include '**/*.md', '**/.gitignore'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-}
-
 
 // Set up exports properly
 nativeUtils {
@@ -281,7 +228,20 @@ model {
     }
 }
 
-build.dependsOn spotlessApply
+
+tasks.register("wpiformat", Exec) {
+    commandLine "wpiformat"
+
+    onlyIf {
+        try {
+            ["wpiformat", "--version"].execute().waitFor() == 0
+        } catch (Exception ignored) {
+            false
+        }
+    }
+}
+
+build.dependsOn wpiformat
 
 
 apply from: 'publish.gradle'
