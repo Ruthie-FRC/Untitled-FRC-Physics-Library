@@ -33,7 +33,7 @@ jobs:
       - name: Generate API docs
         working-directory: vendordep
         run: |
-          ./gradlew javadoc doxygen
+          ./gradlew javadoc doxygenDox
       - name: Build docs site and stage API references
         run: |
           mkdocs build --config-file mkdocs/mkdocs.yml
