@@ -1,18 +1,18 @@
+// Copyright (c) RenSim contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the LGPLv3 license file in the root directory of this project.
+
 package rensim.jni;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * JNI entry points for the vendor physics driver.
- */
-public class VendorJNI {
-  private VendorJNI() {}
+/** JNI entry points for the vendor physics driver. */
+public class RenSimJNI {
+  private RenSimJNI() {}
 
   static boolean libraryLoaded = false;
 
-  /**
-   * Configures whether the native library is loaded during static initialization.
-   */
+  /** Configures whether the native library is loaded during static initialization. */
   public static class Helper {
     private Helper() {}
 
@@ -39,19 +39,17 @@ public class VendorJNI {
 
   static {
     if (Helper.getExtractOnStaticLoad()) {
-      System.loadLibrary("VendorDriver");
+      System.loadLibrary("RenSimDriver");
       libraryLoaded = true;
     }
   }
 
-  /**
-   * Forces the native library to load.
-   */
+  /** Forces the native library to load. */
   public static synchronized void forceLoad() {
     if (libraryLoaded) {
       return;
     }
-    System.loadLibrary("VendorDriver");
+    System.loadLibrary("RenSimDriver");
     libraryLoaded = true;
   }
 
@@ -97,8 +95,8 @@ public class VendorJNI {
    * @param zMeters the z position in meters
    * @return zero on success
    */
-  public static native int setBodyPosition(long worldHandle, int bodyIndex, double xMeters, double yMeters,
-      double zMeters);
+  public static native int setBodyPosition(
+      long worldHandle, int bodyIndex, double xMeters, double yMeters, double zMeters);
 
   /**
    * Sets a body's linear velocity in meters per second.
@@ -110,8 +108,8 @@ public class VendorJNI {
    * @param vzMps the z velocity in meters per second
    * @return zero on success
    */
-  public static native int setBodyLinearVelocity(long worldHandle, int bodyIndex, double vxMps, double vyMps,
-      double vzMps);
+  public static native int setBodyLinearVelocity(
+      long worldHandle, int bodyIndex, double vxMps, double vyMps, double vzMps);
 
   /**
    * Enables or disables gravity for a body.
@@ -132,7 +130,8 @@ public class VendorJNI {
    * @param gzMps2 the z gravity component in meters per second squared
    * @return zero on success
    */
-  public static native int setWorldGravity(long worldHandle, double gxMps2, double gyMps2, double gzMps2);
+  public static native int setWorldGravity(
+      long worldHandle, double gxMps2, double gyMps2, double gzMps2);
 
   /**
    * Advances the world by the given number of steps.
@@ -161,5 +160,6 @@ public class VendorJNI {
    * @param outVxyzMps the output array that receives the linear velocity
    * @return zero on success
    */
-  public static native int getBodyLinearVelocity(long worldHandle, int bodyIndex, double[] outVxyzMps);
+  public static native int getBodyLinearVelocity(
+      long worldHandle, int bodyIndex, double[] outVxyzMps);
 }

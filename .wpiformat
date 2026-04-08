@@ -1,0 +1,15 @@
+cppHeaderFileInclude {
+   \.h$
+   \.hpp$
+   \.inc$
+   \.inl$
+}
+cppSrcFileInclude {
+   \.cpp$
+}
+modifiableFileExclude {
+   gradle/
+   .styleguide
+   .styleguide-license
+   .clang-format
+}

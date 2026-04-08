@@ -13,16 +13,16 @@ RenSim uses date-based versioning: `YYYY.MM.DD.patch-no`
 
 ### Added
 - **Rigid Body Physics**: Complete rigid-body simulation with mass, inertia, linear/angular velocity, and force/torque application
-- **Joint Constraints**: 
+- **Joint Constraints**:
   - Fixed joints for rigid connections
   - Revolute joints with optional angle limits and motor control
   - Prismatic joints with optional displacement limits and motor control
 - **Integration Methods**: Semi-implicit Euler, explicit Euler, Runge-Kutta 2nd-order
-- **Force Generators**: 
+- **Force Generators**:
   - Gravity (configurable per-body and global)
   - Motor forces (from torque/force targets)
   - Spring forces
-- **Aerodynamics**: 
+- **Aerodynamics**:
   - Drag force modeling with quadratic and linear terms
   - Magnus force (spin-induced lift)
   - Spin decay

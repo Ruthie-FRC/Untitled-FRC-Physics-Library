@@ -1,3 +1,7 @@
+// Copyright (c) RenSim contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the LGPLv3 license file in the root directory of this project.
+
 #pragma once
 
 #include "vector.hpp"
@@ -6,83 +10,63 @@
 namespace frcsim {
 
 struct Integrator {
+  // Semi-Implicit Euler (Linear)
+  // velocity += acceleration * dt
+  // position += velocity * dt
+  // Stable and standard for real-time physics engines.
 
-    // Semi-Implicit Euler (Linear)
-    // velocity += acceleration * dt
-    // position += velocity * dt
-    // Stable and standard for real-time physics engines.
+  static inline void integrateLinear(Vector3& position, Vector3& velocity,
+                                     const Vector3& acceleration,
+                                     double dt) noexcept {
+    velocity += acceleration * dt;
+    position += velocity * dt;
+  }
 
-    static inline void integrateLinear(
-        Vector3& position,
-        Vector3& velocity,
-        const Vector3& acceleration,
-        double dt
-    ) noexcept
-    {
-        velocity += acceleration * dt;
-        position += velocity * dt;
-    }
+  // Explicit Euler (optional)
+  // Useful for debugging or predictor steps
 
+  static inline void integrateLinearExplicit(Vector3& position,
+                                             Vector3& velocity,
+                                             const Vector3& acceleration,
+                                             double dt) noexcept {
+    position += velocity * dt;
+    velocity += acceleration * dt;
+  }
 
-    // Explicit Euler (optional)
-    // Useful for debugging or predictor steps
+  // Angular Integration
+  // Quaternion derivative:
+  //   q_dot = 0.5 * omega_quat * q
+  // where omega_quat = (0, wx, wy, wz)
+  static inline void integrateAngular(Quaternion& orientation,
+                                      const Vector3& angularVelocity,
+                                      double dt) noexcept {
+    Quaternion omegaQuat(0.0, angularVelocity.x, angularVelocity.y,
+                         angularVelocity.z);
+    Quaternion dq = omegaQuat * orientation * 0.5;
+    orientation = orientation + dq * dt;
+    orientation.normalizeIfNeeded();
+  }
 
-    static inline void integrateLinearExplicit(
-        Vector3& position,
-        Vector3& velocity,
-        const Vector3& acceleration,
-        double dt
-    ) noexcept
-    {
-        position += velocity * dt;
-        velocity += acceleration * dt;
-    }
+  // Angular Velocity Integration: omega += alpha * dt
 
+  static inline void integrateAngularVelocity(
+      Vector3& angularVelocity, const Vector3& angularAcceleration,
+      double dt) noexcept {
+    angularVelocity += angularAcceleration * dt;
+  }
 
-    // Angular Integration
-    // Quaternion derivative:
-    //   q_dot = 0.5 * omega_quat * q
-    // where omega_quat = (0, wx, wy, wz)
-    static inline void integrateAngular(
-        Quaternion& orientation,
-        const Vector3& angularVelocity,
-        double dt
-    ) noexcept
-    {
-        Quaternion omegaQuat(0.0, angularVelocity.x, angularVelocity.y, angularVelocity.z);
-        Quaternion dq = omegaQuat * orientation * 0.5;
-        orientation = orientation + dq * dt;
-        orientation.normalizeIfNeeded();
-    }
+  // RK2 Integrator (optional)
+  // Midpoint integration, useful for projectiles or high-speed mechanisms.
 
-    // Angular Velocity Integration: omega += alpha * dt
+  static inline void integrateLinearRK2(Vector3& position, Vector3& velocity,
+                                        const Vector3& acceleration,
+                                        double dt) noexcept {
+    Vector3 halfVelocity = velocity + acceleration * (0.5 * dt);
 
-    static inline void integrateAngularVelocity(
-        Vector3& angularVelocity,
-        const Vector3& angularAcceleration,
-        double dt
-    ) noexcept
-    {
-        angularVelocity += angularAcceleration * dt;
-    }
+    position += halfVelocity * dt;
 
-    // RK2 Integrator (optional)
-    // Midpoint integration, useful for projectiles or high-speed mechanisms.
-
-    static inline void integrateLinearRK2(
-        Vector3& position,
-        Vector3& velocity,
-        const Vector3& acceleration,
-        double dt
-    ) noexcept
-    {
-        Vector3 halfVelocity = velocity + acceleration * (0.5 * dt);
-
-        position += halfVelocity * dt;
-
-        velocity += acceleration * dt;
-    }
-
+    velocity += acceleration * dt;
+  }
 };
 
-} // namespace frcsim
+}  // namespace frcsim

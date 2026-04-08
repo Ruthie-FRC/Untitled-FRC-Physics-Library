@@ -1,6 +1,9 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: ["master"]
+  pull_request:
 
 jobs:
   validation:
@@ -19,9 +22,9 @@ jobs:
           fi
           echo "Found $count standalone native test source files."
 
-  javadoc:
+  api-docs:
     needs: [validation]
-    name: "Javadoc"
+    name: "API Docs"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,9 +35,23 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21
-      - name: Check Java docs
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+      - name: Build Javadoc and Doxygen
         working-directory: vendordep
-        run: ./gradlew javadoc
+        run: ./gradlew javadoc doxygenDox
+      - name: Upload Javadocs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: javadocs
+          path: vendordep/build/docs/javadoc
+      - name: Upload Doxygen artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen
+          path: vendordep/build/docs/doxygen
 
   build-all-script:
     needs: [validation]
@@ -78,6 +95,10 @@ jobs:
       - name: Fetch all history and metadata
         run: |
           git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
+          default_branch="${{ github.event.repository.default_branch }}"
+          git fetch origin "${default_branch}:${default_branch}" --update-head-ok || git fetch origin "${default_branch}"
+          git remote set-head origin "${default_branch}" || true
+      - run: pip3 install wpiformat
       - name: Build with Gradle
         working-directory: vendordep
         run: ./gradlew build ${{ matrix.build-options }}
@@ -100,9 +121,9 @@ jobs:
           - os: windows-2022
             artifact-name: Win64
             architecture: x64
-          - os: macos-14
-            artifact-name: macOS
-            architecture: aarch64
+          # - os: macos-14
+          #   artifact-name: macOS
+          #   architecture: aarch64
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -110,7 +131,12 @@ jobs:
         with:
           submodules: true
       - name: Fetch all history and metadata
-        run: git fetch --prune --unshallow
+        shell: bash
+        run: |
+          default_branch="${{ github.event.repository.default_branch }}"
+          git fetch --prune --unshallow
+          git fetch origin "${default_branch}:${default_branch}" --update-head-ok || git fetch origin "${default_branch}"
+          git remote set-head origin "${default_branch}" || true
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'

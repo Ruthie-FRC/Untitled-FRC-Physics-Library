@@ -46,6 +46,8 @@ cd vendordep
 ## Documentation Map
 
 - [API Usage](api_usage.md): integrating RenSim into applications
+- [Java API Reference (Javadocs)](/api/javadoc/): generated Java bindings and APIs
+- [Native API Reference (Doxygen)](/api/doxygen/html/): generated C++ and mixed-language symbols
 - [Architecture](architecture.md): subsystem layout and extension model
 - [Physics Reference](physics_reference.md): models, assumptions, and equations
 - [Math Overview](math_index.md): math modules and conventions

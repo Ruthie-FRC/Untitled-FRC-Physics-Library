@@ -9,11 +9,11 @@ def templateVendorFile = "RenSim.json"
 
 def artifactGroupId = 'rensim'
 def baseArtifactId = 'RenSim'
-ext.pubVersion = System.getenv("releaseVersion") ?: System.getenv("releaseName") ?: "test"
 
 def outputsFolder = file("$buildDir/outputs")
 
 def versionFile = file("$outputsFolder/version.txt")
+def releasesRepoUrl = "$releasePath/releases"
 
 task outputVersions() {
     description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
@@ -103,6 +103,7 @@ addTaskToCopyAllOutputs(cppDriverHeadersZip)
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier = 'sources'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from sourceSets.main.allSource
 }
 
@@ -121,6 +122,7 @@ task outputSourcesJar(type: Jar, dependsOn: classes) {
     archiveBaseName = javaBaseName
     destinationDirectory = outputsFolder
     archiveClassifier = 'sources'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from sourceSets.main.allSource
 }
 
@@ -143,8 +145,8 @@ task vendordepJson() {
             from templateVendorFile
             into "$buildDir/repos/"
             expand(version: pubVersion,
-                    groupId: artifactGroupId,
-                    artifactId: baseArtifactId)
+            groupId: artifactGroupId,
+            artifactId: baseArtifactId)
         }
     }
 }
@@ -181,8 +183,6 @@ build.dependsOn vendordepJsonZip
 
 libraryBuild.dependsOn build
 
-def releasesRepoUrl = "$buildDir/repos/releases"
-
 publishing {
     repositories {
         maven {
@@ -199,9 +199,9 @@ tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
 
 model {
     publishing {
-        def taskList = createComponentZipTasks($.components, ['Vendor'], zipBaseName, Zip, project, includeStandardZipFormat)
+        def taskList = createComponentZipTasks($.components, ['RenSim'], zipBaseName, Zip, project, includeStandardZipFormat)
 
-        def driverTaskList = createComponentZipTasks($.components, ['VendorDriver'], driverZipBaseName, Zip, project, includeStandardZipFormat)
+        def driverTaskList = createComponentZipTasks($.components, ['RenSimDriver'], driverZipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {

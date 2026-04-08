@@ -14,15 +14,15 @@ import rensim.PhysicsWorld;
 import rensim.Vec3;
 
 try (PhysicsWorld world = new PhysicsWorld(0.01, true)) {
-	PhysicsBody body = world.createBody(1.0);
-	body.setPosition(new Vec3(0.0, 0.0, 1.0));
-	body.setLinearVelocity(new Vec3(3.0, 0.0, 2.0));
+  PhysicsBody body = world.createBody(1.0);
+  body.setPosition(new Vec3(0.0, 0.0, 1.0));
+  body.setLinearVelocity(new Vec3(3.0, 0.0, 2.0));
 
-	for (int i = 0; i < 100; ++i) {
-		world.step();
-	}
+  for (int i = 0; i < 100; ++i) {
+    world.step();
+  }
 
-	Vec3 position = body.position();
+  Vec3 position = body.position();
 }
 ```
 

@@ -7,7 +7,7 @@ RenSim is a physics simulation framework for FRC-style robotics. This prerelease
 ### Core Physics Engine (C++)
 - **Rigid Body Dynamics**: Mass, inertia, linear/angular velocity, forces, torque
 - **Integration Methods**: Semi-implicit Euler, explicit Euler, RK2
-- **Joint Constraints**: 
+- **Joint Constraints**:
   - Fixed joints (rigid connections)
   - Revolute joints (hinges with optional angle limits and motors)
   - Prismatic joints (linear sliders with optional displacement limits and motors)
@@ -53,12 +53,12 @@ try (PhysicsWorld world = new PhysicsWorld(0.01, true)) {
     PhysicsBody body = world.createBody(1.0);
     body.setPosition(new Vec3(0.0, 0.0, 1.0));
     body.setLinearVelocity(new Vec3(3.0, 0.0, 2.0));
-    
+
     // Simulate 100 steps (1 second at 100 Hz)
     for (int i = 0; i < 100; ++i) {
         world.step();
     }
-    
+
     // Read final state
     Vec3 pos = body.position();
     Vec3 vel = body.linearVelocity();

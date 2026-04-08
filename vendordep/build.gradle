@@ -1,30 +1,34 @@
 import edu.wpi.first.toolchain.*
 
 plugins {
-  id 'cpp'
-  id 'java'
-  id 'google-test'
-  id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2025.0'
-  id 'edu.wpi.first.NativeUtils' version '2026.0.1'
-  id 'edu.wpi.first.GradleJni' version '1.1.0'
-  id 'edu.wpi.first.GradleVsCode' version '2.1.0'
+    id 'cpp'
+    id 'java'
+    id 'google-test'
+    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2025.0'
+    id 'edu.wpi.first.NativeUtils' version '2026.0.1'
+    id 'edu.wpi.first.GradleJni' version '1.1.0'
+    id 'edu.wpi.first.GradleVsCode' version '2.1.0'
+    id 'org.ysb33r.doxygen' version "2.1.1"
+    id 'com.diffplug.spotless' version '8.0.0'
 }
 
 // WPILib Version
-ext.wpilibVersion = "2026.+"
+ext.wpilibVersion = "2026.2.1"
+ext.releasePath = "$buildDir/maven"
+ext.pubVersion = System.getenv("releaseVersion") ?: System.getenv("releaseName") ?: "test"
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 if (project.hasProperty('releaseMode')) {
-  wpilibRepositories.addAllReleaseRepositories(project)
+    wpilibRepositories.addAllReleaseRepositories(project)
 } else {
-  wpilibRepositories.addAllDevelopmentRepositories(project)
+    wpilibRepositories.addAllDevelopmentRepositories(project)
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 var javaVersion = "17"
 
@@ -66,127 +70,108 @@ if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm3
     test.enabled = false
 }
 
-def crossCompileOnlyProperties = [
-  'onlylinuxathena',
-  'onlylinuxarm32',
-  'onlylinuxarm64',
-  'onlywindowsarm64',
-  'onlylinuxsystemcore'
-]
-def isCrossCompileOnlyMode = crossCompileOnlyProperties.any { project.hasProperty(it) }
-def isLinuxHost = System.getProperty('os.name').toLowerCase().contains('linux')
-def legacyNativeTestSources = fileTree("${rootDir}/tests") {
-  include '*.cpp'
-}
-
-tasks.register('compileLegacyNativeTests') {
-  group = 'verification'
-  description = 'Compiles standalone native tests in vendordep/tests.'
-
-  inputs.files(legacyNativeTestSources)
-  inputs.files(
-    file("${rootDir}/../core/driver/src/physics_world.cpp"),
-    file("${rootDir}/../core/driver/src/rigid_assembly.cpp"),
-    file("${rootDir}/../core/driver/src/joints.cpp")
-  )
-  outputs.dir(layout.buildDirectory.dir('legacy-native-tests'))
-
-  onlyIf {
-    isLinuxHost && !isCrossCompileOnlyMode
-  }
-
-  doLast {
-    def outputDir = layout.buildDirectory.dir('legacy-native-tests').get().asFile
-    outputDir.mkdirs()
-
-    def sortedTestFiles = legacyNativeTestSources.files.sort { a, b -> a.name <=> b.name }
-    if (sortedTestFiles.isEmpty()) {
-      throw new GradleException('No legacy native test sources were found in vendordep/tests (*.cpp).')
-    }
-
-    sortedTestFiles.each { testFile ->
-      def executableName = testFile.name.replaceFirst(/\.cpp$/, '')
-      def executablePath = new File(outputDir, executableName)
-      logger.lifecycle("Compiling legacy native test: ${testFile.name}")
-
-      exec {
-        commandLine 'g++',
-          '-std=c++20',
-          '-O0',
-          '-g0',
-          "-I${rootDir}/../core/driver/include",
-          "-I${rootDir}/../core/physics-core/include",
-          "-I${rootDir}/src/main/driver/include",
-          "${rootDir}/../core/driver/src/physics_world.cpp",
-          "${rootDir}/../core/driver/src/rigid_assembly.cpp",
-          "${rootDir}/../core/driver/src/joints.cpp",
-          testFile.absolutePath,
-          '-o',
-          executablePath.absolutePath
-      }
-    }
-
-    def builtExecutables = outputDir.listFiles()?.findAll { it.isFile() } ?: []
-    if (builtExecutables.size() != sortedTestFiles.size()) {
-      throw new GradleException("Legacy native test build produced ${builtExecutables.size()} executables for ${sortedTestFiles.size()} sources.")
-    }
-  }
-}
-
-tasks.register('runLegacyNativeTests') {
-  group = 'verification'
-  description = 'Runs standalone native tests compiled from vendordep/tests.'
-  dependsOn(tasks.named('compileLegacyNativeTests'))
-
-  onlyIf {
-    isLinuxHost && !isCrossCompileOnlyMode
-  }
-
-  doLast {
-    def outputDir = layout.buildDirectory.dir('legacy-native-tests').get().asFile
-    def executables = outputDir.listFiles()?.findAll { it.isFile() }?.sort { a, b -> a.name <=> b.name } ?: []
-
-    if (executables.isEmpty()) {
-      throw new GradleException('No legacy native test executables were found to run.')
-    }
-
-    executables.each { executable ->
-      logger.lifecycle("Running legacy native test: ${executable.name}")
-      exec {
-        commandLine executable.absolutePath
-      }
-    }
-  }
-}
-
-test.dependsOn(tasks.named('runLegacyNativeTests'))
-
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
     options.encoding = 'UTF-8'
 }
 
 // Setup Javadocs to link back to WPILib docs
+def enableExternalJavadocLinks = !gradle.startParameter.isOffline() && System.getenv('CI') == null
+
 javadoc {
+    title = "RenSim API"
+
+    failOnError = true
     options {
-        links "https://docs.oracle.com/en/java/javase/$javaVersion/docs/api/", 'https://github.wpilib.org/allwpilib/docs/release/java/'
-    addBooleanOption('Werror', true)
+        if (enableExternalJavadocLinks) {
+            links "https://docs.oracle.com/en/java/javase/$javaVersion/docs/api/", 'https://github.wpilib.org/allwpilib/docs/release/java/'
+        }
+        addBooleanOption('Werror', true)
     }
 }
 
+// https://ysb33rorg.gitlab.io/gradle/doxygen-gradle-plugin/doxygen-gradle-plugin/2.1.1/usage.html
+// Outputs to build/docs/doxygen
+doxygen {
+    sourceSets {
+        main {          
+            // Name
+            option "project_name", "RenSim"
+            option "project_number", "$pubVersion"
+
+            // Native C++ headers + sources
+            sources "src/main/native/include"
+            sources "src/main/native/cpp"
+
+            // Driver C++ header and sources
+            sources "src/main/driver/cpp"
+            sources "src/main/driver/include"
+
+            // Java (for JNI + API docs)
+            sources "src/main/java"
+
+            // Configure warnings
+            option "warnings", true
+            option "warn_if_undocumented", true
+            option "warn_if_undoc_enum_val", true
+            option "warn_layout_file", true
+            option "warn_line_format", true
+            option "warn_if_doc_error", true
+            option "warn_no_paramdoc", true
+            option "warn_as_error", "fail_on_warnings"
+
+            // Core Doxygen options
+            option "recursive", true
+            option "generate_html", true
+            option "generate_latex", false
+
+            // Useful for mixed-language projects
+            option "file_patterns", "*.java *.cpp *.h *.hpp *.c"
+            option "extract_all", true
+        }
+    }
+}
+
+
 // Set up exports properly
 nativeUtils {
-  exportsConfigs {
-    // Main library is just default empty. This will export everything
-    Vendor {
+    exportsConfigs {
+        // Main library is just default empty. This will export everything
+        RenSim {
+            x86ExcludeSymbols = [
+                '_CT??_R0?AV_System_error',
+                '_CT??_R0?AVexception',
+                '_CT??_R0?AVfailure',
+                '_CT??_R0?AVruntime_error',
+                '_CT??_R0?AVsystem_error',
+                '_CTA5?AVfailure',
+                '_TI5?AVfailure',
+                '_CT??_R0?AVout_of_range',
+                '_CTA3?AVout_of_range',
+                '_TI3?AVout_of_range',
+                '_CT??_R0?AVbad_cast'
+            ]
+            x64ExcludeSymbols = [
+                '_CT??_R0?AV_System_error',
+                '_CT??_R0?AVexception',
+                '_CT??_R0?AVfailure',
+                '_CT??_R0?AVruntime_error',
+                '_CT??_R0?AVsystem_error',
+                '_CTA5?AVfailure',
+                '_TI5?AVfailure',
+                '_CT??_R0?AVout_of_range',
+                '_CTA3?AVout_of_range',
+                '_TI3?AVout_of_range',
+                '_CT??_R0?AVbad_cast'
+            ]
+        }
     }
-  }
-  privateExportsConfigs {
-    // Only export explicit symbols from driver library
-    VendorDriver {
-      exportsFile = project.file("src/main/driver/symbols.txt")
+    privateExportsConfigs {
+        // Only export explicit symbols from driver library
+        RenSimDriver {
+            exportsFile = project.file("src/main/driver/symbols.txt")
+        }
     }
-  }
 }
 
 ext.getCurrentArch = {
@@ -199,98 +184,115 @@ def systemArch = getCurrentArch()
 sourceSets {
     main {
         java {
-            srcDir "$rootDir/../core/java/"
+            srcDir "src/main/java/"
         }
     }
-//    test {
-//        java {
-//            srcDir "src/test/java"
-//        }
-//    }
+    //    test {
+    //        java {
+    //            srcDir "src/test/java"
+    //        }
+    //    } // TODO: Eventually write java unit tests
 }
 
 
 model {
-  components {
-    Vendor(NativeLibrarySpec) {
-      sources {
-        cpp {
-          source {
-            srcDirs 'src/main/native/cpp'
-            include '**/*.cpp'
-          }
-          exportedHeaders {
-            srcDirs 'src/main/native/include'
-          }
-        }
-      }
-      binaries.all {
-        lib library: 'VendorDriver', linkage: 'shared'
-      }
-      nativeUtils.useRequiredLibrary(it, 'wpilib_shared')
-    }
-
-    VendorDriver(JniNativeLibrarySpec) {
-      enableCheckTask true
-      javaCompileTasks << compileJava
-      jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-      // Leave these for future proofing
-      jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
-      jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
-      sources {
-        cpp {
-          source {
-            srcDirs 'src/main/driver/cpp', "$rootDir/../core/driver/src"
-            include '**/*.cpp'
-          }
-          exportedHeaders {
-            srcDirs 'src/main/driver/include', "$rootDir/../core/driver/include"
-          }
-        }
-      }
-
-      nativeUtils.useRequiredLibrary(it, "driver_shared")
-    }
-  }
-  testSuites {
-    VendorTest {
-        sources.cpp {
-            source {
-                srcDir 'src/test/native/cpp'
-                include '**/*.cpp'
+    components {
+        RenSim(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
             }
-        }
-
-        binaries.all {
-          lib library: 'VendorDriver', linkage: 'shared'
-
-          def arch = it.targetPlatform.name
-          if (systemArch == arch && it.buildType.name == 'debug') {
-            def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
-            test.dependsOn it.tasks.install
-            test.systemProperty 'java.library.path', filePath
-            test.environment 'LD_LIBRARY_PATH', filePath
-            test.workingDir filePath
-          }
-        }
-
-        nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
-    }
-
-    VendorDriverTest {
-        sources.cpp {
-            source {
-                srcDir 'src/test/driver/cpp'
-                include '**/*.cpp'
+            binaries.all {
+                lib library: 'RenSimDriver', linkage: 'shared'
             }
+            nativeUtils.useRequiredLibrary(it, 'wpilib_shared', 'wpimath_shared')
         }
-        nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
+
+        RenSimDriver(JniNativeLibrarySpec) {
+            enableCheckTask true
+            javaCompileTasks << compileJava
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
+            // Leave these for future proofing
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/driver/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/driver/include'
+                    }
+                }
+            }
+
+            nativeUtils.useRequiredLibrary(it, "driver_shared")
+        }
     }
-  }
+    testSuites {
+        RenSimTest {
+            sources.cpp {
+                source {
+                    srcDir 'src/test/native/cpp'
+                    include '**/*.cpp'
+                }
+            }
+
+            binaries.all {
+                lib library: 'RenSimDriver', linkage: 'shared'
+
+                def arch = it.targetPlatform.name
+                if (systemArch == arch && it.buildType.name == 'debug') {
+                    def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+                    test.dependsOn it.tasks.install
+                    test.systemProperty 'java.library.path', filePath
+                    test.environment 'LD_LIBRARY_PATH', filePath
+                    test.workingDir filePath
+                }
+            }
+
+            nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
+        }
+
+        RenSimDriverTest {
+            sources.cpp {
+                source {
+                    srcDir 'src/test/driver/cpp'
+                    include '**/*.cpp'
+                }
+            }
+            nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
+        }
+    }
 }
+
+
+tasks.register("wpiformat", Exec) {
+    commandLine "wpiformat"
+
+    onlyIf {
+        try {
+            ["wpiformat", "-h"].execute().waitFor() == 0
+        } catch (Exception ignored) {
+            false
+        }
+    }
+}
+
+build.dependsOn wpiformat
+build.dependsOn javadoc
+build.dependsOn doxygenDox
 
 apply from: 'publish.gradle'
 
 wrapper {
-  gradleVersion = '8.14.3'
+    gradleVersion = '8.14.3'
 }
