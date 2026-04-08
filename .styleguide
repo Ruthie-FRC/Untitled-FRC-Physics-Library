@@ -9,4 +9,7 @@ cppSrcFileInclude {
 }
 modifiableFileExclude {
    gradle/
+   .styleguide
+   .styleguide-license
+   .clang-format
 }
