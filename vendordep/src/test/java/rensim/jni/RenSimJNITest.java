@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import rensim.jni.RenSimJNI;
 
-public class VendorJNITest {
+public class RenSimJNITest {
   @Test
   void jniLinkTest() {
     RenSimJNI.initialize();
