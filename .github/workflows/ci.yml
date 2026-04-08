@@ -42,7 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip3 install wpiformat
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -79,6 +78,7 @@ jobs:
       - name: Fetch all history and metadata
         run: |
           git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
+      - run: pip3 install wpiformat
       - name: Build with Gradle
         working-directory: vendordep
         run: ./gradlew build ${{ matrix.build-options }}
