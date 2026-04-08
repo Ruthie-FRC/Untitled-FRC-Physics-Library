@@ -94,7 +94,7 @@ javadoc {
 // Outputs to build/docs/doxygen
 doxygen {
     sourceSets {
-        main {          
+        main {
             // Name
             option "project_name", "RenSim"
             option "project_number", "$pubVersion"
