@@ -97,6 +97,10 @@ doxygen {
             sources "src/main/native/include"
             sources "src/main/native/cpp"
 
+            // Driver C++ header and sources
+            sources "src/main/driver/cpp"
+            sources "src/main/driver/include"
+
             // Java (for JNI + API docs)
             sources "src/main/java"
 
@@ -110,7 +114,7 @@ doxygen {
             option "warn_no_paramdoc", true
 
             // Useful for mixed-language projects
-            option "file_patterns", "*.java *.cpp *.h *.hpp"
+            option "file_patterns", "*.java *.cpp *.h *.hpp *.c"
             option "extract_all", true
         }
     }
