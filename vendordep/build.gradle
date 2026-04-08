@@ -104,6 +104,10 @@ doxygen {
             option "recursive", true
             option "generate_html", true
             option "generate_latex", false
+            option "warn_if_undocumented", true
+            option "warnings", true
+            option "warn_if_doc_error", true
+            option "warn_no_paramdoc", true
 
             // Useful for mixed-language projects
             option "file_patterns", "*.java *.cpp *.h *.hpp"
@@ -269,6 +273,7 @@ tasks.register("wpiformat", Exec) {
 
 build.dependsOn wpiformat
 build.dependsOn javadoc
+build.dependsOn doxygenDox
 
 apply from: 'publish.gradle'
 
