@@ -16,13 +16,33 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Install MkDocs and Material theme
+      - name: Install docs toolchain
         run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
           pip install mkdocs mkdocs-material
-      - name: Build and Deploy
+      - name: Generate API docs
+        working-directory: vendordep
         run: |
-          mkdocs gh-deploy --force --config-file mkdocs/mkdocs.yml
+          ./gradlew javadoc doxygen
+      - name: Build docs site and stage API references
+        run: |
+          mkdocs build --config-file mkdocs/mkdocs.yml
+
+          mkdir -p mkdocs/site/api/javadoc
+          mkdir -p mkdocs/site/api/doxygen
+
+          rsync -a --delete vendordep/build/docs/javadoc/ mkdocs/site/api/javadoc/
+          rsync -a --delete vendordep/build/docs/doxygen/ mkdocs/site/api/doxygen/
+      - name: Deploy
+        run: |
+          ghp-import -n -p -f mkdocs/site

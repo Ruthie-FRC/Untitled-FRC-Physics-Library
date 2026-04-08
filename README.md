@@ -78,6 +78,8 @@ mkdocs serve --config-file mkdocs/mkdocs.yml
 - Docs source: `mkdocs/docs/`
 - MkDocs config: `mkdocs/mkdocs.yml`
 - Deployed docs: https://rensim.dev
+- Java API (Javadocs): https://rensim.dev/api/javadoc/
+- Native API (Doxygen): https://rensim.dev/api/doxygen/html/
 
 ## Contributing
 
