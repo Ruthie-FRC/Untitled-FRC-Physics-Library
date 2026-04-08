@@ -79,6 +79,8 @@ tasks.withType(JavaCompile) {
 def enableExternalJavadocLinks = !gradle.startParameter.isOffline() && System.getenv('CI') == null
 
 javadoc {
+    title = "RenSim API"
+
     failOnError = true
     options {
         if (enableExternalJavadocLinks) {
