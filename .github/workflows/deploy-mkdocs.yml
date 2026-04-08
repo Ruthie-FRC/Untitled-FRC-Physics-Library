@@ -43,6 +43,10 @@ jobs:
 
           rsync -a --delete vendordep/build/docs/javadoc/ mkdocs/site/api/javadoc/
           rsync -a --delete vendordep/build/docs/doxygen/ mkdocs/site/api/doxygen/
+      - name: Configure git identity for deployment
+        run: |
+          git config --global user.name github-actions[bot]
+          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
       - name: Deploy
         run: |
           ghp-import -n -p -f mkdocs/site

@@ -19,9 +19,9 @@ jobs:
           fi
           echo "Found $count standalone native test source files."
 
-  javadoc:
+  api-docs:
     needs: [validation]
-    name: "Javadoc"
+    name: "API Docs"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,9 +32,23 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21
-      - name: Check Java docs
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+      - name: Build Javadoc and Doxygen
         working-directory: vendordep
-        run: ./gradlew javadoc
+        run: ./gradlew javadoc doxygen
+      - name: Upload Javadocs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: javadocs
+          path: vendordep/build/docs/javadoc
+      - name: Upload Doxygen artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen
+          path: vendordep/build/docs/doxygen
 
   build-all-script:
     needs: [validation]
