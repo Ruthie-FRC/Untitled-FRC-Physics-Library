@@ -114,6 +114,7 @@ jobs:
         with:
           submodules: true
       - name: Fetch all history and metadata
+        shell: bash
         run: |
           default_branch="${{ github.event.repository.default_branch }}"
           git fetch --prune --unshallow
