@@ -41,7 +41,7 @@ jobs:
           sudo apt-get install -y doxygen
       - name: Build Javadoc and Doxygen
         working-directory: vendordep
-        run: ./gradlew javadoc doxygen
+        run: ./gradlew javadoc doxygenDox
       - name: Upload Javadocs artifact
         uses: actions/upload-artifact@v4
         with:
@@ -121,9 +121,9 @@ jobs:
           - os: windows-2022
             artifact-name: Win64
             architecture: x64
-          - os: macos-14
-            artifact-name: macOS
-            architecture: aarch64
+          # - os: macos-14
+          #   artifact-name: macOS
+          #   architecture: aarch64
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
