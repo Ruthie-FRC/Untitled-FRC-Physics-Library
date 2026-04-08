@@ -1,3 +1,7 @@
+// Copyright (c) RenSim contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the LGPLv3 license file in the root directory of this project.
+
 #include "frcsim/rigidbody/rigid_assembly.hpp"
 
 #include "frcsim/joints/fixed_joint.hpp"
@@ -11,27 +15,35 @@ RigidBody* RigidAssembly::addBody(double mass_kg) {
   return &bodies_.back();
 }
 
-RevoluteJoint* RigidAssembly::addRevoluteJoint(size_t body_a_idx, size_t body_b_idx,
-                           const Vector3& axis_local) {
-  if (body_a_idx >= bodies_.size() || body_b_idx >= bodies_.size()) return nullptr;
-  auto joint = std::make_shared<RevoluteJoint>(&bodies_[body_a_idx], &bodies_[body_b_idx], axis_local);
+RevoluteJoint* RigidAssembly::addRevoluteJoint(size_t body_a_idx,
+                                               size_t body_b_idx,
+                                               const Vector3& axis_local) {
+  if (body_a_idx >= bodies_.size() || body_b_idx >= bodies_.size())
+    return nullptr;
+  auto joint = std::make_shared<RevoluteJoint>(
+      &bodies_[body_a_idx], &bodies_[body_b_idx], axis_local);
   RevoluteJoint* ptr = joint.get();
   joints_.push_back(joint);
   return ptr;
 }
 
-PrismaticJoint* RigidAssembly::addPrismaticJoint(size_t body_a_idx, size_t body_b_idx,
-                         const Vector3& axis_local) {
-  if (body_a_idx >= bodies_.size() || body_b_idx >= bodies_.size()) return nullptr;
-  auto joint = std::make_shared<PrismaticJoint>(&bodies_[body_a_idx], &bodies_[body_b_idx], axis_local);
+PrismaticJoint* RigidAssembly::addPrismaticJoint(size_t body_a_idx,
+                                                 size_t body_b_idx,
+                                                 const Vector3& axis_local) {
+  if (body_a_idx >= bodies_.size() || body_b_idx >= bodies_.size())
+    return nullptr;
+  auto joint = std::make_shared<PrismaticJoint>(
+      &bodies_[body_a_idx], &bodies_[body_b_idx], axis_local);
   PrismaticJoint* ptr = joint.get();
   joints_.push_back(joint);
   return ptr;
 }
 
 FixedJoint* RigidAssembly::addFixedJoint(size_t body_a_idx, size_t body_b_idx) {
-  if (body_a_idx >= bodies_.size() || body_b_idx >= bodies_.size()) return nullptr;
-  auto joint = std::make_shared<FixedJoint>(&bodies_[body_a_idx], &bodies_[body_b_idx]);
+  if (body_a_idx >= bodies_.size() || body_b_idx >= bodies_.size())
+    return nullptr;
+  auto joint =
+      std::make_shared<FixedJoint>(&bodies_[body_a_idx], &bodies_[body_b_idx]);
   FixedJoint* ptr = joint.get();
   joints_.push_back(joint);
   return ptr;

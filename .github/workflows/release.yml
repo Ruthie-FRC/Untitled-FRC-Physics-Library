@@ -20,7 +20,7 @@ jobs:
       workingDirectory: ${{github.workspace}}/vendordep
       name: github-pages
       #url: ${{steps.deployment.outputs.page_url}}
-    
+
     steps:
       - run: git config --global user.name "Ruthie-FRC" && git config --global user.email "Ruthie-FRC@users.noreply.github.com"
       - uses: actions/checkout@v4

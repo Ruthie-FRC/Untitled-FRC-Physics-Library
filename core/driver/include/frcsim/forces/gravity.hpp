@@ -1,3 +1,7 @@
+// Copyright (c) RenSim contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the LGPLv3 license file in the root directory of this project.
+
 #pragma once
 
 #include "frcsim/forces/force_generator.hpp"
@@ -7,16 +11,18 @@
 namespace frcsim {
 
 class GravityForce : public ForceGenerator {
-	public:
-		explicit GravityForce(const Vector3& gravity_mps2) : gravity_mps2_(gravity_mps2) {}
+ public:
+  explicit GravityForce(const Vector3& gravity_mps2)
+      : gravity_mps2_(gravity_mps2) {}
 
-		void apply(RigidBody& body, double /*dt_s*/) const override {
-				if (body.flags().is_kinematic) return;
-				body.applyForce(gravity_mps2_ * body.massKg());
-		}
+  void apply(RigidBody& body, double /*dt_s*/) const override {
+    if (body.flags().is_kinematic)
+      return;
+    body.applyForce(gravity_mps2_ * body.massKg());
+  }
 
-	private:
-		Vector3 gravity_mps2_{};
+ private:
+  Vector3 gravity_mps2_{};
 };
 
 }  // namespace frcsim
