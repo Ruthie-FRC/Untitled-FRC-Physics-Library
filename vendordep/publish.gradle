@@ -61,7 +61,7 @@ task cppHeadersZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/native/include') {
+    from('src/main/driver/include') {
         into '/'
     }
 }
@@ -75,7 +75,7 @@ task cppSourceZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/native/cpp') {
+    from('src/main/driver/cpp') {
         into '/'
     }
 }
