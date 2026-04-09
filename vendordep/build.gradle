@@ -180,6 +180,13 @@ ext.getCurrentArch = {
 
 def systemArch = getCurrentArch()
 
+// Native C++ should track the driver implementation. Keep JNI glue out of the
+// pure native component and let the driver/JNI library own it.
+def nativeFromDriverExcludes = [
+    '**/RenSimJNI.cpp',
+    '**/physics_jni.cpp'
+]
+
 
 sourceSets {
     main {
@@ -201,11 +208,12 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp'
+                        srcDirs 'src/main/driver/cpp'
                         include '**/*.cpp'
+                        exclude nativeFromDriverExcludes
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/driver/include'
                     }
                 }
             }
