@@ -58,7 +58,6 @@ This is a **prerelease**. Core physics API (PhysicsWorld, RigidBody) is stable. 
 
 ### Architecture Overview
 - **core/driver**: Main C++ physics engine with constraint solvers
-- **core/physics-core**: Alternative physics API entry point (legacy, not actively maintained in prerelease)
 - **vendordep**: WPILib wrapper, JNI bindings, Java API
 - **apps**: Device simulators and runtime integration
 - **examples**: Usage demonstrations for C++ and Java

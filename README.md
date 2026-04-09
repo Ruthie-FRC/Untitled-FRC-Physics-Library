@@ -56,12 +56,10 @@ mkdocs serve --config-file mkdocs/mkdocs.yml
 ### Core Libraries
 
 - `core/driver/`: C++ physics engine implementation and headers
-- `core/physics-core/`: shared physics components
 - `core/java/`: Java-side code and bindings
 - `core/python/`: Python-side code and bindings
 - `core/bindings-java/`: Java binding support
 - `core/gamepiece-models/`: gamepiece model definitions
-- `physics-core/`: additional physics core include/source tree
 
 ### Applications
 

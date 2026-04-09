@@ -19,7 +19,7 @@ This page explains drag equations used by RenSim and how projected area and coef
 
 Primary implementation:
 
-- core/physics-core/include/frcsim/aerodynamics/drag_model.hpp
+- core/driver/include/frcsim/aerodynamics/drag_model.hpp
 - core/driver/include/frcsim/math/vector.hpp
 - core/driver/include/frcsim/rigidbody/rigid_body.hpp
 

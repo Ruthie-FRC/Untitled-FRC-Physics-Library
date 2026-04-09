@@ -37,7 +37,7 @@ Current Java API includes:
 
 ### C++
 
-Use `rensim::PhysicsWorld` from `src/main/driver/include/header.h`.
+Use `rensim::PhysicsWorld` from `src/main/driver/include/driverheader.h`.
 
 ## Build Notes
 

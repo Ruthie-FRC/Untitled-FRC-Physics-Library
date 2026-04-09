@@ -15,7 +15,7 @@ This page explains the spin-induced side force model used by RenSim.
 
 Primary implementation:
 
-- core/physics-core/include/frcsim/aerodynamics/magnus_model.hpp
+- core/driver/include/frcsim/aerodynamics/magnus_model.hpp
 - core/driver/include/frcsim/math/vector.hpp
 
 Validation tests:
