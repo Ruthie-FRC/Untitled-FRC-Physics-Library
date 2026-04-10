@@ -212,5 +212,79 @@ int main() {
         const double high_speed_ratio = run_head_on_restitution_ratio(5.0);
         assert(high_speed_ratio < low_speed_ratio - 0.05);
 
+        // Wall velocity-dependent restitution regression: high-speed impacts should
+        // lose more energy than low-speed impacts.
+        auto run_wall_restitution_ratio = [&](double speed_mps) -> double {
+            frcsim::BallGamepieceSim::FieldConfig cfg;
+            cfg.wall_restitution = 0.85;
+            cfg.wall_restitution_reference_speed_mps = 2.0;
+            cfg.wall_restitution_speed_exponent = 0.25;
+            cfg.wall_restitution_min_scale = 0.4;
+            cfg.wall_friction = 0.0;
+
+            frcsim::BallGamepieceSim wall_sim(cfg);
+            wall_sim.setSimulationSubsteps(8);
+
+            frcsim::BallPhysicsSim3D::Config ball_cfg =
+                    frcsim::BallGamepiecePresets::season2026BallConfig();
+            ball_cfg.drag_scale = 0.0;
+            ball_cfg.magnus_scale = 0.0;
+            ball_cfg.rolling_friction_per_s = 0.0;
+
+            const auto props = frcsim::BallGamepiecePresets::season2026BallProperties();
+            frcsim::BallPhysicsSim3D::BallState state;
+            state.position_m = frcsim::Vector3(props.radius_m + 0.20, 3.0, props.radius_m);
+            state.velocity_mps = frcsim::Vector3(-speed_mps, 0.0, 0.0);
+            wall_sim.addBall(state, ball_cfg, props);
+
+            for (int i = 0; i < 40; ++i) {
+                wall_sim.step(0.005);
+            }
+
+            const double post_speed = wall_sim.balls()[0].sim.state().velocity_mps.x;
+            return std::max(0.0, post_speed) / speed_mps;
+        };
+
+        const double wall_low_ratio = run_wall_restitution_ratio(1.0);
+        const double wall_high_ratio = run_wall_restitution_ratio(5.0);
+        assert(wall_high_ratio < wall_low_ratio - 0.05);
+
+        // Ball-ball spin transfer regression: glancing collisions should induce
+        // spin from tangential friction impulse.
+        frcsim::BallGamepieceSim::FieldConfig spin_field;
+        spin_field.ball_ball_contact_restitution = 0.4;
+        spin_field.ball_ball_contact_friction = 0.8;
+        spin_field.ball_ball_spin_transfer_gain = 0.35;
+        spin_field.free_ball_spin_decay_per_s = 0.0;
+        frcsim::BallGamepieceSim spin_sim(spin_field);
+        spin_sim.setSimulationSubsteps(8);
+
+        frcsim::BallPhysicsSim3D::Config spin_cfg =
+                frcsim::BallGamepiecePresets::season2026BallConfig();
+        spin_cfg.drag_scale = 0.0;
+        spin_cfg.magnus_scale = 0.0;
+        spin_cfg.rolling_friction_per_s = 0.0;
+        const auto spin_props = frcsim::BallGamepiecePresets::season2026BallProperties();
+
+        frcsim::BallPhysicsSim3D::BallState spin_a;
+        spin_a.position_m = frcsim::Vector3(6.0, 4.0, spin_props.radius_m);
+        spin_a.velocity_mps = frcsim::Vector3(2.5, 0.0, 0.0);
+        spin_sim.addBall(spin_a, spin_cfg, spin_props);
+
+        frcsim::BallPhysicsSim3D::BallState spin_b;
+        spin_b.position_m = frcsim::Vector3(
+                6.0 + 2.0 * spin_props.radius_m + 0.03, 4.0 + 0.08,
+                spin_props.radius_m);
+        spin_b.velocity_mps = frcsim::Vector3(0.0, 0.0, 0.0);
+        spin_sim.addBall(spin_b, spin_cfg, spin_props);
+
+        for (int i = 0; i < 50; ++i) {
+            spin_sim.step(0.005);
+        }
+
+        const double spin_norm_a = spin_sim.balls()[0].sim.state().spin_radps.norm();
+        const double spin_norm_b = spin_sim.balls()[1].sim.state().spin_radps.norm();
+        assert(spin_norm_a > 1e-3 || spin_norm_b > 1e-3);
+
     return 0;
 }
