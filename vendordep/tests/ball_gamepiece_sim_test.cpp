@@ -358,5 +358,142 @@ int main() {
         }
         assert(!sleep_sim.balls()[0].sleeping);
 
+        // Full integration regression: run all math systems together and verify
+        // finite, bounded, non-explosive behavior over a sustained horizon.
+        frcsim::BallGamepieceSim::FieldConfig full_field;
+        full_field.ccd_enabled = true;
+        full_field.ccd_speed_threshold_mps = 6.0;
+        full_field.sleeping_enabled = true;
+        full_field.sleep_velocity_threshold_mps = 0.06;
+        full_field.sleep_spin_threshold_radps = 0.5;
+        full_field.sleep_frame_threshold = 8;
+        full_field.solver_iterations = 5;
+        full_field.baumgarte_beta = 0.25;
+        full_field.baumgarte_slop_m = 0.004;
+        full_field.ball_ball_contact_restitution = 0.55;
+        full_field.ball_ball_contact_friction = 0.28;
+        full_field.ball_ball_spin_transfer_gain = 0.22;
+        full_field.free_ball_spin_decay_per_s = 0.3;
+        full_field.net_boundary_user_id = 777;
+
+        frcsim::BallGamepieceSim full_sim(full_field);
+        full_sim.setSimulationSubsteps(6);
+
+        frcsim::BallGamepieceSim::RobotState full_robot_a;
+        full_robot_a.position_m = frcsim::Vector3(2.0, 2.0, 0.0);
+        full_robot_a.velocity_mps = frcsim::Vector3(1.4, 0.2, 0.0);
+        full_robot_a.yaw_rad = 0.2;
+        full_robot_a.intake_enabled = true;
+        full_robot_a.intake_radius_m = 0.32;
+        full_sim.addRobot(full_robot_a);
+
+        frcsim::BallGamepieceSim::RobotState full_robot_b;
+        full_robot_b.position_m = frcsim::Vector3(12.0, 6.0, 0.0);
+        full_robot_b.velocity_mps = frcsim::Vector3(-1.0, -0.4, 0.0);
+        full_robot_b.yaw_rad = -0.6;
+        full_sim.addRobot(full_robot_b);
+
+        frcsim::EnvironmentalBoundary full_plane;
+        full_plane.type = frcsim::BoundaryType::kPlane;
+        full_plane.position_m = frcsim::Vector3(6.0, 0.0, 0.0);
+        full_plane.orientation =
+                frcsim::Quaternion::fromAxisAngle(frcsim::Vector3::unitY(), -1.57079632679);
+        full_plane.restitution = 0.5;
+        full_plane.friction_coefficient = 0.18;
+        full_plane.is_active = true;
+        full_sim.addFieldElement(full_plane);
+
+        frcsim::EnvironmentalBoundary full_box;
+        full_box.type = frcsim::BoundaryType::kBox;
+        full_box.position_m = frcsim::Vector3(8.0, 4.0, 0.35);
+        full_box.half_extents_m = frcsim::Vector3(0.08, 1.0, 0.35);
+        full_box.restitution = 0.62;
+        full_box.friction_coefficient = 0.22;
+        full_box.is_active = true;
+        full_sim.addFieldElement(full_box);
+
+        frcsim::EnvironmentalBoundary full_cylinder;
+        full_cylinder.type = frcsim::BoundaryType::kCylinder;
+        full_cylinder.position_m = frcsim::Vector3(10.5, 3.8, 0.3);
+        full_cylinder.radius_m = 0.22;
+        full_cylinder.half_extents_m = frcsim::Vector3(0.0, 0.0, 0.5);
+        full_cylinder.restitution = 0.55;
+        full_cylinder.friction_coefficient = 0.2;
+        full_cylinder.is_active = true;
+        full_sim.addFieldElement(full_cylinder);
+
+        frcsim::EnvironmentalBoundary full_net;
+        full_net.type = frcsim::BoundaryType::kBox;
+        full_net.position_m = frcsim::Vector3(15.0, 4.0, 1.7);
+        full_net.half_extents_m = frcsim::Vector3(0.3, 0.5, 0.45);
+        full_net.user_id = 777;
+        full_net.is_active = true;
+        full_sim.addFieldElement(full_net);
+
+        frcsim::BallPhysicsSim3D::Config full_cfg =
+                frcsim::BallGamepiecePresets::season2026BallConfig();
+        full_cfg.max_substep_s = 0.004;
+        full_cfg.drag_scale = 1.0;
+        full_cfg.magnus_scale = 1.0;
+
+        const auto full_props = frcsim::BallGamepiecePresets::season2026BallProperties();
+        for (int i = 0; i < 18; ++i) {
+            frcsim::BallPhysicsSim3D::BallState seed;
+            seed.position_m = frcsim::Vector3(
+                    1.2 + 0.7 * (i % 6),
+                    1.1 + 0.8 * ((i / 6) % 3),
+                    full_props.radius_m + 0.03 * (i % 2));
+            seed.velocity_mps = frcsim::Vector3(
+                    (i % 3 == 0 ? 6.5 : -3.8 + 0.22 * i),
+                    (i % 2 == 0 ? 1.6 : -1.3),
+                    (i % 5 == 0 ? 2.8 : 0.4));
+            seed.spin_radps = frcsim::Vector3(0.0, (i % 2 == 0 ? 45.0 : -35.0), 6.0);
+            full_sim.addBall(seed, full_cfg, full_props);
+        }
+
+        for (int step = 0; step < 900; ++step) {
+            full_sim.step(0.005);
+            const auto& balls = full_sim.balls();
+
+            for (const auto& entity : balls) {
+                const auto& s = entity.sim.state();
+                assert(std::isfinite(s.position_m.x));
+                assert(std::isfinite(s.position_m.y));
+                assert(std::isfinite(s.position_m.z));
+                assert(std::isfinite(s.velocity_mps.x));
+                assert(std::isfinite(s.velocity_mps.y));
+                assert(std::isfinite(s.velocity_mps.z));
+                assert(std::isfinite(s.spin_radps.x));
+                assert(std::isfinite(s.spin_radps.y));
+                assert(std::isfinite(s.spin_radps.z));
+
+                assert(std::fabs(s.velocity_mps.x) < 220.0);
+                assert(std::fabs(s.velocity_mps.y) < 220.0);
+                assert(std::fabs(s.velocity_mps.z) < 220.0);
+                assert(s.position_m.x > -1.0 && s.position_m.x < 18.0);
+                assert(s.position_m.y > -1.0 && s.position_m.y < 10.0);
+                assert(s.position_m.z > -0.2 && s.position_m.z < 8.0);
+
+                if (entity.sleeping) {
+                    assert(s.velocity_mps.norm() <=
+                                 full_field.sleep_velocity_threshold_mps + 0.03);
+                }
+            }
+
+            for (std::size_t i = 0; i < balls.size(); ++i) {
+                for (std::size_t j = i + 1; j < balls.size(); ++j) {
+                    const auto& a = balls[i].sim.state();
+                    const auto& b = balls[j].sim.state();
+                    const double min_sep =
+                            balls[i].sim.ballProperties().radius_m +
+                            balls[j].sim.ballProperties().radius_m;
+                    const double sep = (b.position_m - a.position_m).norm();
+                    assert(sep + 0.03 >= min_sep);
+                }
+            }
+        }
+
+        assert(full_sim.countScoredBalls() <= full_sim.countBalls());
+
     return 0;
 }
