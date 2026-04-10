@@ -168,6 +168,7 @@ class RigidBody {
 
   /**
    * @brief Sets cylinder axis from world-space direction.
+    * @param axis_world World-space direction to convert into local body space.
    *
    * The provided axis is transformed into local body space and normalized.
    * Zero-length input falls back to local +Z.

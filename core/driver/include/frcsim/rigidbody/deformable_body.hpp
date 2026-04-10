@@ -17,7 +17,9 @@ namespace frcsim {
  * @brief Rigid body with optional deformable mesh dynamics overlay.
  *
  * Extends rigid body behavior with per-node deformation tracking in local
- * coordinates. Currently a structural placeholder for future flex-body integration.
+ * coordinates.
+ * @details This is intentionally overkill for current use cases, but it keeps
+ * the future flex-body integration path explicit.
  * TODO: Implement deformation solving during simulation substeps.
  */
 class DeformableBody {

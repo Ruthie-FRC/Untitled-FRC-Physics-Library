@@ -53,8 +53,8 @@ class DragModel {
         linear_drag_coefficient_n_per_mps_(linear_drag_coefficient_n_per_mps) {}
 
   /**
-   * @brief Computes detailed drag force breakdown for a velocity vector.
-   * @param velocity_mps Body velocity in m/s.
+     * @brief Computes detailed drag force breakdown for a world-space velocity vector.
+     * @param velocity_mps World-space velocity in m/s.
    * @return DragForceDetails with force, direction, and diagnostic fields.
    */
   Vector3::DragForceDetails computeForceDetailed(
@@ -65,8 +65,8 @@ class DragModel {
   }
 
   /**
-   * @brief Computes detailed drag force using body geometry and motion.
-   * @param body Rigid body supplying velocity and drag area geometry.
+    * @brief Computes detailed drag force using body geometry and motion.
+    * @param body Rigid body supplying world-space velocity and drag area geometry.
    * @return DragForceDetails with force, direction, and diagnostics.
    */
   Vector3::DragForceDetails computeForceDetailed(const RigidBody& body) const {
@@ -82,8 +82,8 @@ class DragModel {
   }
 
   /**
-   * @brief Computes drag force vector for a velocity.
-   * @param velocity_mps Body velocity in m/s.
+    * @brief Computes drag force vector for a world-space velocity.
+    * @param velocity_mps World-space velocity in m/s.
    * @return Drag force vector in newtons.
    */
   Vector3 computeForce(const Vector3& velocity_mps) const {
@@ -93,7 +93,7 @@ class DragModel {
 
   /**
    * @brief Computes drag force using body geometry.
-   * @param body Rigid body to evaluate drag for.
+    * @param body Rigid body to evaluate drag for using its world-space velocity.
    * @return Drag force vector in newtons.
    */
   Vector3 computeForce(const RigidBody& body) const {
@@ -104,7 +104,7 @@ class DragModel {
   /**
    * @brief Compares drag force magnitude against an effective gravity vector.
    * @param body Rigid body to evaluate.
-   * @param effective_gravity_mps2 Gravity vector in m/s^2 (e.g., gravity + Magnus).
+    * @param effective_gravity_mps2 Effective gravity vector in m/s^2 (e.g., gravity + Magnus).
    * @return Diagnostic comparison showing drag-to-gravity ratio.
    */
   DragGravityComparison compareToEffectiveGravity(

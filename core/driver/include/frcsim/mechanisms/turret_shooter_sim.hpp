@@ -33,7 +33,7 @@ class TurretShooterSim {
     /** @brief Muzzle origin offset in local turret frame (meters, before yaw/pitch rotation). */
     Vector3 muzzle_offset_local_m{0.35, 0.0, 0.18};
 
-    /** @brief Intake center offset in local turret frame (meters). */
+    /** @brief Intake center offset from the turret rotation origin in local turret frame (meters). */
     Vector3 intake_offset_local_m{0.15, 0.0, -0.06};
 
     /** @brief Radius around intake center for successful ball pickup (meters). */
