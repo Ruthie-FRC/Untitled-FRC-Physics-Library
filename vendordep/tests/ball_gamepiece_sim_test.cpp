@@ -358,6 +358,35 @@ int main() {
         }
         assert(!sleep_sim.balls()[0].sleeping);
 
+    // Sleeping integration regression: distant active field elements should not
+    // wake an otherwise resting ball.
+    frcsim::BallGamepieceSim::FieldConfig sleep_field_with_geometry;
+    sleep_field_with_geometry.sleeping_enabled = true;
+    sleep_field_with_geometry.sleep_velocity_threshold_mps = 0.05;
+    sleep_field_with_geometry.sleep_spin_threshold_radps = 0.2;
+    sleep_field_with_geometry.sleep_frame_threshold = 4;
+    frcsim::BallGamepieceSim sleep_geo_sim(sleep_field_with_geometry);
+    sleep_geo_sim.setSimulationSubsteps(4);
+
+    frcsim::EnvironmentalBoundary far_geometry;
+    far_geometry.type = frcsim::BoundaryType::kBox;
+    far_geometry.position_m = frcsim::Vector3(14.0, 7.0, 0.4);
+    far_geometry.half_extents_m = frcsim::Vector3(0.3, 0.3, 0.4);
+    far_geometry.restitution = 0.7;
+    far_geometry.friction_coefficient = 0.2;
+    far_geometry.is_active = true;
+    sleep_geo_sim.addFieldElement(far_geometry);
+
+    frcsim::BallPhysicsSim3D::BallState sleep_geo_ball;
+    sleep_geo_ball.position_m = frcsim::Vector3(2.0, 1.5, sleep_props.radius_m);
+    sleep_geo_ball.velocity_mps = frcsim::Vector3(0.0, 0.0, 0.0);
+    sleep_geo_sim.addBall(sleep_geo_ball, sleep_cfg, sleep_props);
+
+    for (int i = 0; i < 12; ++i) {
+      sleep_geo_sim.step(0.02);
+    }
+    assert(sleep_geo_sim.balls()[0].sleeping);
+
         // Full integration regression: run all math systems together and verify
         // finite, bounded, non-explosive behavior over a sustained horizon.
         frcsim::BallGamepieceSim::FieldConfig full_field;

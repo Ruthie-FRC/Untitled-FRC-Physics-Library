@@ -1590,8 +1590,6 @@ class BallGamepieceSim {
           continue;
         }
 
-        wakeBall(ball);
-
         switch (boundary.type) {
           case BoundaryType::kPlane:
           case BoundaryType::kWall:
