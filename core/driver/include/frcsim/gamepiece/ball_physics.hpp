@@ -211,10 +211,13 @@ class BallPhysicsSim3D {
   }
 
  private:
+  /** @brief Returns true when all vector components are finite. */
   static bool finiteVector(const Vector3& v) {
     return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z);
   }
 
+  /** @brief Clamps to non-negative and substitutes fallback on non-finite
+   * input. */
   static double sanitizeNonNegative(double value, double fallback) {
     if (!std::isfinite(value)) {
       return fallback;
@@ -271,6 +274,7 @@ class BallPhysicsSim3D {
     return sanitized;
   }
 
+  /** @brief Replaces non-finite state components with zero vectors. */
   static void sanitizeState(BallState& state) {
     if (!finiteVector(state.position_m)) {
       state.position_m = Vector3::zero();
@@ -283,6 +287,11 @@ class BallPhysicsSim3D {
     }
   }
 
+  /**
+   * @brief Computes linear acceleration from gravity, drag, and Magnus terms.
+   * @param velocity_mps Current linear velocity.
+   * @return World-frame acceleration in meters per second squared.
+   */
   Vector3 computeAcceleration(const Vector3& velocity_mps) const {
     const Vector3 gravity_mps2 =
         config_.gravity_mps2 * config_.effective_gravity_scale;
@@ -301,6 +310,11 @@ class BallPhysicsSim3D {
     return finiteVector(accel_mps2) ? accel_mps2 : gravity_mps2;
   }
 
+  /**
+   * @brief Resolves contact against the ground plane with bounce and rolling
+   * friction.
+   * @param dt_s Substep duration used for planar friction decay.
+   */
   void resolveGroundContact(double dt_s) {
     const double floor_z = config_.ground_height_m + ball_properties_.radius_m;
     if (!std::isfinite(floor_z) || state_.position_m.z > floor_z) {

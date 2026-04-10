@@ -850,6 +850,7 @@ class BallGamepieceSim {
     return config;
   }
 
+  /** @brief Rotates a local-space vector around +Z by yaw. */
   static Vector3 rotateYaw(const Vector3& local, double yaw_rad) {
     const double c = std::cos(yaw_rad);
     const double s = std::sin(yaw_rad);
@@ -857,10 +858,18 @@ class BallGamepieceSim {
                    local.z);
   }
 
+  /** @brief Returns the world-space outward normal for a boundary. */
   static Vector3 boundaryNormalWorld(const EnvironmentalBoundary& boundary) {
     return boundary.orientation.rotate(Vector3::unitZ()).normalized();
   }
 
+  /**
+   * @brief Applies a normal+friction impulse to a velocity vector.
+   * @param velocity Velocity modified in place.
+   * @param normal Unit contact normal pointing out of the collision surface.
+   * @param restitution Coefficient of restitution in [0, 1].
+   * @param friction Tangential damping factor in [0, 1].
+   */
   static void applyContactImpulse(Vector3& velocity, const Vector3& normal,
                                   double restitution, double friction) {
     const double vn = velocity.dot(normal);
@@ -873,6 +882,10 @@ class BallGamepieceSim {
     velocity -= tangential * std::clamp(friction, 0.0, 1.0);
   }
 
+  /**
+   * @brief Scales restitution as impact speed rises beyond a reference speed.
+   * @return Effective restitution in [0, 1].
+   */
   static double velocityScaledRestitution(
       double base_restitution, double impact_speed_mps,
       double reference_speed_mps, double speed_exponent,
@@ -905,11 +918,13 @@ class BallGamepieceSim {
     return base * restitution_scale;
   }
 
+  /** @brief Marks a ball as awake and clears its sleep counter. */
   static void wakeBall(BallEntity& ball) {
     ball.sleeping = false;
     ball.sleep_frame_count = 0;
   }
 
+  /** @brief Updates sleeping/wake state for all grounded balls. */
   void updateSleepStates() {
     if (!field_.sleeping_enabled) {
       for (auto& ball : balls_) {
@@ -953,6 +968,12 @@ class BallGamepieceSim {
     }
   }
 
+  /**
+   * @brief Performs fast-path swept collision checks for high-speed balls.
+   * @param ball Ball entity to update.
+   * @param previous_position Position before integration.
+   * @param dt_s Substep delta time.
+   */
   void resolveContinuousCollision(BallEntity& ball,
                                   const Vector3& previous_position,
                                   double dt_s) const {
@@ -991,6 +1012,7 @@ class BallGamepieceSim {
     ball.sim.setState(state);
   }
 
+  /** @brief Resolves swept collisions against outer XY field bounds. */
   void resolveSweptFieldBounds(BallPhysicsSim3D::BallState& state,
                                const Vector3& previous_position,
                                double radius) const {
@@ -1033,6 +1055,7 @@ class BallGamepieceSim {
     }
   }
 
+  /** @brief Resolves swept collision against an infinite plane boundary. */
   void resolveSweptPlaneBoundary(BallPhysicsSim3D::BallState& state,
                                  const Vector3& previous_position,
                                  const EnvironmentalBoundary& boundary,
@@ -1059,6 +1082,7 @@ class BallGamepieceSim {
                         boundary.friction_coefficient);
   }
 
+  /** @brief Resolves swept collision against an oriented box boundary. */
   void resolveSweptBoxBoundary(BallPhysicsSim3D::BallState& state,
                                const Vector3& previous_position,
                                const EnvironmentalBoundary& boundary,
@@ -1145,6 +1169,7 @@ class BallGamepieceSim {
                         boundary.friction_coefficient);
   }
 
+  /** @brief Computes speed-dependent restitution for wall/field contacts. */
   double scaledWallRestitution(double base_restitution,
                                double impact_speed_mps) const {
     return velocityScaledRestitution(
@@ -1154,6 +1179,7 @@ class BallGamepieceSim {
         field_.wall_restitution_min_scale);
   }
 
+  /** @brief Computes speed-dependent restitution for robot-ball contacts. */
   double scaledRobotBallRestitution(double impact_speed_mps) const {
     return velocityScaledRestitution(
         field_.robot_ball_contact_restitution, impact_speed_mps,
@@ -1162,6 +1188,8 @@ class BallGamepieceSim {
         field_.robot_ball_restitution_min_scale);
   }
 
+  /** @brief Integrates robot kinematics and clamps robot centers to field
+   * bounds. */
   void integrateRobots(double dt_s) {
     for (auto& robot : robots_) {
       robot.position_m += robot.velocity_mps * dt_s;
@@ -1190,6 +1218,7 @@ class BallGamepieceSim {
     }
   }
 
+  /** @brief Resolves planar robot-robot overlap and relative normal velocity. */
   void resolveRobotRobotImpedance() {
     for (std::size_t i = 0; i < robots_.size(); ++i) {
       for (std::size_t j = i + 1; j < robots_.size(); ++j) {
@@ -1281,6 +1310,7 @@ class BallGamepieceSim {
     }
   }
 
+  /** @brief Resolves robot-ball contact response including plow coupling. */
   void resolveRobotBallContacts(BallEntity& ball) {
     auto state = ball.sim.state();
 
@@ -1323,6 +1353,10 @@ class BallGamepieceSim {
     ball.sim.setState(state);
   }
 
+  /**
+   * @brief Runs iterative sequential-impulse ball-ball collision solving.
+   * @param dt_s Substep duration used by Baumgarte stabilization.
+   */
   void resolveBallBallContacts(double dt_s) {
     struct BallBallContact {
       std::size_t a_index{};
@@ -1478,6 +1512,7 @@ class BallGamepieceSim {
     }
   }
 
+  /** @brief Resolves contacts against outer rectangular field limits. */
   void resolveFieldBounds(BallEntity& ball) const {
     auto state = ball.sim.state();
     const double radius = ball.sim.ballProperties().radius_m;
@@ -1523,6 +1558,11 @@ class BallGamepieceSim {
     ball.sim.setState(state);
   }
 
+  /**
+   * @brief Resolves contacts against configured field elements and net zones.
+   * @param ball Ball entity to update.
+   * @param dt_s Substep duration for net damping/downward bias.
+   */
   void resolveFieldElements(BallEntity& ball, double dt_s) {
     const int solver_iterations = std::max(1, field_.solver_iterations);
     for (int iteration = 0; iteration < solver_iterations; ++iteration) {
@@ -1572,6 +1612,8 @@ class BallGamepieceSim {
     }
   }
 
+  /** @brief Returns true when a point lies inside an oriented box boundary
+   * with slack. */
   static bool isInsideBoxBoundary(const Vector3& world_point,
                                   const EnvironmentalBoundary& boundary,
                                   double slack) {
@@ -1582,6 +1624,7 @@ class BallGamepieceSim {
            std::abs(local.z) <= boundary.half_extents_m.z + slack;
   }
 
+  /** @brief Resolves penetration and impulse response for plane boundaries. */
   void resolvePlaneBoundary(BallPhysicsSim3D::BallState& state,
                             const EnvironmentalBoundary& boundary,
                             double ball_radius) const {
@@ -1605,9 +1648,11 @@ class BallGamepieceSim {
               boundary.friction_coefficient);
   }
 
-    void resolveBoxBoundary(BallPhysicsSim3D::BallState& state,
-                const EnvironmentalBoundary& boundary,
-                double ball_radius) const {
+  /** @brief Resolves penetration and impulse response for oriented box
+   * boundaries. */
+  void resolveBoxBoundary(BallPhysicsSim3D::BallState& state,
+                          const EnvironmentalBoundary& boundary,
+                          double ball_radius) const {
     const Quaternion inverse = boundary.orientation.inverse();
     const Vector3 local =
         inverse.rotate(state.position_m - boundary.position_m);
@@ -1656,9 +1701,11 @@ class BallGamepieceSim {
               boundary.friction_coefficient);
   }
 
-    void resolveCylinderBoundary(BallPhysicsSim3D::BallState& state,
-                   const EnvironmentalBoundary& boundary,
-                   double ball_radius) const {
+  /** @brief Resolves penetration and impulse response for cylinder
+   * boundaries. */
+  void resolveCylinderBoundary(BallPhysicsSim3D::BallState& state,
+                               const EnvironmentalBoundary& boundary,
+                               double ball_radius) const {
     const Quaternion inverse = boundary.orientation.inverse();
     const Vector3 local =
         inverse.rotate(state.position_m - boundary.position_m);
