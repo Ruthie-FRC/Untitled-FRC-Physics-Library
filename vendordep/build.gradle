@@ -187,11 +187,11 @@ def nativeFromDriverExcludes = [
 // Native code can still reference WPILibC elsewhere, but driver targets should
 // not compile WPILibC-labeled sources.
 def driverWpilibCExcludes = [
-    '**/wpilibc/**',
-    '**/wpilib/**',
-    '**/*wpilib*.cpp',
-    '**/*wpilib*.cc',
-    '**/*wpilib*.cxx'
+    'src/main/driver/cpp/**/wpilibc/**',
+    'src/main/driver/cpp/**/wpilib/**',
+    'src/main/driver/cpp/**/*wpilib*.cpp',
+    'src/main/driver/cpp/**/*wpilib*.cc',
+    'src/main/driver/cpp/**/*wpilib*.cxx'
 ]
 
 
@@ -215,6 +215,7 @@ model {
             sources {
                 cpp {
                     source {
+                        srcDirs 'src/main/native/cpp'
                         srcDirs 'src/main/driver/cpp'
                         include '**/*.cpp'
                         exclude nativeFromDriverExcludes
@@ -228,6 +229,7 @@ model {
             binaries.all {
                 lib library: 'RenSimDriver', linkage: 'shared'
             }
+            nativeUtils.useRequiredLibrary(it, 'wpilib_shared', 'wpimath_shared')
         }
 
         RenSimDriver(JniNativeLibrarySpec) {
