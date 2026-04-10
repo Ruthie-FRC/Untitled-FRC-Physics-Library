@@ -121,6 +121,12 @@ class BallGamepieceSim {
     double sleep_spin_threshold_radps{0.8};
     /** Consecutive qualifying frames required before sleeping. */
     int sleep_frame_threshold{12};
+    /** Number of sequential-impulse iterations for contact solving. */
+    int solver_iterations{4};
+    /** Baumgarte stabilization factor used to reduce penetration. */
+    double baumgarte_beta{0.2};
+    /** Allowed penetration before stabilization is applied, in meters. */
+    double baumgarte_slop_m{0.005};
   };
 
   /** @brief Per-robot state used by game piece interaction and collision
@@ -677,7 +683,7 @@ class BallGamepieceSim {
       }
     }
 
-    resolveBallBallContacts();
+    resolveBallBallContacts(dt_s);
     updateSleepStates();
   }
 
@@ -1291,8 +1297,9 @@ class BallGamepieceSim {
 
       const Vector3 normal =
           distance > 1e-9 ? robot_to_ball / distance : Vector3::unitX();
-      const double penetration = contact_distance - distance;
-      state.position_m += normal * penetration;
+        const double penetration = contact_distance - distance;
+        state.position_m +=
+          normal * std::max(0.0, penetration - field_.baumgarte_slop_m);
 
       // Plowing behavior: transfer robot planar velocity into the ball.
       const Vector3 robot_planar_velocity(robot.velocity_mps.x,
@@ -1315,9 +1322,29 @@ class BallGamepieceSim {
     ball.sim.setState(state);
   }
 
-  void resolveBallBallContacts() {
+  void resolveBallBallContacts(double dt_s) {
+    struct BallBallContact {
+      std::size_t a_index{};
+      std::size_t b_index{};
+      Vector3 normal{};
+      double penetration{0.0};
+      double inv_mass_a{0.0};
+      double inv_mass_b{0.0};
+      double mass_a{0.0};
+      double mass_b{0.0};
+      double radius_a{0.0};
+      double radius_b{0.0};
+      double restitution{0.0};
+      double friction{0.0};
+      double normal_impulse_accum{0.0};
+      double tangent_impulse_accum{0.0};
+    };
+
+    std::vector<BallBallContact> contacts;
+    contacts.reserve(balls_.size());
+
     for (std::size_t i = 0; i < balls_.size(); ++i) {
-      auto state_a = balls_[i].sim.state();
+      const auto& state_a = balls_[i].sim.state();
       if (state_a.held || balls_[i].scored_in_net) {
         continue;
       }
@@ -1327,11 +1354,7 @@ class BallGamepieceSim {
           std::max(1e-9, balls_[i].sim.ballProperties().mass_kg);
 
       for (std::size_t j = i + 1; j < balls_.size(); ++j) {
-        if (balls_[i].sleeping && balls_[j].sleeping) {
-          continue;
-        }
-
-        auto state_b = balls_[j].sim.state();
+        const auto& state_b = balls_[j].sim.state();
         if (state_b.held || balls_[j].scored_in_net) {
           continue;
         }
@@ -1340,91 +1363,117 @@ class BallGamepieceSim {
         const double mass_b =
             std::max(1e-9, balls_[j].sim.ballProperties().mass_kg);
 
-        Vector3 delta = state_b.position_m - state_a.position_m;
+        const Vector3 delta = state_b.position_m - state_a.position_m;
         const double distance = delta.norm();
         const double target_distance = radius_a + radius_b;
         if (distance >= target_distance) {
           continue;
         }
 
+        BallBallContact contact{};
+        contact.a_index = i;
+        contact.b_index = j;
+        contact.normal = distance > 1e-9 ? delta / distance : Vector3::unitX();
+        contact.penetration = target_distance - distance;
+        contact.inv_mass_a = 1.0 / mass_a;
+        contact.inv_mass_b = 1.0 / mass_b;
+        contact.mass_a = mass_a;
+        contact.mass_b = mass_b;
+        contact.radius_a = radius_a;
+        contact.radius_b = radius_b;
+        const double approach_speed =
+            std::max(0.0, (state_a.velocity_mps - state_b.velocity_mps).dot(contact.normal));
+        contact.restitution = velocityScaledRestitution(
+            field_.ball_ball_contact_restitution, approach_speed,
+            field_.ball_ball_restitution_reference_speed_mps,
+            field_.ball_ball_restitution_speed_exponent,
+            field_.ball_ball_restitution_min_scale);
+        contact.friction = std::clamp(field_.ball_ball_contact_friction, 0.0, 1.0);
+        contacts.push_back(contact);
         wakeBall(balls_[i]);
         wakeBall(balls_[j]);
+      }
+    }
 
-        const Vector3 normal =
-            distance > 1e-9 ? delta / distance : Vector3::unitX();
-        const double penetration = target_distance - distance;
+    if (contacts.empty()) {
+      return;
+    }
 
-        // Split positional correction by inverse mass so heavy balls move less.
-        const double inv_mass_a = 1.0 / mass_a;
-        const double inv_mass_b = 1.0 / mass_b;
-        const double inv_mass_sum = inv_mass_a + inv_mass_b;
-        if (inv_mass_sum <= 1e-9) {
-          continue;
-        }
+    const int solver_iterations = std::max(1, field_.solver_iterations);
+    const double inv_dt = 1.0 / std::max(1e-9, dt_s);
 
-        state_a.position_m -=
-            normal * (penetration * (inv_mass_a / inv_mass_sum));
-        state_b.position_m +=
-            normal * (penetration * (inv_mass_b / inv_mass_sum));
+    for (int iteration = 0; iteration < solver_iterations; ++iteration) {
+      for (auto& contact : contacts) {
+        auto state_a = balls_[contact.a_index].sim.state();
+        auto state_b = balls_[contact.b_index].sim.state();
 
         Vector3 relative_velocity = state_b.velocity_mps - state_a.velocity_mps;
-        const double normal_speed = relative_velocity.dot(normal);
-        if (normal_speed >= 0.0) {
-          balls_[j].sim.setState(state_b);
-          continue;
-        }
+        const double normal_speed = relative_velocity.dot(contact.normal);
+        const double position_bias =
+            std::max(0.0, contact.penetration - field_.baumgarte_slop_m) *
+            std::clamp(field_.baumgarte_beta, 0.0, 1.0) * inv_dt;
 
-        const double restitution = velocityScaledRestitution(
-          field_.ball_ball_contact_restitution, -normal_speed,
-          field_.ball_ball_restitution_reference_speed_mps,
-          field_.ball_ball_restitution_speed_exponent,
-          field_.ball_ball_restitution_min_scale);
-        const double normal_impulse_magnitude =
-            -(1.0 + restitution) * normal_speed / inv_mass_sum;
-        const Vector3 normal_impulse = normal * normal_impulse_magnitude;
+        if (normal_speed < 0.0 || position_bias > 0.0) {
+          const double inv_mass_sum = contact.inv_mass_a + contact.inv_mass_b;
+          if (inv_mass_sum <= 1e-9) {
+            continue;
+          }
 
-        state_a.velocity_mps -= normal_impulse * inv_mass_a;
-        state_b.velocity_mps += normal_impulse * inv_mass_b;
+          const double desired_normal_impulse =
+              -((1.0 + contact.restitution) * normal_speed + position_bias) /
+              inv_mass_sum;
+          const double old_normal_accum = contact.normal_impulse_accum;
+          contact.normal_impulse_accum = std::max(
+              0.0, contact.normal_impulse_accum + desired_normal_impulse);
+          const double applied_normal_impulse =
+              contact.normal_impulse_accum - old_normal_accum;
+          const Vector3 normal_impulse_vec = contact.normal * applied_normal_impulse;
 
-        relative_velocity = state_b.velocity_mps - state_a.velocity_mps;
-        const Vector3 tangential_velocity =
-            relative_velocity - normal * relative_velocity.dot(normal);
-        const double tangential_speed = tangential_velocity.norm();
-        if (tangential_speed > 1e-9) {
-          const Vector3 tangent = tangential_velocity / tangential_speed;
-          const double friction =
-              std::clamp(field_.ball_ball_contact_friction, 0.0, 1.0);
-          const double desired_friction_impulse = tangential_speed / inv_mass_sum;
-          const double max_friction_impulse = friction * normal_impulse_magnitude;
-          const double friction_impulse_magnitude =
-              std::min(desired_friction_impulse, max_friction_impulse);
-          const Vector3 friction_impulse = tangent * friction_impulse_magnitude;
-          state_a.velocity_mps += friction_impulse * inv_mass_a;
-          state_b.velocity_mps -= friction_impulse * inv_mass_b;
+          state_a.velocity_mps -= normal_impulse_vec * contact.inv_mass_a;
+          state_b.velocity_mps += normal_impulse_vec * contact.inv_mass_b;
+
+          relative_velocity = state_b.velocity_mps - state_a.velocity_mps;
+          const Vector3 tangential_velocity =
+              relative_velocity - contact.normal *
+                  relative_velocity.dot(contact.normal);
+          const double tangential_speed = tangential_velocity.norm();
+          if (tangential_speed > 1e-9 && contact.friction > 0.0) {
+            const Vector3 tangent = tangential_velocity / tangential_speed;
+            const double desired_tangent_impulse =
+                -tangential_speed / inv_mass_sum;
+            const double max_friction_impulse =
+                contact.friction * contact.normal_impulse_accum;
+            const double old_tangent_accum = contact.tangent_impulse_accum;
+            contact.tangent_impulse_accum = std::clamp(
+                contact.tangent_impulse_accum + desired_tangent_impulse,
+                -max_friction_impulse, max_friction_impulse);
+            const double applied_tangent_impulse =
+                contact.tangent_impulse_accum - old_tangent_accum;
+            const Vector3 friction_impulse = tangent * applied_tangent_impulse;
+
+            state_a.velocity_mps += friction_impulse * contact.inv_mass_a;
+            state_b.velocity_mps -= friction_impulse * contact.inv_mass_b;
 
             const double spin_transfer_gain =
-              std::max(0.0, field_.ball_ball_spin_transfer_gain);
+                std::max(0.0, field_.ball_ball_spin_transfer_gain);
             if (spin_transfer_gain > 0.0) {
-            const double inertia_a =
-              std::max(1e-9, 0.4 * mass_a * radius_a * radius_a);
-            const double inertia_b =
-              std::max(1e-9, 0.4 * mass_b * radius_b * radius_b);
-
-            const Vector3 contact_arm_a = normal * radius_a;
-            const Vector3 contact_arm_b = normal * (-radius_b);
-            state_a.spin_radps +=
-              contact_arm_a.cross(friction_impulse) *
-              (spin_transfer_gain / inertia_a);
-            state_b.spin_radps +=
-              contact_arm_b.cross(-friction_impulse) *
-              (spin_transfer_gain / inertia_b);
+              const double inertia_a =
+                  std::max(1e-9, 0.4 * contact.mass_a * contact.radius_a * contact.radius_a);
+              const double inertia_b =
+                  std::max(1e-9, 0.4 * contact.mass_b * contact.radius_b * contact.radius_b);
+              state_a.spin_radps +=
+                  contact.normal.cross(friction_impulse) *
+                  (spin_transfer_gain / inertia_a) * contact.radius_a;
+              state_b.spin_radps +=
+                  (-contact.normal).cross(-friction_impulse) *
+                  (spin_transfer_gain / inertia_b) * contact.radius_b;
             }
+          }
+
+          balls_[contact.a_index].sim.setState(state_a);
+          balls_[contact.b_index].sim.setState(state_b);
         }
-
-        balls_[j].sim.setState(state_b);
       }
-
-      balls_[i].sim.setState(state_a);
     }
   }
 
