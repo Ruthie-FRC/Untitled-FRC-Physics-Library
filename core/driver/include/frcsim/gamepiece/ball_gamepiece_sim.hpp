@@ -109,6 +109,18 @@ class BallGamepieceSim {
     double ball_ball_spin_transfer_gain{0.18};
     /** Exponential-like free spin decay applied while balls are not held. */
     double free_ball_spin_decay_per_s{0.35};
+    /** Enables continuous collision checks for fast-moving balls. */
+    bool ccd_enabled{true};
+    /** Speed threshold above which CCD checks are evaluated. */
+    double ccd_speed_threshold_mps{10.0};
+    /** Enables sleeping/wake logic for nearly resting balls. */
+    bool sleeping_enabled{true};
+    /** Maximum linear speed for sleep candidacy. */
+    double sleep_velocity_threshold_mps{0.05};
+    /** Maximum spin magnitude for sleep candidacy. */
+    double sleep_spin_threshold_radps{0.8};
+    /** Consecutive qualifying frames required before sleeping. */
+    int sleep_frame_threshold{12};
   };
 
   /** @brief Per-robot state used by game piece interaction and collision
@@ -239,6 +251,10 @@ class BallGamepieceSim {
     BallPhysicsSim3D sim{};
     /** True once this ball has entered a configured net volume. */
     bool scored_in_net{false};
+    /** True when this ball is currently sleeping. */
+    bool sleeping{false};
+    /** Number of consecutive sleep-eligible frames observed. */
+    int sleep_frame_count{0};
   };
 
   /** @brief Constructs a simulator with default evergreen field bounds and
@@ -634,7 +650,13 @@ class BallGamepieceSim {
     for (std::size_t i = 0; i < balls_.size(); ++i) {
       BallEntity& ball = balls_[i];
       applyRobotCarrierPose(i, ball);
-      ball.sim.step(dt_s);
+
+      const Vector3 pre_step_position = ball.sim.state().position_m;
+      const bool skip_integration =
+          field_.sleeping_enabled && ball.sleeping && !ball.sim.state().held;
+      if (!skip_integration) {
+        ball.sim.step(dt_s);
+      }
 
       if (!ball.sim.state().held) {
         auto state = ball.sim.state();
@@ -643,6 +665,8 @@ class BallGamepieceSim {
         state.spin_radps *= spin_decay;
         ball.sim.setState(state);
       }
+
+      resolveContinuousCollision(ball, pre_step_position, dt_s);
 
       if (!ball.sim.state().held) {
         resolveRobotBallContacts(ball);
@@ -654,6 +678,7 @@ class BallGamepieceSim {
     }
 
     resolveBallBallContacts();
+    updateSleepStates();
   }
 
   void updateProjectiles(double dt_s) {
@@ -873,6 +898,246 @@ class BallGamepieceSim {
     return base * restitution_scale;
   }
 
+  static void wakeBall(BallEntity& ball) {
+    ball.sleeping = false;
+    ball.sleep_frame_count = 0;
+  }
+
+  void updateSleepStates() {
+    if (!field_.sleeping_enabled) {
+      for (auto& ball : balls_) {
+        wakeBall(ball);
+      }
+      return;
+    }
+
+    const double velocity_threshold = std::max(0.0, field_.sleep_velocity_threshold_mps);
+    const double spin_threshold = std::max(0.0, field_.sleep_spin_threshold_radps);
+    const int frame_threshold = std::max(1, field_.sleep_frame_threshold);
+
+    for (auto& ball : balls_) {
+      auto state = ball.sim.state();
+      if (state.held || ball.scored_in_net) {
+        wakeBall(ball);
+        continue;
+      }
+
+      const double floor_z =
+          ball.sim.config().ground_height_m + ball.sim.ballProperties().radius_m;
+      const bool near_ground = state.position_m.z <= floor_z + 0.01;
+      const bool sleep_candidate = near_ground &&
+                                   state.velocity_mps.norm() <= velocity_threshold &&
+                                   state.spin_radps.norm() <= spin_threshold;
+
+      if (!sleep_candidate) {
+        wakeBall(ball);
+        continue;
+      }
+
+      ball.sleep_frame_count += 1;
+      if (ball.sleep_frame_count < frame_threshold) {
+        continue;
+      }
+
+      ball.sleeping = true;
+      state.velocity_mps = Vector3::zero();
+      state.spin_radps = Vector3::zero();
+      ball.sim.setState(state);
+    }
+  }
+
+  void resolveContinuousCollision(BallEntity& ball,
+                                  const Vector3& previous_position,
+                                  double dt_s) const {
+    if (!field_.ccd_enabled || dt_s <= 0.0 || ball.sim.state().held) {
+      return;
+    }
+
+    auto state = ball.sim.state();
+    const double speed_mps =
+        (state.position_m - previous_position).norm() / std::max(1e-9, dt_s);
+    if (speed_mps < std::max(0.0, field_.ccd_speed_threshold_mps)) {
+      return;
+    }
+
+    const double radius = ball.sim.ballProperties().radius_m;
+    resolveSweptFieldBounds(state, previous_position, radius);
+
+    for (const auto& boundary : field_elements_) {
+      if (!boundary.is_active) {
+        continue;
+      }
+
+      switch (boundary.type) {
+        case BoundaryType::kPlane:
+        case BoundaryType::kWall:
+          resolveSweptPlaneBoundary(state, previous_position, boundary, radius);
+          break;
+        case BoundaryType::kBox:
+          resolveSweptBoxBoundary(state, previous_position, boundary, radius);
+          break;
+        default:
+          break;
+      }
+    }
+
+    ball.sim.setState(state);
+  }
+
+  void resolveSweptFieldBounds(BallPhysicsSim3D::BallState& state,
+                               const Vector3& previous_position,
+                               double radius) const {
+    const double min_x = field_.min_corner_m.x + radius;
+    const double max_x = field_.max_corner_m.x - radius;
+    const double min_y = field_.min_corner_m.y + radius;
+    const double max_y = field_.max_corner_m.y - radius;
+
+    if (previous_position.x >= min_x && state.position_m.x < min_x) {
+      state.position_m.x = min_x;
+      state.velocity_mps.x = std::abs(state.velocity_mps.x) *
+                             scaledWallRestitution(
+                                 field_.wall_restitution,
+                                 std::abs(state.velocity_mps.x));
+      state.velocity_mps.y *= (1.0 - field_.wall_friction);
+    }
+    if (previous_position.x <= max_x && state.position_m.x > max_x) {
+      state.position_m.x = max_x;
+      state.velocity_mps.x = -std::abs(state.velocity_mps.x) *
+                             scaledWallRestitution(
+                                 field_.wall_restitution,
+                                 std::abs(state.velocity_mps.x));
+      state.velocity_mps.y *= (1.0 - field_.wall_friction);
+    }
+    if (previous_position.y >= min_y && state.position_m.y < min_y) {
+      state.position_m.y = min_y;
+      state.velocity_mps.y = std::abs(state.velocity_mps.y) *
+                             scaledWallRestitution(
+                                 field_.wall_restitution,
+                                 std::abs(state.velocity_mps.y));
+      state.velocity_mps.x *= (1.0 - field_.wall_friction);
+    }
+    if (previous_position.y <= max_y && state.position_m.y > max_y) {
+      state.position_m.y = max_y;
+      state.velocity_mps.y = -std::abs(state.velocity_mps.y) *
+                             scaledWallRestitution(
+                                 field_.wall_restitution,
+                                 std::abs(state.velocity_mps.y));
+      state.velocity_mps.x *= (1.0 - field_.wall_friction);
+    }
+  }
+
+  void resolveSweptPlaneBoundary(BallPhysicsSim3D::BallState& state,
+                                 const Vector3& previous_position,
+                                 const EnvironmentalBoundary& boundary,
+                                 double ball_radius) const {
+    Vector3 normal = boundaryNormalWorld(boundary);
+    if (normal.isZero()) {
+      normal = Vector3::unitZ();
+    }
+
+    const double prev_distance =
+        (previous_position - boundary.position_m).dot(normal);
+    const double curr_distance =
+        (state.position_m - boundary.position_m).dot(normal);
+
+    if (!(prev_distance >= ball_radius && curr_distance < ball_radius)) {
+      return;
+    }
+
+    state.position_m += normal * (ball_radius - curr_distance);
+    const double impact_speed = std::max(0.0, -state.velocity_mps.dot(normal));
+    applyContactImpulse(state.velocity_mps, normal,
+                        scaledWallRestitution(boundary.restitution,
+                                              impact_speed),
+                        boundary.friction_coefficient);
+  }
+
+  void resolveSweptBoxBoundary(BallPhysicsSim3D::BallState& state,
+                               const Vector3& previous_position,
+                               const EnvironmentalBoundary& boundary,
+                               double ball_radius) const {
+    const Quaternion inverse = boundary.orientation.inverse();
+    const Vector3 prev_local =
+        inverse.rotate(previous_position - boundary.position_m);
+    const Vector3 curr_local =
+        inverse.rotate(state.position_m - boundary.position_m);
+    const Vector3 delta_local = curr_local - prev_local;
+
+    const Vector3 expanded_min(-boundary.half_extents_m.x - ball_radius,
+                               -boundary.half_extents_m.y - ball_radius,
+                               -boundary.half_extents_m.z - ball_radius);
+    const Vector3 expanded_max(boundary.half_extents_m.x + ball_radius,
+                               boundary.half_extents_m.y + ball_radius,
+                               boundary.half_extents_m.z + ball_radius);
+
+    auto inside_expanded = [&](const Vector3& p) {
+      return p.x >= expanded_min.x && p.x <= expanded_max.x &&
+             p.y >= expanded_min.y && p.y <= expanded_max.y &&
+             p.z >= expanded_min.z && p.z <= expanded_max.z;
+    };
+
+    if (inside_expanded(curr_local)) {
+      return;
+    }
+
+    double t_enter = 0.0;
+    double t_exit = 1.0;
+    Vector3 local_normal = Vector3::zero();
+
+    auto process_axis = [&](double p0, double d, double min_b, double max_b,
+                            const Vector3& min_normal,
+                            const Vector3& max_normal) -> bool {
+      if (std::abs(d) < 1e-9) {
+        return p0 >= min_b && p0 <= max_b;
+      }
+
+      const double inv_d = 1.0 / d;
+      double t0 = (min_b - p0) * inv_d;
+      double t1 = (max_b - p0) * inv_d;
+      Vector3 candidate_normal = min_normal;
+      if (t0 > t1) {
+        std::swap(t0, t1);
+        candidate_normal = max_normal;
+      }
+
+      if (t0 > t_enter) {
+        t_enter = t0;
+        local_normal = candidate_normal;
+      }
+      t_exit = std::min(t_exit, t1);
+      return t_enter <= t_exit;
+    };
+
+    if (!process_axis(prev_local.x, delta_local.x, expanded_min.x, expanded_max.x,
+                      Vector3(-1.0, 0.0, 0.0), Vector3(1.0, 0.0, 0.0))) {
+      return;
+    }
+    if (!process_axis(prev_local.y, delta_local.y, expanded_min.y, expanded_max.y,
+                      Vector3(0.0, -1.0, 0.0), Vector3(0.0, 1.0, 0.0))) {
+      return;
+    }
+    if (!process_axis(prev_local.z, delta_local.z, expanded_min.z, expanded_max.z,
+                      Vector3(0.0, 0.0, -1.0), Vector3(0.0, 0.0, 1.0))) {
+      return;
+    }
+
+    if (t_enter < 0.0 || t_enter > 1.0 || local_normal.isZero()) {
+      return;
+    }
+
+    const Vector3 hit_local = prev_local + delta_local * t_enter;
+    const Vector3 corrected_local = hit_local + local_normal * 1e-4;
+    const Vector3 world_normal =
+        boundary.orientation.rotate(local_normal).normalized();
+
+    state.position_m = boundary.position_m + boundary.orientation.rotate(corrected_local);
+    const double impact_speed = std::max(0.0, -state.velocity_mps.dot(world_normal));
+    applyContactImpulse(state.velocity_mps, world_normal,
+                        scaledWallRestitution(boundary.restitution,
+                                              impact_speed),
+                        boundary.friction_coefficient);
+  }
+
   double scaledWallRestitution(double base_restitution,
                                double impact_speed_mps) const {
     return velocityScaledRestitution(
@@ -1022,6 +1287,8 @@ class BallGamepieceSim {
         continue;
       }
 
+      wakeBall(ball);
+
       const Vector3 normal =
           distance > 1e-9 ? robot_to_ball / distance : Vector3::unitX();
       const double penetration = contact_distance - distance;
@@ -1060,6 +1327,10 @@ class BallGamepieceSim {
           std::max(1e-9, balls_[i].sim.ballProperties().mass_kg);
 
       for (std::size_t j = i + 1; j < balls_.size(); ++j) {
+        if (balls_[i].sleeping && balls_[j].sleeping) {
+          continue;
+        }
+
         auto state_b = balls_[j].sim.state();
         if (state_b.held || balls_[j].scored_in_net) {
           continue;
@@ -1075,6 +1346,9 @@ class BallGamepieceSim {
         if (distance >= target_distance) {
           continue;
         }
+
+        wakeBall(balls_[i]);
+        wakeBall(balls_[j]);
 
         const Vector3 normal =
             distance > 1e-9 ? delta / distance : Vector3::unitX();
