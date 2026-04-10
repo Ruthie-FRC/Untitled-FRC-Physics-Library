@@ -18,23 +18,27 @@ namespace frcsim {
  * pickup, and firing flows. */
 class TurretShooterSim {
  public:
-  /** @brief Configuration for differential kinematics, ball model, and local
-   * mount geometry. */
+  /** @brief Configuration for differential kinematics, ball model, and local mount geometry. */
   struct Config {
+    /** @brief Double-differential (yaw/pitch) leg kinematics. */
     DoubleDifferentialMechanism::Config differential{};
+    /** @brief Ball physics environment and simulation behavior. */
     BallPhysicsSim3D::Config ball_config{};
+    /** @brief Ball mass, radius, drag, and impact properties. */
     BallPhysicsSim3D::BallProperties ball_properties{};
 
-    // Position of the differential pivot in world frame.
+    /** @brief Position of the differential pivot in world frame (meters). */
     Vector3 turret_mount_position_m{};
 
-    // Muzzle origin in local turret frame before yaw/pitch rotation.
+    /** @brief Muzzle origin offset in local turret frame (meters, before yaw/pitch rotation). */
     Vector3 muzzle_offset_local_m{0.35, 0.0, 0.18};
 
-    // Intake center in local turret frame.
+    /** @brief Intake center offset in local turret frame (meters). */
     Vector3 intake_offset_local_m{0.15, 0.0, -0.06};
 
+    /** @brief Radius around intake center for successful ball pickup (meters). */
     double intake_capture_radius_m{0.22};
+    /** @brief Offset from intake to carried ball rest position in local frame (meters). */
     Vector3 carry_offset_local_m{0.05, 0.0, -0.02};
   };
 
@@ -123,22 +127,28 @@ class TurretShooterSim {
     return differential_.forward(motor_state_);
   }
 
-  /** @brief Returns current muzzle origin in world coordinates. @return World
-   * position of muzzle. */
+  /**
+   * @brief Computes current muzzle origin in world coordinates.
+   * @return World position of the muzzle in meters.
+   */
   Vector3 muzzlePositionWorld() const {
     return config_.turret_mount_position_m +
            turretOrientationWorld().rotate(config_.muzzle_offset_local_m);
   }
 
-  /** @brief Returns intake center in world coordinates. @return World position
-   * of intake center. */
+  /**
+   * @brief Computes current intake center position in world coordinates.
+   * @return World position of the intake center in meters.
+   */
   Vector3 intakePositionWorld() const {
     return config_.turret_mount_position_m +
            turretOrientationWorld().rotate(config_.intake_offset_local_m);
   }
 
-  /** @brief Returns normalized muzzle forward direction in world frame. @return
-   * Unit direction vector. */
+  /**
+   * @brief Computes the muzzle forward firing direction in world frame.
+   * @return Normalized unit direction vector for projectile launch.
+   */
   Vector3 muzzleDirectionWorld() const {
     return turretOrientationWorld().rotate(Vector3::unitX()).normalized();
   }
@@ -188,11 +198,9 @@ class TurretShooterSim {
     ball_.step(dt_s);
   }
 
-  /** @brief Mutable access to internal ball simulator. @return BallPhysicsSim3D
-   * reference. */
+  /** @brief Mutable access to internal ball simulator. */
   BallPhysicsSim3D& ball() { return ball_; }
-  /** @brief Immutable access to internal ball simulator. @return Const
-   * BallPhysicsSim3D reference. */
+  /** @brief Immutable access to internal ball simulator. */
   const BallPhysicsSim3D& ball() const { return ball_; }
 
  private:
