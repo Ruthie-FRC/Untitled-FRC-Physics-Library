@@ -21,9 +21,11 @@ namespace frcsim {
  */
 struct alignas(16) Vector3 {
   /** @brief X component. */
-  double x, y, z;
+  double x;
   /** @brief Y component. */
+  double y;
   /** @brief Z component. */
+  double z;
 
   /** @brief Constructs a zero vector. */
   constexpr Vector3() noexcept : x(0.0), y(0.0), z(0.0) {}
