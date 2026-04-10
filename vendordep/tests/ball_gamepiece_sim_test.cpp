@@ -164,5 +164,53 @@ int main() {
     assert(left_after.velocity_mps.x < 0.0);
     assert(right_after.velocity_mps.x > 0.0);
 
+        // Velocity-dependent restitution regression: high-speed impacts should be
+        // less elastic than low-speed impacts.
+        auto run_head_on_restitution_ratio =
+                [&](double speed_mps) -> double {
+            frcsim::BallGamepieceSim::FieldConfig cfg;
+            cfg.ball_ball_contact_restitution = 0.8;
+            cfg.ball_ball_contact_friction = 0.0;
+            cfg.ball_ball_restitution_reference_speed_mps = 2.0;
+            cfg.ball_ball_restitution_speed_exponent = 0.25;
+            cfg.ball_ball_restitution_min_scale = 0.4;
+
+            frcsim::BallGamepieceSim speed_sim(cfg);
+            speed_sim.setSimulationSubsteps(8);
+
+            frcsim::BallPhysicsSim3D::Config speed_cfg =
+                    frcsim::BallGamepiecePresets::season2026BallConfig();
+            speed_cfg.drag_scale = 0.0;
+            speed_cfg.magnus_scale = 0.0;
+            speed_cfg.rolling_friction_per_s = 0.0;
+
+            const auto props = frcsim::BallGamepiecePresets::season2026BallProperties();
+
+            frcsim::BallPhysicsSim3D::BallState a;
+            a.position_m = frcsim::Vector3(5.0, 4.0, props.radius_m);
+            a.velocity_mps = frcsim::Vector3(speed_mps, 0.0, 0.0);
+            speed_sim.addBall(a, speed_cfg, props);
+
+            frcsim::BallPhysicsSim3D::BallState b;
+            b.position_m =
+                    frcsim::Vector3(5.0 + 2.0 * props.radius_m + 0.03, 4.0, props.radius_m);
+            b.velocity_mps = frcsim::Vector3(-speed_mps, 0.0, 0.0);
+            speed_sim.addBall(b, speed_cfg, props);
+
+            const double relative_in = 2.0 * speed_mps;
+            for (int i = 0; i < 30; ++i) {
+                speed_sim.step(0.005);
+            }
+
+            const double relative_out =
+                    std::abs(speed_sim.balls()[1].sim.state().velocity_mps.x -
+                                     speed_sim.balls()[0].sim.state().velocity_mps.x);
+            return relative_out / relative_in;
+        };
+
+        const double low_speed_ratio = run_head_on_restitution_ratio(1.0);
+        const double high_speed_ratio = run_head_on_restitution_ratio(5.0);
+        assert(high_speed_ratio < low_speed_ratio - 0.05);
+
     return 0;
 }
