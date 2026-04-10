@@ -50,26 +50,29 @@ struct GoalStructure {
 
   /** Selected geometry mode for this goal. */
   Shape shape{Shape::kBox};
-  /** Goal center in world coordinates. */
+  /** @brief Goal center position in world coordinates (meters). */
   Vector3 center_m{};
-  /** Half extents used when shape is kBox. */
+  /** @brief Half-extent dimensions used when shape is kBox (meters). */
   Vector3 half_extents_m{0.2, 0.2, 0.2};
-  /** Radius used when shape is kSphere. */
+  /** @brief Sphere radius used when shape is kSphere (meters). */
   double radius_m{0.25};
 
-  /** Accepted gamepiece type enum. */
+  /** @brief Filter for accepted gamepiece types (allows selective scoring). */
   AcceptedType accepted_type{AcceptedType::kBall};
-  /** If true, scoring is valid only for upward-moving objects unless overridden
-   * by custom validator. */
+  /** @brief When true, scoring requires upward (+Z) velocity unless custom validator overrides. */
   bool require_positive_vertical_velocity{false};
 
-  /** Optional custom checker for complex scoring geometry in kCustom mode. */
+  /** @brief Optional custom position test for complex geometry in kCustom mode. */
   std::function<bool(const Vector3&)> custom_position_checker{};
 
-  /** Optional custom validator for velocity constraints at score time. */
+  /** @brief Optional custom validator for velocity constraints during scoring. */
   std::function<bool(const Vector3&)> custom_velocity_validator{};
 
-  /** @brief Returns true when position is inside this goal's geometry. */
+  /**
+   * @brief Test whether a position is contained within this goal's volume.
+   * @param position_m Position to test in world coordinates (meters).
+   * @return True when position is inside the goal geometry.
+   */
   bool contains(const Vector3& position_m) const {
     if (shape == Shape::kCustom && custom_position_checker) {
       return custom_position_checker(position_m);
@@ -85,7 +88,10 @@ struct GoalStructure {
            std::abs(delta.z) <= half_extents_m.z;
   }
 
-  /** @brief Returns true when velocity satisfies configured score constraints.
+  /**
+   * @brief Test whether a velocity satisfies score acceptance constraints.
+   * @param velocity_mps Velocity vector in world frame (m/s).
+   * @return True when velocity meets configured requirements.
    */
   bool velocityAllowed(const Vector3& velocity_mps) const {
     if (custom_velocity_validator) {
