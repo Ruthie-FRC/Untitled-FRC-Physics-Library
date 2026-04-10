@@ -278,7 +278,7 @@ class RigidBody {
    * @brief Advances translational and rotational state by one timestep.
    * @param dt_s Step duration in seconds.
    * @param method Linear integration method.
-   * @param gravity_mps2 Gravity acceleration vector in m/s^2.
+    * @param gravity_mps2 World-space gravity acceleration vector in m/s^2.
    * @param linear_damping_per_s Linear damping coefficient in 1/s.
    * @param angular_damping_per_s Angular damping coefficient in 1/s.
    */
