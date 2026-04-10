@@ -86,6 +86,12 @@ class BallGamepieceSim {
     double ball_ball_contact_restitution{0.45};
     /** Friction used for grounded ball-ball collision impulse. */
     double ball_ball_contact_friction{0.2};
+    /** Reference impact speed for velocity-dependent ball-ball restitution. */
+    double ball_ball_restitution_reference_speed_mps{3.0};
+    /** Exponent used when scaling restitution above reference impact speed. */
+    double ball_ball_restitution_speed_exponent{0.15};
+    /** Minimum fraction of base restitution retained at very high speeds. */
+    double ball_ball_restitution_min_scale{0.55};
   };
 
   /** @brief Per-robot state used by game piece interaction and collision
@@ -810,6 +816,38 @@ class BallGamepieceSim {
     velocity -= tangential * std::clamp(friction, 0.0, 1.0);
   }
 
+  static double velocityScaledRestitution(
+      double base_restitution, double impact_speed_mps,
+      double reference_speed_mps, double speed_exponent,
+      double min_scale) {
+    const double base = std::clamp(base_restitution, 0.0, 1.0);
+    if (!std::isfinite(impact_speed_mps) || impact_speed_mps <= 0.0) {
+      return base;
+    }
+
+    const double reference_speed = std::max(
+      1e-6,
+      (std::isfinite(reference_speed_mps) && reference_speed_mps >= 0.0)
+        ? reference_speed_mps
+        : 3.0);
+    const double exponent =
+      (std::isfinite(speed_exponent) && speed_exponent >= 0.0)
+        ? speed_exponent
+        : 0.15;
+    const double clamped_min_scale = std::clamp(
+        std::isfinite(min_scale) ? min_scale : 0.55, 0.0, 1.0);
+
+    if (impact_speed_mps <= reference_speed || exponent <= 0.0) {
+      return base;
+    }
+
+    const double speed_scale =
+        std::pow(reference_speed / impact_speed_mps, exponent);
+    const double restitution_scale =
+        std::clamp(speed_scale, clamped_min_scale, 1.0);
+    return base * restitution_scale;
+  }
+
   void integrateRobots(double dt_s) {
     for (auto& robot : robots_) {
       robot.position_m += robot.velocity_mps * dt_s;
@@ -1017,8 +1055,11 @@ class BallGamepieceSim {
           continue;
         }
 
-        const double restitution =
-            std::clamp(field_.ball_ball_contact_restitution, 0.0, 1.0);
+        const double restitution = velocityScaledRestitution(
+          field_.ball_ball_contact_restitution, -normal_speed,
+          field_.ball_ball_restitution_reference_speed_mps,
+          field_.ball_ball_restitution_speed_exponent,
+          field_.ball_ball_restitution_min_scale);
         const double normal_impulse_magnitude =
             -(1.0 + restitution) * normal_speed / inv_mass_sum;
         const Vector3 normal_impulse = normal * normal_impulse_magnitude;
