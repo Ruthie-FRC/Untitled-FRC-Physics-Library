@@ -12,7 +12,7 @@ This page explains drag equations used by RenSim and how projected area and coef
 | v | Speed magnitude | m/s |
 | v_hat | Velocity unit direction | dimensionless |
 | q | Dynamic pressure | Pa |
-| k_1 | Linear drag coefficient | N/(m/s) |
+| k_1 | Linear drag coefficient (Seperate from C_d) | N/(m/s) |
 | k_2 | Quadratic drag coefficient | N/(m/s)^2 |
 
 ## Source and scope
