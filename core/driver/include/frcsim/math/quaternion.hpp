@@ -10,6 +10,18 @@
 
 namespace frcsim {
 
+/**
+ * @brief Unit-quaternion rotation representation and rotation algebra helpers.
+ *
+ * Physics principle: quaternion rotational kinematics avoids gimbal lock and
+ * provides stable composition/integration of 3D orientation. Vectors are
+ * rotated with q v q^-1 and orientation updates use angular velocity via
+ * quaternion derivatives.
+ *
+ * References:
+ * https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
+ * https://en.wikipedia.org/wiki/Gimbal_lock
+ */
 struct Quaternion {
   alignas(16) double w, x, y, z;
 

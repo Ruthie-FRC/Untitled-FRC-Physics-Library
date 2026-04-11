@@ -16,6 +16,16 @@ class RevoluteJoint;
 class PrismaticJoint;
 class FixedJoint;
 
+/**
+ * @brief Multi-body articulated system made from rigid links and joints.
+ *
+ * Physics principle: an assembly forms a constrained rigid-body graph where
+ * each joint removes degrees of freedom and the solver enforces those
+ * constraints through impulses each step.
+ *
+ * Reference:
+ * https://en.wikipedia.org/wiki/Multibody_system
+ */
 class RigidAssembly {
  public:
   RigidAssembly() = default;

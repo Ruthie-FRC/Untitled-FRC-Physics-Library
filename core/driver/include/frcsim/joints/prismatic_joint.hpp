@@ -8,6 +8,17 @@
 
 namespace frcsim {
 
+/**
+ * @brief Slider joint that permits translation along one axis and constrains
+ * all other relative motion.
+ *
+ * Physics principle: constrained rigid-body dynamics with one translational
+ * degree of freedom. Optional limits and motor targets are enforced with
+ * impulse constraints.
+ *
+ * Reference:
+ * https://en.wikipedia.org/wiki/Slider-crank_linkage
+ */
 class PrismaticJoint : public JointBase {
  public:
   PrismaticJoint(RigidBody* body_a, RigidBody* body_b,

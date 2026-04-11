@@ -14,6 +14,16 @@
 
 namespace frcsim {
 
+/**
+ * @brief 3x3 matrix type used for rotations and inertia-tensor operations.
+ *
+ * Physics principle: linear transformations in 3D Euclidean space. In rigid
+ * dynamics this type is used for tensor transforms, inverse-inertia
+ * calculations, and basis changes between local and world frames.
+ *
+ * Reference:
+ * https://en.wikipedia.org/wiki/Inertia_tensor
+ */
 struct alignas(16) Matrix3 {
   double m[3][3];  // row-major
 

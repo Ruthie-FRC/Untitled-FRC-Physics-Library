@@ -6,6 +6,17 @@
 
 namespace frcsim {
 
+/**
+ * @brief Contact material parameters for collision response.
+ *
+ * Physics principles: coefficient of restitution models normal impulse energy
+ * retention; static/kinetic coefficients approximate Coulomb friction limits;
+ * damping provides additional numerical dissipation after impacts.
+ *
+ * References:
+ * https://en.wikipedia.org/wiki/Coefficient_of_restitution
+ * https://en.wikipedia.org/wiki/Friction#Coulomb_friction
+ */
 struct Material {
   /// Coefficient of restitution (bounciness): 0 = absorb, 1 = perfectly elastic
   double coefficient_of_restitution{0.5};

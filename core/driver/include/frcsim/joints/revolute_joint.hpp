@@ -8,6 +8,17 @@
 
 namespace frcsim {
 
+/**
+ * @brief Hinge joint that permits rotation about one axis while constraining
+ * relative translation.
+ *
+ * Physics principle: constrained rigid-body dynamics with one rotational
+ * degree of freedom. Limit and motor behavior are represented as angular
+ * inequality/equality constraints solved by impulses.
+ *
+ * Reference:
+ * https://en.wikipedia.org/wiki/Hinge
+ */
 class RevoluteJoint : public JointBase {
  public:
   RevoluteJoint(RigidBody* body_a, RigidBody* body_b, const Vector3& axis_local)

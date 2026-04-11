@@ -18,6 +18,19 @@ enum class JointType {
   kDistance,   // Distance constraint between bodies
 };
 
+/**
+ * @brief Base class for bilateral kinematic constraints between two rigid
+ * bodies.
+ *
+ * Joints are enforced as constraint equations solved each step by an iterative
+ * impulse method (sequential impulse / projected Gauss-Seidel style). Each
+ * derived joint defines which relative degrees of freedom are permitted and
+ * which are constrained.
+ *
+ * References:
+ * https://box2d.org/files/ErinCatto_SequentialImpulses_GDC2006.pdf
+ * https://en.wikipedia.org/wiki/Constraint_(classical_mechanics)
+ */
 class JointBase {
  public:
   virtual ~JointBase() = default;

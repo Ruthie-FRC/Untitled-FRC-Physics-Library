@@ -9,6 +9,19 @@
 
 namespace frcsim {
 
+/**
+ * @brief Time-integration helpers for translational and rotational rigid-body
+ * dynamics.
+ *
+ * This utility exposes explicit Euler, semi-implicit (symplectic) Euler, and
+ * midpoint RK2 variants for linear motion, plus quaternion-based angular
+ * integration using q_dot = 0.5 * omega_quat * q.
+ *
+ * References:
+ * https://en.wikipedia.org/wiki/Semi-implicit_Euler_method
+ * https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods
+ * https://en.wikipedia.org/wiki/Quaternion#Using_quaternions_as_rotations
+ */
 struct Integrator {
   // Semi-Implicit Euler (Linear)
   // velocity += acceleration * dt
