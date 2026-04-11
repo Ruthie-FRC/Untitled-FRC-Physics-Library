@@ -130,6 +130,25 @@ class PhysicsWorld {
   PhysicsConfig& config() { return config_; }
   const PhysicsConfig& config() const { return config_; }
 
+  /** @brief Sets world gravity acceleration in m/s^2 from scalar components. */
+  void setGravity(double gx_mps2, double gy_mps2, double gz_mps2) {
+    config_.gravity_mps2 = Vector3{gx_mps2, gy_mps2, gz_mps2};
+    config_.enable_gravity = true;
+  }
+
+  /** @brief Gets world gravity acceleration in m/s^2 by scalar output pointers. */
+  void gravity(double* gx_mps2, double* gy_mps2, double* gz_mps2) const {
+    if (gx_mps2) {
+      *gx_mps2 = config_.gravity_mps2.x;
+    }
+    if (gy_mps2) {
+      *gy_mps2 = config_.gravity_mps2.y;
+    }
+    if (gz_mps2) {
+      *gz_mps2 = config_.gravity_mps2.z;
+    }
+  }
+
  private:
   PhysicsConfig config_{};
 
