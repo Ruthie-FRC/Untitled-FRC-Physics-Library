@@ -1,6 +1,6 @@
-# RenSim Vendordep
+# JSim Vendordep
 
-This package exposes RenSim physics as a WPILib vendordep with both Java and C++ entry points.
+This package exposes JSim physics as a WPILib vendordep with both Java and C++ entry points.
 
 ## Implemented API Surface
 
@@ -46,7 +46,7 @@ Use `rensim::PhysicsWorld` from `src/main/driver/include/driverheader.h`.
 
 ## Release Packaging
 
-`RenSim.json` is configured to publish Java, JNI driver, and C++ artifacts.
+`JSim.json` is configured to publish Java, JNI driver, and C++ artifacts.
 Before prerelease publishing:
 
 1. Set desired version in `publish.gradle` (`pubVersion`).

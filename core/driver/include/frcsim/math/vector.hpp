@@ -1,4 +1,4 @@
-// Copyright (c) RenSim contributors.
+// Copyright (c) JSim contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the LGPLv3 license file in the root directory of this project.
 
@@ -13,7 +13,7 @@
 namespace frcsim {
 
 /**
- * @brief 3D vector utility used throughout RenSim physics.
+ * @brief 3D vector utility used throughout JSim physics.
  *
  * This type stores Cartesian coordinates in SI units when used with simulation
  * state (meters, meters/second, radians/second, newtons, etc.). The math

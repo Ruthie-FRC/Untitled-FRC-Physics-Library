@@ -1,6 +1,6 @@
 # Integrators (frcsim::Integrator)
 
-This page explains the numerical integration methods used in RenSim, their error properties, and practical method-selection tradeoffs.
+This page explains the numerical integration methods used in JSim, their error properties, and practical method-selection tradeoffs.
 
 ## Symbols
 
@@ -94,7 +94,7 @@ Use when:
 
 ### RK2 midpoint (integrateLinearRK2)
 
-RenSim midpoint-style update:
+JSim midpoint-style update:
 
 $$
 v_{mid} = v_n + a_n \frac{dt}{2}
@@ -123,7 +123,7 @@ $$
 
 ### Quaternion update (integrateAngular)
 
-RenSim computes:
+JSim computes:
 
 $$
 dq = 0.5 (\omega_q q)
@@ -188,7 +188,7 @@ Given $$x_0=0$$, $$v_0=0$$, $$a=-9.81$$, $$dt=0.01$$:
 
 This illustrates why step ordering affects short-horizon position estimates.
 
-## Validation in RenSim
+## Validation in JSim
 
 Use vendordep/tests/integration_test.cpp to verify:
 

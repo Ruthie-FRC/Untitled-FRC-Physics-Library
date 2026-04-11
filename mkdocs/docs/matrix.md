@@ -1,6 +1,6 @@
 # Matrix3 (frcsim::Matrix3)
 
-This page explains how Matrix3 is used in RenSim for coordinate transforms, inertia mapping, and rotational dynamics.
+This page explains how Matrix3 is used in JSim for coordinate transforms, inertia mapping, and rotational dynamics.
 
 ## Purpose
 
@@ -17,7 +17,7 @@ Matrix3 is central to rotational dynamics, coordinate transforms, and body-to-wo
 | alpha | Angular acceleration | rad/s^2 |
 | v_b, v_w | Same vector in body/world frame | varies |
 
-## Conventions Used in RenSim
+## Conventions Used in JSim
 
 Before applying formulas, keep these conventions consistent.
 
@@ -169,7 +169,7 @@ $$
 - Combining body-frame torque with world-frame inertia.
 - Inverting matrices repeatedly in hot loops when transpose or cached forms suffice.
 
-## Validation in RenSim
+## Validation in JSim
 
 Use math and dynamics tests to sanity-check conventions and transforms:
 

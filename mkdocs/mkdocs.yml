@@ -1,8 +1,8 @@
-site_name: RenSim
-repo_url: https://github.com/Ruthie-FRC/RenSim
-repo_name: Ruthie-FRC/RenSim
+site_name: JSim
+repo_url: https://github.com/Ruthie-FRC/JSim
+repo_name: Ruthie-FRC/JSim
 site_description: >-
-  Professional documentation for the RenSim FRC physics library.
+  Professional documentation for the JSim FRC physics library.
 site_author: Ruthie-FRC
 edit_uri: edit/main/mkdocs/docs/
 
@@ -69,8 +69,8 @@ extra:
   generator: false
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/Ruthie-FRC/RenSim
-      name: RenSim on GitHub
+      link: https://github.com/Ruthie-FRC/JSim
+      name: JSim on GitHub
 
 extra_css:
   - assets/stylesheets/extra.css

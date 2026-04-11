@@ -1,6 +1,6 @@
 # Quaternion (frcsim::Quaternion)
 
-This page explains quaternion math used by RenSim for stable 3D orientation updates.
+This page explains quaternion math used by JSim for stable 3D orientation updates.
 
 ## Symbols
 
@@ -26,7 +26,7 @@ Validation tests:
 
 ## Representation
 
-RenSim stores quaternion as:
+JSim stores quaternion as:
 
 $$
 q = (w, x, y, z) = (w, \mathbf{v})
@@ -64,7 +64,7 @@ $$
 
 The rotated vector is the xyz part of $$p'$$.
 
-RenSim rotate helper uses conjugate for unit quaternions, which is efficient and stable when normalization is maintained.
+JSim rotate helper uses conjugate for unit quaternions, which is efficient and stable when normalization is maintained.
 
 ### Why conjugate is valid in rotate()
 
@@ -88,7 +88,7 @@ Near zero angle, axis is not uniquely defined; implementation falls back to a de
 
 ## Quaternion to rotation matrix mapping
 
-RenSim exposes conversion to 3x3 rotation matrix. This matrix should remain orthonormal if q is normalized.
+JSim exposes conversion to 3x3 rotation matrix. This matrix should remain orthonormal if q is normalized.
 
 Validation checks after conversion:
 
@@ -107,7 +107,7 @@ Implication for interpolation:
 
 For interpolation parameter t in [0,1], SLERP follows the geodesic on unit quaternion sphere.
 
-RenSim behavior:
+JSim behavior:
 
 - flips sign when needed for shortest path
 - falls back to normalized lerp when quaternions are very close
@@ -119,7 +119,7 @@ Reason for fallback:
 
 ## Quaternion integration and normalization
 
-RenSim angular integration uses:
+JSim angular integration uses:
 
 $$
 \dot{q} = \frac{1}{2}\omega_q q
@@ -143,7 +143,7 @@ Per integration step:
 5. Update q with forward step.
 6. Normalize if needed.
 
-This order matches the intended rigid-body update flow in RenSim.
+This order matches the intended rigid-body update flow in JSim.
 
 ## Worked 90-degree example
 

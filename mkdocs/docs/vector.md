@@ -212,7 +212,7 @@ Example 2: drag and thrust along X
 - mixing force (N) and acceleration (m/s^2)
 - applying drag in same direction as velocity
 
-## Validation in RenSim
+## Validation in JSim
 
 - vendordep/tests/math_test.cpp: dot/cross/norm/normalization checks
 - vendordep/tests/forces_test.cpp: drag diagnostics and force accumulation

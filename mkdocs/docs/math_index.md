@@ -1,6 +1,6 @@
 # Math Overview
 
-This section documents the mathematical foundations of RenSim and connects each model to implementation and tests.
+This section documents the mathematical foundations of JSim and connects each model to implementation and tests.
 
 ## Documentation goals
 

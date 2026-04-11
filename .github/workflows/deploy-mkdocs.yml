@@ -57,7 +57,7 @@ jobs:
       - name: Stage maven on docs site
         run: |
           mkdir -p mkdocs/site/maven
-          mv vendordep/build/repos/RenSim.json mkdocs/site/
+          mv vendordep/build/repos/JSim.json mkdocs/site/
           rsync -a --delete vendordep/build/maven/ mkdocs/site/maven/
       - name: Output tree
         run: |

@@ -1,13 +1,13 @@
 {
-    "fileName": "RenSim.json",
-    "name": "RenSim",
+    "fileName": "JSim.json",
+    "name": "JSim",
     "version": "${version}",
     "frcYear": "2026",
     "uuid": "a87eb0a9-efa5-4de6-9bb0-9ca5565d20c1",
     "mavenUrls": [
         "https://rensim.dev/maven/"
     ],
-    "jsonUrl": "https://rensim.dev/RenSim.json",
+    "jsonUrl": "https://rensim.dev/JSim.json",
     "javaDependencies": [
         {
             "groupId": "${groupId}",
@@ -37,7 +37,7 @@
             "groupId": "${groupId}",
             "artifactId": "${artifactId}-cpp",
             "version": "${version}",
-            "libName": "RenSim",
+            "libName": "JSim",
             "headerClassifier": "headers",
             "sharedLibrary": false,
             "skipInvalidPlatforms": true,
@@ -54,7 +54,7 @@
             "groupId": "${groupId}",
             "artifactId": "${artifactId}-driver",
             "version": "${version}",
-            "libName": "RenSimDriver",
+            "libName": "JSimDriver",
             "headerClassifier": "headers",
             "sharedLibrary": false,
             "skipInvalidPlatforms": true,

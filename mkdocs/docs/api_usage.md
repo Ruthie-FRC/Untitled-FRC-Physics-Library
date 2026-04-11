@@ -1,6 +1,6 @@
 # API Usage
 
-This page describes the primary usage patterns for RenSim in C++, Python, and Java.
+This page describes the primary usage patterns for JSim in C++, Python, and Java.
 
 ## C++
 

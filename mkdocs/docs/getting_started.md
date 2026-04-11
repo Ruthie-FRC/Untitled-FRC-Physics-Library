@@ -1,6 +1,6 @@
 # Getting Started
 
-Use this section as the entry point for integrating RenSim into your project.
+Use this section as the entry point for integrating JSim into your project.
 
 ## Build and Test
 

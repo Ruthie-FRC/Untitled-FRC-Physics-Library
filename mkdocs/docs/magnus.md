@@ -1,6 +1,6 @@
 # Magnus Effect Math
 
-This page explains the spin-induced side force model used by RenSim.
+This page explains the spin-induced side force model used by JSim.
 
 ## Symbols
 
@@ -23,7 +23,7 @@ Validation tests:
 - vendordep/tests/magnus_test.cpp
 - vendordep/tests/forces_test.cpp
 
-RenSim computes Magnus force direction from cross product:
+JSim computes Magnus force direction from cross product:
 
 $$
 F_m = k_m (\omega \times v)
@@ -99,7 +99,7 @@ In practice, trajectory curvature depends on all three terms and their time-vary
 - Mixing world and body spin vectors.
 - Tuning k_m before confirming sign and frame correctness.
 
-## Validation in RenSim
+## Validation in JSim
 
 - vendordep/tests/magnus_test.cpp checks canonical omega x v sign
 - vendordep/tests/forces_test.cpp checks integration with broader force pipeline

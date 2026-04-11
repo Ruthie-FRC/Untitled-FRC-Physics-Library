@@ -1,6 +1,6 @@
 # Aerodynamics Math
 
-This page explains drag equations used by RenSim and how projected area and coefficients affect force.
+This page explains drag equations used by JSim and how projected area and coefficients affect force.
 
 ## Symbols
 
@@ -29,7 +29,7 @@ Validation tests:
 
 ## Quadratic drag
 
-RenSim uses the standard magnitude model:
+JSim uses the standard magnitude model:
 
 $$
 |F_d| = \frac{1}{2} \rho C_d A v^2
@@ -75,7 +75,7 @@ Implementation interpretation:
 
 ## Dynamic pressure
 
-RenSim reports dynamic pressure:
+JSim reports dynamic pressure:
 
 $$
 q = \frac{1}{2} \rho v^2
@@ -146,7 +146,7 @@ This ratio is useful when deciding whether gravity-only approximations are accep
 - Keep signs frame-consistent before tuning coefficients.
 - Validate with speed-decay and drop tests, not just one timestep.
 
-## Validation in RenSim
+## Validation in JSim
 
 Use:
 

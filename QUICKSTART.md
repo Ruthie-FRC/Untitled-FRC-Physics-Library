@@ -1,6 +1,6 @@
-# RenSim 2026.04.03.0-prerelease Quick Start
+# Jsim 2026.04.03.0-prerelease Quick Start
 
-RenSim is a physics simulation framework for FRC-style robotics. This prerelease (2026.04.03.0) includes a fully functional rigid-body dynamics engine with joint constraints, aerodynamic forces, and a complete Java API for FRC teams.
+Jsim is a physics simulation framework for FRC-style robotics. This prerelease (2026.04.03.0) includes a fully functional rigid-body dynamics engine with joint constraints, aerodynamic forces, and a complete Java API for FRC teams.
 
 ## What's Included
 
@@ -131,7 +131,7 @@ This release provides a **solid foundation for physics-based simulations**. The 
 - Mechanism tuning (arm kinematics, drivetrain dynamics)
 - Control algorithm validation
 
-For FRC teams: Integrate via WPILib vendordep manager. Add `RenSim.json` to your project's vendordep directory and reference via imports.
+For FRC teams: Integrate via WPILib vendordep manager. Add `JSim.json` to your project's vendordep directory and reference via imports.
 
 ## Next Steps
 

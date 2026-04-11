@@ -5,10 +5,10 @@ apply plugin: 'maven-publish'
 
 ext.licenseFile = files("$rootDir/../LICENSE.txt")
 
-def templateVendorFile = "RenSim.json"
+def templateVendorFile = "JSim.json"
 
 def artifactGroupId = 'rensim'
-def baseArtifactId = 'RenSim'
+def baseArtifactId = 'JSim'
 
 def outputsFolder = file("$buildDir/outputs")
 
@@ -199,9 +199,9 @@ tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
 
 model {
     publishing {
-        def taskList = createComponentZipTasks($.components, ['RenSim'], zipBaseName, Zip, project, includeStandardZipFormat)
+        def taskList = createComponentZipTasks($.components, ['JSim'], zipBaseName, Zip, project, includeStandardZipFormat)
 
-        def driverTaskList = createComponentZipTasks($.components, ['RenSimDriver'], driverZipBaseName, Zip, project, includeStandardZipFormat)
+        def driverTaskList = createComponentZipTasks($.components, ['JSimDriver'], driverZipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {

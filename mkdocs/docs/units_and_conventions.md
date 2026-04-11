@@ -1,6 +1,6 @@
 # Units and Conventions
 
-This page defines shared notation, units, frame conventions, and sign rules used across all RenSim math documentation.
+This page defines shared notation, units, frame conventions, and sign rules used across all JSim math documentation.
 
 ## Notation standard
 

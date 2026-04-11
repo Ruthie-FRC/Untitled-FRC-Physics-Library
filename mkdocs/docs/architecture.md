@@ -1,6 +1,6 @@
 # Architecture
 
-RenSim is organized as a modular monorepo with clear separation between core physics, bindings, runtime applications, and documentation.
+JSim is organized as a modular monorepo with clear separation between core physics, bindings, runtime applications, and documentation.
 
 ## High-Level Structure
 

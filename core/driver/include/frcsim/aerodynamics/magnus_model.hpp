@@ -1,4 +1,4 @@
-// Copyright (c) RenSim contributors.
+// Copyright (c) Jsim contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the LGPLv3 license file in the root directory of this project.
 
@@ -16,7 +16,7 @@ namespace frcsim {
  * same lift formulation can be reused by game-piece, shot, and simulation code
  * without duplicating the cross-product math.
  *
- * The input vectors use the world frame convention used throughout RenSim and
+ * The input vectors use the world frame convention used throughout Jsim and
  * WPILib: +X points away from the blue alliance wall downfield, +Y points to
  * the left when looking from the blue alliance end, and +Z points upward.
  */

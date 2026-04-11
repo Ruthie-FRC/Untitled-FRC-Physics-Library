@@ -1,10 +1,10 @@
-// Copyright (c) RenSim contributors.
+// Copyright (c) JSim contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the LGPLv3 license file in the root directory of this project.
 
 package rensim;
 
-import rensim.jni.RenSimJNI;
+import rensim.jni.JSimJNI;
 
 /**
  * Thin Java wrapper around the native physics world implementation.
@@ -19,8 +19,8 @@ public final class PhysicsWorld implements AutoCloseable {
 	 * @param enableGravity whether gravity is enabled for newly created bodies
 	 */
 	public PhysicsWorld(double fixedDtSeconds, boolean enableGravity) {
-		RenSimJNI.forceLoad();
-		this.worldHandle = RenSimJNI.createWorld(fixedDtSeconds, enableGravity);
+		JSimJNI.forceLoad();
+		this.worldHandle = JSimJNI.createWorld(fixedDtSeconds, enableGravity);
 		if (worldHandle == 0) {
 			throw new IllegalStateException("Failed to create native PhysicsWorld");
 		}
@@ -34,7 +34,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	 */
 	public PhysicsBody createBody(double massKg) {
 		ensureOpen();
-		int index = RenSimJNI.createBody(worldHandle, massKg);
+		int index = JSimJNI.createBody(worldHandle, massKg);
 		if (index < 0) {
 			throw new IllegalStateException("Failed to create body");
 		}
@@ -51,7 +51,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	 */
 	void setBodyPosition(int bodyIndex, double xMeters, double yMeters, double zMeters) {
 		ensureOpen();
-		int rc = RenSimJNI.setBodyPosition(worldHandle, bodyIndex, xMeters, yMeters, zMeters);
+		int rc = JSimJNI.setBodyPosition(worldHandle, bodyIndex, xMeters, yMeters, zMeters);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to set body position: rc=" + rc);
 		}
@@ -68,7 +68,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	void setBodyLinearVelocity(int bodyIndex, double vxMetersPerSecond, double vyMetersPerSecond,
 			double vzMetersPerSecond) {
 		ensureOpen();
-		int rc = RenSimJNI.setBodyLinearVelocity(worldHandle, bodyIndex, vxMetersPerSecond,
+		int rc = JSimJNI.setBodyLinearVelocity(worldHandle, bodyIndex, vxMetersPerSecond,
 				vyMetersPerSecond, vzMetersPerSecond);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to set body linear velocity: rc=" + rc);
@@ -83,7 +83,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	 */
 	void setBodyGravityEnabled(int bodyIndex, boolean enabled) {
 		ensureOpen();
-		int rc = RenSimJNI.setBodyGravityEnabled(worldHandle, bodyIndex, enabled);
+		int rc = JSimJNI.setBodyGravityEnabled(worldHandle, bodyIndex, enabled);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to set body gravity enabled: rc=" + rc);
 		}
@@ -98,7 +98,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	public Vec3 getBodyPosition(int bodyIndex) {
 		ensureOpen();
 		double[] values = new double[3];
-		int rc = RenSimJNI.getBodyPosition(worldHandle, bodyIndex, values);
+		int rc = JSimJNI.getBodyPosition(worldHandle, bodyIndex, values);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to get body position: rc=" + rc);
 		}
@@ -114,7 +114,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	public Vec3 getBodyLinearVelocity(int bodyIndex) {
 		ensureOpen();
 		double[] values = new double[3];
-		int rc = RenSimJNI.getBodyLinearVelocity(worldHandle, bodyIndex, values);
+		int rc = JSimJNI.getBodyLinearVelocity(worldHandle, bodyIndex, values);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to get body linear velocity: rc=" + rc);
 		}
@@ -135,7 +135,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	 */
 	public void step(int steps) {
 		ensureOpen();
-		int rc = RenSimJNI.stepWorld(worldHandle, steps);
+		int rc = JSimJNI.stepWorld(worldHandle, steps);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to step world: rc=" + rc);
 		}
@@ -148,7 +148,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	 */
 	public void setGravity(Vec3 gravity) {
 		ensureOpen();
-		int rc = RenSimJNI.setWorldGravity(worldHandle, gravity.x(), gravity.y(), gravity.z());
+		int rc = JSimJNI.setWorldGravity(worldHandle, gravity.x(), gravity.y(), gravity.z());
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to set gravity: rc=" + rc);
 		}
@@ -157,7 +157,7 @@ public final class PhysicsWorld implements AutoCloseable {
 	@Override
 	public void close() {
 		if (worldHandle != 0) {
-			RenSimJNI.destroyWorld(worldHandle);
+			JSimJNI.destroyWorld(worldHandle);
 			worldHandle = 0;
 		}
 	}

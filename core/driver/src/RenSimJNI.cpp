@@ -1,9 +1,9 @@
-// Copyright (c) RenSim contributors.
+// Copyright (c) JSim contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the LGPLv3 license file in the root directory of this project.
 
 #include "jni.h"
-#include "rensim_jni_RenSimJNI.h"
+#include "rensim_jni_JSimJNI.h"
 
 #include <cstdint>
 
@@ -25,12 +25,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {}
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    initialize
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_initialize
+Java_rensim_jni_JSimJNI_initialize
   (JNIEnv*, jclass)
 {
   c_doThing();
@@ -38,12 +38,12 @@ Java_rensim_jni_RenSimJNI_initialize
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    createWorld
  * Signature: (DZ)J
  */
 JNIEXPORT jlong JNICALL
-Java_rensim_jni_RenSimJNI_createWorld
+Java_rensim_jni_JSimJNI_createWorld
   (JNIEnv*, jclass, jdouble fixed_dt_seconds, jboolean enable_gravity)
 {
   return static_cast<jlong>(
@@ -51,24 +51,24 @@ Java_rensim_jni_RenSimJNI_createWorld
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    destroyWorld
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_rensim_jni_RenSimJNI_destroyWorld
+Java_rensim_jni_JSimJNI_destroyWorld
   (JNIEnv*, jclass, jlong world_handle)
 {
   c_rsDestroyWorld(static_cast<uint64_t>(world_handle));
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    createBody
  * Signature: (JD)I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_createBody
+Java_rensim_jni_JSimJNI_createBody
   (JNIEnv*, jclass, jlong world_handle, jdouble mass_kg)
 {
   return static_cast<jint>(
@@ -76,12 +76,12 @@ Java_rensim_jni_RenSimJNI_createBody
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    setBodyPosition
  * Signature: (JIDDD)I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_setBodyPosition
+Java_rensim_jni_JSimJNI_setBodyPosition
   (JNIEnv*, jclass, jlong world_handle, jint body_index, jdouble x_m,
    jdouble y_m, jdouble z_m)
 {
@@ -91,12 +91,12 @@ Java_rensim_jni_RenSimJNI_setBodyPosition
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    setBodyLinearVelocity
  * Signature: (JIDDD)I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_setBodyLinearVelocity
+Java_rensim_jni_JSimJNI_setBodyLinearVelocity
   (JNIEnv*, jclass, jlong world_handle, jint body_index, jdouble vx_mps,
    jdouble vy_mps, jdouble vz_mps)
 {
@@ -106,12 +106,12 @@ Java_rensim_jni_RenSimJNI_setBodyLinearVelocity
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    setBodyGravityEnabled
  * Signature: (JIZ)I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_setBodyGravityEnabled
+Java_rensim_jni_JSimJNI_setBodyGravityEnabled
   (JNIEnv*, jclass, jlong world_handle, jint body_index, jboolean enabled)
 {
   return static_cast<jint>(
@@ -120,12 +120,12 @@ Java_rensim_jni_RenSimJNI_setBodyGravityEnabled
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    setWorldGravity
  * Signature: (JDDD)I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_setWorldGravity
+Java_rensim_jni_JSimJNI_setWorldGravity
   (JNIEnv*, jclass, jlong world_handle, jdouble gx_mps2, jdouble gy_mps2,
    jdouble gz_mps2)
 {
@@ -135,12 +135,12 @@ Java_rensim_jni_RenSimJNI_setWorldGravity
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    stepWorld
  * Signature: (JI)I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_stepWorld
+Java_rensim_jni_JSimJNI_stepWorld
   (JNIEnv*, jclass, jlong world_handle, jint steps)
 {
   return static_cast<jint>(
@@ -148,12 +148,12 @@ Java_rensim_jni_RenSimJNI_stepWorld
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    getBodyPosition
  * Signature: (JI[D)I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_getBodyPosition
+Java_rensim_jni_JSimJNI_getBodyPosition
   (JNIEnv* env, jclass, jlong world_handle, jint body_index,
    jdoubleArray out_xyz)
 {
@@ -176,12 +176,12 @@ Java_rensim_jni_RenSimJNI_getBodyPosition
 }
 
 /*
- * Class:     rensim_jni_RenSimJNI
+ * Class:     rensim_jni_JSimJNI
  * Method:    getBodyLinearVelocity
  * Signature: (JI[D)I
  */
 JNIEXPORT jint JNICALL
-Java_rensim_jni_RenSimJNI_getBodyLinearVelocity
+Java_rensim_jni_JSimJNI_getBodyLinearVelocity
   (JNIEnv* env, jclass, jlong world_handle, jint body_index,
    jdoubleArray out_vxyz)
 {

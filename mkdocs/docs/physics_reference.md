@@ -1,6 +1,6 @@
 # Physics Reference
 
-This page summarizes the physical models currently represented in RenSim.
+This page summarizes the physical models currently represented in JSim.
 
 ## Rigid-Body Dynamics
 
@@ -26,7 +26,7 @@ See [Quaternion](quaternion.md) for API details.
 
 ## Forces
 
-RenSim supports force models including:
+JSim supports force models including:
 
 - Gravity
 - Springs

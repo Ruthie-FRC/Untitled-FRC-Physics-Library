@@ -79,7 +79,7 @@ tasks.withType(JavaCompile) {
 def enableExternalJavadocLinks = !gradle.startParameter.isOffline() && System.getenv('CI') == null
 
 javadoc {
-    title = "RenSim API"
+    title = "JSim API"
 
     failOnError = true
     options {
@@ -96,7 +96,7 @@ doxygen {
     sourceSets {
         main {
             // Name
-            option "project_name", "RenSim"
+            option "project_name", "JSim"
             option "project_number", "$pubVersion"
 
             // Driver C++ headers + sources
@@ -133,7 +133,7 @@ doxygen {
 nativeUtils {
     exportsConfigs {
         // Main library is just default empty. This will export everything
-        RenSim {
+        JSim {
             x86ExcludeSymbols = [
                 '_CT??_R0?AV_System_error',
                 '_CT??_R0?AVexception',
@@ -164,7 +164,7 @@ nativeUtils {
     }
     privateExportsConfigs {
         // Only export explicit symbols from driver library
-        RenSimDriver {
+        JSimDriver {
             exportsFile = project.file("src/main/driver/symbols.txt")
         }
     }
@@ -179,7 +179,7 @@ def systemArch = getCurrentArch()
 // Native C++ should track the driver implementation. Keep JNI glue out of the
 // pure native component and let the driver/JNI library own it.
 def nativeFromDriverExcludes = [
-    '**/RenSimJNI.cpp',
+    '**/JSimJNI.cpp',
     '**/physics_jni.cpp'
 ]
 
@@ -207,7 +207,7 @@ sourceSets {
 
 model {
     components {
-        RenSim(NativeLibrarySpec) {
+        JSim(NativeLibrarySpec) {
             sources {
                 cpp {
                     source {
@@ -223,12 +223,12 @@ model {
                 }
             }
             binaries.all {
-                lib library: 'RenSimDriver', linkage: 'shared'
+                lib library: 'JSimDriver', linkage: 'shared'
             }
             nativeUtils.useRequiredLibrary(it, 'wpilib_shared', 'wpimath_shared')
         }
 
-        RenSimDriver(JniNativeLibrarySpec) {
+        JSimDriver(JniNativeLibrarySpec) {
             enableCheckTask true
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
@@ -252,7 +252,7 @@ model {
         }
     }
     testSuites {
-        RenSimTest {
+        JSimTest {
             sources.cpp {
                 source {
                     srcDir 'src/test/native/cpp'
@@ -261,7 +261,7 @@ model {
             }
 
             binaries.all {
-                lib library: 'RenSimDriver', linkage: 'shared'
+                lib library: 'JSimDriver', linkage: 'shared'
 
                 def arch = it.targetPlatform.name
                 if (systemArch == arch && it.buildType.name == 'debug') {
@@ -276,7 +276,7 @@ model {
             nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared", "googletest_static")
         }
 
-        RenSimDriverTest {
+        JSimDriverTest {
             sources.cpp {
                 source {
                     srcDir 'src/test/driver/cpp'

@@ -1,6 +1,6 @@
 # Collision Impulses and Boundary Math
 
-This page describes the math conventions RenSim uses for boundary interactions and the impulse model intended for contact response.
+This page describes the math conventions JSim uses for boundary interactions and the impulse model intended for contact response.
 
 ## Symbols
 
@@ -132,7 +132,7 @@ $$
 
 Post-collision normal velocity becomes positive (separating).
 
-## Validation in RenSim
+## Validation in JSim
 
 Current available checks:
 

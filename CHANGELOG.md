@@ -1,10 +1,10 @@
 # Changelog
 
-All notable changes to RenSim are documented in this file.
+All notable changes to JSim are documented in this file.
 
 ## Versioning
 
-RenSim uses date-based versioning: `YYYY.MM.DD.patch-no`
+JSim uses date-based versioning: `YYYY.MM.DD.patch-no`
 - `patch-no` increments for multiple releases on the same day
 - Format: `2026.04.03.0` is the first release on April 3, 2026
 - Prerelease versions append `-prerelease` suffix
