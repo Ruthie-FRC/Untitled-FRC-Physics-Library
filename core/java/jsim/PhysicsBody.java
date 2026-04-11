@@ -35,12 +35,36 @@ public final class PhysicsBody {
   }
 
   /**
+   * Sets the body's world-space position in meters.
+   *
+   * @param xMeters x position in meters
+   * @param yMeters y position in meters
+   * @param zMeters z position in meters
+   */
+  public void setPosition(double xMeters, double yMeters, double zMeters) {
+    world.setBodyPosition(bodyIndex, xMeters, yMeters, zMeters);
+  }
+
+  /**
    * Sets the body's linear velocity in meters per second.
    *
    * @param velocityMps the new linear velocity in meters per second
    */
   public void setLinearVelocity(Vec3 velocityMps) {
     world.setBodyLinearVelocity(bodyIndex, velocityMps.x(), velocityMps.y(), velocityMps.z());
+  }
+
+  /**
+   * Sets the body's linear velocity in meters per second.
+   *
+   * @param vxMetersPerSecond x velocity in meters per second
+   * @param vyMetersPerSecond y velocity in meters per second
+   * @param vzMetersPerSecond z velocity in meters per second
+   */
+  public void setLinearVelocity(
+      double vxMetersPerSecond, double vyMetersPerSecond, double vzMetersPerSecond) {
+    world.setBodyLinearVelocity(
+        bodyIndex, vxMetersPerSecond, vyMetersPerSecond, vzMetersPerSecond);
   }
 
   /**
@@ -62,6 +86,15 @@ public final class PhysicsBody {
   }
 
   /**
+   * Gets the current world-space position in meters.
+   *
+   * @return a length-3 array containing {x, y, z}
+   */
+  public double[] positionArray() {
+    return world.getBodyPositionArray(bodyIndex);
+  }
+
+  /**
    * Gets the current world-space linear velocity in meters per second.
    *
    * @return the body linear velocity
@@ -69,4 +102,14 @@ public final class PhysicsBody {
   public Vec3 linearVelocity() {
     return world.getBodyLinearVelocity(bodyIndex);
   }
+
+  /**
+   * Gets the current world-space linear velocity in meters per second.
+   *
+   * @return a length-3 array containing {vx, vy, vz}
+   */
+  public double[] linearVelocityArray() {
+    return world.getBodyLinearVelocityArray(bodyIndex);
+  }
+
 }

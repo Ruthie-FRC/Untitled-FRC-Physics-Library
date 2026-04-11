@@ -96,13 +96,24 @@ public final class PhysicsWorld implements AutoCloseable {
 	 * @return body position
 	 */
 	public Vec3 getBodyPosition(int bodyIndex) {
+		double[] values = getBodyPositionArray(bodyIndex);
+		return new Vec3(values[0], values[1], values[2]);
+	}
+
+	/**
+	 * Gets the world position for the given body.
+	 *
+	 * @param bodyIndex native body index
+	 * @return a length-3 array containing {x, y, z}
+	 */
+	public double[] getBodyPositionArray(int bodyIndex) {
 		ensureOpen();
 		double[] values = new double[3];
 		int rc = JSimJNI.getBodyPosition(worldHandle, bodyIndex, values);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to get body position: rc=" + rc);
 		}
-		return new Vec3(values[0], values[1], values[2]);
+		return values;
 	}
 
 	/**
@@ -112,13 +123,24 @@ public final class PhysicsWorld implements AutoCloseable {
 	 * @return body linear velocity
 	 */
 	public Vec3 getBodyLinearVelocity(int bodyIndex) {
+		double[] values = getBodyLinearVelocityArray(bodyIndex);
+		return new Vec3(values[0], values[1], values[2]);
+	}
+
+	/**
+	 * Gets the world linear velocity for the given body.
+	 *
+	 * @param bodyIndex native body index
+	 * @return a length-3 array containing {vx, vy, vz}
+	 */
+	public double[] getBodyLinearVelocityArray(int bodyIndex) {
 		ensureOpen();
 		double[] values = new double[3];
 		int rc = JSimJNI.getBodyLinearVelocity(worldHandle, bodyIndex, values);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to get body linear velocity: rc=" + rc);
 		}
-		return new Vec3(values[0], values[1], values[2]);
+		return values;
 	}
 
 	/**
@@ -147,8 +169,21 @@ public final class PhysicsWorld implements AutoCloseable {
 	 * @param gravity gravity vector in meters per second squared
 	 */
 	public void setGravity(Vec3 gravity) {
+		setGravity(gravity.x(), gravity.y(), gravity.z());
+	}
+
+	/**
+	 * Applies gravity components to the world.
+	 *
+	 * @param gxMetersPerSecondSquared x gravity in meters per second squared
+	 * @param gyMetersPerSecondSquared y gravity in meters per second squared
+	 * @param gzMetersPerSecondSquared z gravity in meters per second squared
+	 */
+	public void setGravity(double gxMetersPerSecondSquared, double gyMetersPerSecondSquared,
+			double gzMetersPerSecondSquared) {
 		ensureOpen();
-		int rc = JSimJNI.setWorldGravity(worldHandle, gravity.x(), gravity.y(), gravity.z());
+		int rc = JSimJNI.setWorldGravity(worldHandle, gxMetersPerSecondSquared,
+				gyMetersPerSecondSquared, gzMetersPerSecondSquared);
 		if (rc != 0) {
 			throw new IllegalStateException("Failed to set gravity: rc=" + rc);
 		}
