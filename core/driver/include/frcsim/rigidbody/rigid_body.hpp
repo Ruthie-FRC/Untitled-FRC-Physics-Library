@@ -96,6 +96,22 @@ class RigidBody {
   const Vector3& position() const { return position_m_; }
   /** @brief Sets world position in meters. */
   void setPosition(const Vector3& position_m) { position_m_ = position_m; }
+  /** @brief Sets world position in meters from scalar components. */
+  void setPosition(double x_m, double y_m, double z_m) {
+    setPosition(Vector3{x_m, y_m, z_m});
+  }
+  /** @brief Gets world position in meters via scalar output pointers. */
+  void position(double* x_m, double* y_m, double* z_m) const {
+    if (x_m) {
+      *x_m = position_m_.x;
+    }
+    if (y_m) {
+      *y_m = position_m_.y;
+    }
+    if (z_m) {
+      *z_m = position_m_.z;
+    }
+  }
 
   /** @brief Returns body orientation as a unit quaternion. */
   const Quaternion& orientation() const { return orientation_; }
@@ -110,12 +126,44 @@ class RigidBody {
   void setLinearVelocity(const Vector3& velocity_mps) {
     linear_velocity_mps_ = velocity_mps;
   }
+  /** @brief Sets world linear velocity in meters per second from scalars. */
+  void setLinearVelocity(double vx_mps, double vy_mps, double vz_mps) {
+    setLinearVelocity(Vector3{vx_mps, vy_mps, vz_mps});
+  }
+  /** @brief Gets world linear velocity in meters per second via pointers. */
+  void linearVelocity(double* vx_mps, double* vy_mps, double* vz_mps) const {
+    if (vx_mps) {
+      *vx_mps = linear_velocity_mps_.x;
+    }
+    if (vy_mps) {
+      *vy_mps = linear_velocity_mps_.y;
+    }
+    if (vz_mps) {
+      *vz_mps = linear_velocity_mps_.z;
+    }
+  }
 
   /** @brief Returns world angular velocity in radians per second. */
   const Vector3& angularVelocity() const { return angular_velocity_radps_; }
   /** @brief Sets world angular velocity in radians per second. */
   void setAngularVelocity(const Vector3& angular_velocity_radps) {
     angular_velocity_radps_ = angular_velocity_radps;
+  }
+  /** @brief Sets world angular velocity in radians per second from scalars. */
+  void setAngularVelocity(double wx_radps, double wy_radps, double wz_radps) {
+    setAngularVelocity(Vector3{wx_radps, wy_radps, wz_radps});
+  }
+  /** @brief Gets world angular velocity in radians per second via pointers. */
+  void angularVelocity(double* wx_radps, double* wy_radps, double* wz_radps) const {
+    if (wx_radps) {
+      *wx_radps = angular_velocity_radps_.x;
+    }
+    if (wy_radps) {
+      *wy_radps = angular_velocity_radps_.y;
+    }
+    if (wz_radps) {
+      *wz_radps = angular_velocity_radps_.z;
+    }
   }
 
   /** @brief Returns inertia tensor in body frame. */
@@ -189,6 +237,11 @@ class RigidBody {
     aerodynamic_geometry_->cylinder_axis_local = axis_local;
   }
 
+  /** @brief Sets cylinder axis from world-space scalar direction components. */
+  void setCylinderAxisWorld(double x, double y, double z) {
+    setCylinderAxisWorld(Vector3{x, y, z});
+  }
+
   /**
    * @brief Computes drag reference area for current geometry and motion
    * direction.
@@ -260,6 +313,10 @@ class RigidBody {
 
   /** @brief Adds force at center of mass in newtons. */
   void applyForce(const Vector3& force_n) { accumulated_force_n_ += force_n; }
+  /** @brief Adds force at center of mass in newtons from scalar components. */
+  void applyForce(double fx_n, double fy_n, double fz_n) {
+    applyForce(Vector3{fx_n, fy_n, fz_n});
+  }
 
   /**
    * @brief Adds force at world-space point, accumulating both force and torque.
@@ -270,6 +327,14 @@ class RigidBody {
     applyForce(force_n);
     const Vector3 r = world_point_m - position_m_;
     accumulated_torque_nm_ += r.cross(force_n);
+  }
+
+  /**
+   * @brief Adds force at world-space point from scalar components.
+   */
+  void applyForceAtPoint(double fx_n, double fy_n, double fz_n, double px_m,
+                         double py_m, double pz_m) {
+    applyForceAtPoint(Vector3{fx_n, fy_n, fz_n}, Vector3{px_m, py_m, pz_m});
   }
 
   /** @brief Clears accumulated force and torque buffers. */
