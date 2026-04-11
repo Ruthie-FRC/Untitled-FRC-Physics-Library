@@ -642,7 +642,15 @@ class BallGamepieceSim {
   int simulationSubsteps() const { return simulation_substeps_; }
 
  private:
-  /** @brief Executes one fixed simulation substep. */
+  /**
+   * @brief Executes one fixed simulation substep.
+   *
+   * Runs one deterministic substep of arena simulation in this order:
+   * robot kinematics, robot-robot impedance, projectile integration, intake
+   * updates, then per-ball physics and collision resolution.
+   *
+   * @param dt_s Fixed substep duration in seconds.
+   */
   void stepSingle(double dt_s) {
     if (dt_s <= 0.0) {
       return;
@@ -688,6 +696,14 @@ class BallGamepieceSim {
     updateSleepStates();
   }
 
+  /**
+   * @brief Integrates active projectile states and handles terminal events.
+   * @param dt_s Substep duration in seconds.
+   *
+   * Each active projectile is advanced with gravity and checked for:
+   * goal entry callbacks, floor touch (optionally spawning a ground ball),
+   * and field-exit deactivation.
+   */
   void updateProjectiles(double dt_s) {
     const double floor_z = fallbackBallConfig().ground_height_m;
 
@@ -850,7 +866,12 @@ class BallGamepieceSim {
     return config;
   }
 
-  /** @brief Rotates a local-space vector around +Z by yaw. */
+  /**
+   * @brief Rotates a local-space vector around +Z by yaw.
+   * @param local Local-space vector to rotate.
+   * @param yaw_rad Rotation angle in radians, positive about +Z.
+   * @return Rotated vector in world XY with Z preserved.
+   */
   static Vector3 rotateYaw(const Vector3& local, double yaw_rad) {
     const double c = std::cos(yaw_rad);
     const double s = std::sin(yaw_rad);
@@ -858,7 +879,11 @@ class BallGamepieceSim {
                    local.z);
   }
 
-  /** @brief Returns the world-space outward normal for a boundary. */
+  /**
+   * @brief Returns the world-space outward normal for a boundary.
+   * @param boundary Boundary definition whose orientation sets local +Z.
+   * @return Unit-length outward normal in world coordinates.
+   */
   static Vector3 boundaryNormalWorld(const EnvironmentalBoundary& boundary) {
     return boundary.orientation.rotate(Vector3::unitZ()).normalized();
   }
