@@ -34,6 +34,17 @@ struct PhysicsConfig {
   /** @brief Enable per-body gravity acceleration. */
   bool enable_gravity{true};
 
+  /** @brief Default drag coefficient used when body material/geometry is unset. */
+  double default_drag_coefficient{0.47};
+  /** @brief Default drag reference area in m^2 when body geometry is unset. */
+  double default_drag_reference_area_m2{0.01};
+  /** @brief Ambient air density in kg/m^3. */
+  double air_density_kgpm3{1.225};
+  /** @brief Optional linear drag coefficient in N/(m/s). */
+  double linear_drag_coefficient_n_per_mps{0.0};
+  /** @brief Magnus lift coefficient used with omega x v. */
+  double magnus_coefficient{1e-4};
+
   /** @brief Gravity acceleration vector in m/s^2 (typically {0, 0, -9.81}). */
   Vector3 gravity_mps2{0.0, 0.0, -9.81};
   /** @brief Linear velocity damping coefficient in 1/s (exponential decay). */

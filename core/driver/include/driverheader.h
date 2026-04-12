@@ -22,6 +22,20 @@ int c_rsSetBodyLinearVelocity(uint64_t world_handle, int body_index,
                               double vx_mps, double vy_mps, double vz_mps);
 int c_rsSetBodyGravityEnabled(uint64_t world_handle, int body_index,
                               int enabled);
+int c_rsSetBodyMaterial(uint64_t world_handle, int body_index,
+                        double restitution, double friction_kinetic,
+                        double friction_static, double collision_damping);
+int c_rsSetBodyAerodynamicSphere(uint64_t world_handle, int body_index,
+                                 double radius_m, double drag_coefficient);
+int c_rsSetBodyAerodynamicBox(uint64_t world_handle, int body_index,
+                              double x_m, double y_m, double z_m,
+                              double drag_coefficient);
+int c_rsSetWorldAerodynamics(uint64_t world_handle, int enabled,
+                             double air_density_kgpm3,
+                             double linear_drag_coefficient_n_per_mps,
+                             double magnus_coefficient,
+                             double default_drag_coefficient,
+                             double default_drag_reference_area_m2);
 
 int c_rsStepWorld(uint64_t world_handle, int steps);
 int c_rsSetWorldGravity(uint64_t world_handle, double gx_mps2,
@@ -31,6 +45,10 @@ int c_rsGetBodyPosition(uint64_t world_handle, int body_index,
                         double* x_m, double* y_m, double* z_m);
 int c_rsGetBodyLinearVelocity(uint64_t world_handle, int body_index,
                               double* vx_mps, double* vy_mps, double* vz_mps);
+int c_rsGetBodyPose7Array(uint64_t world_handle, double* out_pose7,
+                          int max_bodies);
+int c_rsGetBodyVelocity6Array(uint64_t world_handle, double* out_velocity6,
+                              int max_bodies);
 
 #ifdef __cplusplus
 }  // extern "C"
