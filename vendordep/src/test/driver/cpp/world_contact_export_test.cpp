@@ -38,6 +38,64 @@ TEST(PhysicsWorldContactTest, PlaneContactAppliesBounceAndFriction) {
   EXPECT_LT(body.linearVelocity().x, 2.0);
 }
 
+TEST(PhysicsWorldContactTest, CollisionFilterMaskBlocksBoundaryResponse) {
+  frcsim::PhysicsConfig config;
+  config.fixed_dt_s = 0.01;
+  config.enable_gravity = false;
+  config.enable_collision_detection = true;
+
+  frcsim::PhysicsWorld world(config);
+  frcsim::RigidBody& body = world.createBody(1.0);
+  body.setPosition(0.0, 0.0, -0.02);
+  body.setLinearVelocity(0.0, 0.0, -1.0);
+  body.setCollisionLayer(0x2u);
+  body.setCollisionMask(0x2u);
+
+  auto& ground = world.addBoundary();
+  ground.type = frcsim::BoundaryType::kPlane;
+  ground.position_m = frcsim::Vector3(0.0, 0.0, 0.0);
+  ground.collision_layer_bits = 0x1u;
+  ground.collision_mask_bits = 0x1u;
+
+  world.step();
+
+  // No interaction because masks do not overlap.
+  EXPECT_LT(body.position().z, -kEps);
+  EXPECT_LT(body.linearVelocity().z, 0.0);
+}
+
+TEST(PhysicsWorldContactTest, MaterialInteractionTableOverridesCoefficients) {
+  frcsim::PhysicsConfig config;
+  config.fixed_dt_s = 0.01;
+  config.enable_gravity = false;
+  config.enable_collision_detection = true;
+
+  frcsim::PhysicsWorld world(config);
+  frcsim::RigidBody& body = world.createBody(1.0);
+  body.setPosition(0.0, 0.0, -0.02);
+  body.setLinearVelocity(1.0, 0.0, -1.0);
+  body.setMaterialId(10);
+
+  auto& ground = world.addBoundary();
+  ground.type = frcsim::BoundaryType::kPlane;
+  ground.position_m = frcsim::Vector3(0.0, 0.0, 0.0);
+  ground.material_id = 20;
+
+  frcsim::PhysicsWorld::MaterialInteraction pair;
+  pair.material_a_id = 10;
+  pair.material_b_id = 20;
+  pair.restitution = 1.0;
+  pair.friction = 0.0;
+  pair.enabled = true;
+  world.setMaterialInteraction(pair);
+
+  world.step();
+
+  // Full bounce and no tangential damping from override.
+  EXPECT_NEAR(body.linearVelocity().z, 1.0, 5e-2);
+  EXPECT_NEAR(body.linearVelocity().x, 1.0, 5e-2);
+}
+
 TEST(DriverApiExportTest, PoseAndVelocityArraysMatchBodyState) {
   const uint64_t world = c_rsCreateWorld(0.01, 0);
   ASSERT_NE(world, 0u);
@@ -88,6 +146,20 @@ TEST(DriverApiAeroTest, ConfigurableAerodynamicsSlowsBody) {
   double out_v[3] = {};
   ASSERT_EQ(c_rsGetBodyLinearVelocity(world, body, &out_v[0], &out_v[1], &out_v[2]), 0);
   EXPECT_LT(out_v[0], 10.0);
+
+  c_rsDestroyWorld(world);
+}
+
+TEST(DriverApiFilterMaterialTest, BodyFilterAndMaterialApisReturnSuccess) {
+  const uint64_t world = c_rsCreateWorld(0.01, 0);
+  ASSERT_NE(world, 0u);
+
+  const int body = c_rsCreateBody(world, 1.0);
+  ASSERT_GE(body, 0);
+
+  ASSERT_EQ(c_rsSetBodyMaterialId(world, body, 7), 0);
+  ASSERT_EQ(c_rsSetBodyCollisionFilter(world, body, 0x4u, 0x8u), 0);
+  ASSERT_EQ(c_rsSetMaterialInteraction(world, 7, 9, 0.2, 0.9, 1), 0);
 
   c_rsDestroyWorld(world);
 }
