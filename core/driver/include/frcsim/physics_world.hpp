@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <vector>
 
@@ -62,6 +63,20 @@ struct PhysicsConfig {
  */
 class PhysicsWorld {
  public:
+  /** @brief Material-pair contact interaction override entry. */
+  struct MaterialInteraction {
+    /** @brief First material numeric id. */
+    std::int32_t material_a_id{0};
+    /** @brief Second material numeric id. */
+    std::int32_t material_b_id{0};
+    /** @brief Override restitution [0, 1]. */
+    double restitution{0.5};
+    /** @brief Override kinetic friction coefficient >= 0. */
+    double friction{0.6};
+    /** @brief Enables this table entry. */
+    bool enabled{true};
+  };
+
   /**
    * @brief Constructs a physics world with given configuration.
    * @param config Initial world settings and feature flags.
@@ -99,6 +114,11 @@ class PhysicsWorld {
    */
   void addGlobalForceGenerator(
       const std::shared_ptr<ForceGenerator>& generator);
+
+  /** @brief Registers or updates a material-pair interaction override. */
+  void setMaterialInteraction(const MaterialInteraction& interaction);
+  /** @brief Removes all material-pair overrides. */
+  void clearMaterialInteractions();
 
   /** @brief Mutable access to all rigid bodies in the world. */
   std::vector<RigidBody>& bodies() { return bodies_; }
@@ -171,6 +191,11 @@ class PhysicsWorld {
   }
 
  private:
+  bool shouldInteract(std::uint32_t layer_a, std::uint32_t mask_a,
+                      std::uint32_t layer_b, std::uint32_t mask_b) const;
+  const MaterialInteraction* findMaterialInteraction(
+      std::int32_t material_a_id, std::int32_t material_b_id) const;
+
   PhysicsConfig config_{};
 
   std::vector<RigidBody> bodies_{};
@@ -178,6 +203,7 @@ class PhysicsWorld {
   std::vector<BallPhysicsSim3D> balls_{};
   std::vector<EnvironmentalBoundary> boundaries_{};
   std::vector<std::shared_ptr<ForceGenerator>> global_force_generators_{};
+  std::vector<MaterialInteraction> material_interactions_{};
 
   std::size_t step_count_{0};
   double accumulated_sim_time_s_{0.0};
