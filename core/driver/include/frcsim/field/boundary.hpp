@@ -11,66 +11,131 @@
 
 namespace frcsim {
 
-/** @brief Supported collision-boundary geometry kinds. */
+/**
+ * @brief Supported environmental boundary geometry kinds.
+ *
+ * These values describe the intended collision primitive semantics for
+ * field geometry and world obstacles.
+ */
 enum class BoundaryType {
-  kWall,      // Fixed planar barrier
-  kPlane,     // Infinite plane constraint
-  kBox,       // Axis-aligned or rotated box region
-  kCylinder,  // Cylindrical region (e.g., exclusion zone)
-};
-
-/** @brief Boundary interaction mode for simulation. */
-enum class BoundaryBehavior {
-  kRigidBody,         // Treat as a moving or static rigid body with physics
-                      // interactions
-  kStaticConstraint,  // Enforce constraint without full physics interactions
-                      // (faster)
+  /** @brief Finite wall-like barrier primitive. */
+  kWall,
+  /** @brief Infinite plane constraint primitive. */
+  kPlane,
+  /** @brief Box primitive (axis-aligned or oriented via quaternion). */
+  kBox,
+  /** @brief Cylindrical primitive (for posts, exclusion zones, etc.). */
+  kCylinder,
 };
 
 /**
- * @brief Collision or constraint boundary definition for physics simulation.
+ * @brief Boundary interaction mode.
  *
- * Models walls, planes, boxes, and cylinders with configurable interaction
- * behavior: rigid-body physics or faster static constraints. The normal() helper
- * is a placeholder for dynamic surface normal queries not yet fully generalized
- * across all geometry types.
+ * Selects whether the boundary should participate as a richer rigid-body-like
+ * contact target or as a lighter static constraint.
+ */
+enum class BoundaryBehavior {
+  /** @brief Treat boundary as a rigid collision participant. */
+  kRigidBody,
+  /** @brief Treat boundary as a fast static constraint surface. */
+  kStaticConstraint,
+};
+
+/**
+ * @brief Collision or constraint boundary definition used by @ref PhysicsWorld.
+ *
+ * This structure captures geometry, transform, contact coefficients, and broad
+ * filtering metadata for world boundaries. It is intentionally POD-like to keep
+ * setup and serialization straightforward for JNI/FFI bridges.
  */
 struct EnvironmentalBoundary {
-  /** @brief Geometry type of this boundary primitive. */
+  /** @brief Geometry primitive type that determines shape semantics. */
   BoundaryType type{BoundaryType::kWall};
-  /** @brief Physics interaction mode for this boundary. */
+
+  /** @brief Boundary interaction behavior mode. */
   BoundaryBehavior behavior{BoundaryBehavior::kStaticConstraint};
 
-  /** @brief World-space position/center in meters. */
+  /**
+   * @brief World-space boundary origin/center in meters.
+   *
+   * Interpretation depends on @ref type (for example, plane anchor point versus
+   * box/cylinder center).
+   */
   Vector3 position_m{};
-  /** @brief World-space orientation quaternion for rotated geometries. */
+
+  /**
+   * @brief World-space boundary orientation.
+   *
+   * Used for oriented primitives and for future generalized normal queries.
+   */
   Quaternion orientation{};
 
-  /** @brief Half extents for box-like geometries in meters. */
+  /**
+   * @brief Half extents in meters for box-like boundaries.
+   *
+   * Components should be non-negative.
+   */
   Vector3 half_extents_m{1.0, 1.0, 1.0};
-  /** @brief Radius for cylindrical and spherical geometries in meters. */
+
+  /**
+   * @brief Radius in meters for cylindrical or radial primitives.
+   *
+   * Should be non-negative.
+   */
   double radius_m{1.0};
 
-  /** @brief Coefficient of restitution (bounce) in [0, 1]. */
+  /**
+   * @brief Coefficient of restitution (bounce response).
+   *
+   * Typical range is [0, 1], where 0 is fully inelastic and 1 is perfectly
+   * elastic under simplified contact assumptions.
+   */
   double restitution{0.5};
-  /** @brief Tangential friction coefficient used in collision response. */
+
+  /**
+   * @brief Tangential friction coefficient for contact response.
+   *
+   * Values are typically >= 0. Higher values reduce tangential slip.
+   */
   double friction_coefficient{0.7};
 
-  /** @brief User-defined tag for scenario-specific interaction logic. */
+  /**
+   * @brief Application-defined identifier for scenario-specific routing.
+   *
+   * Not interpreted by core physics logic.
+   */
   int user_id{0};
-  /** @brief Numeric material identifier used by world interaction tables. */
+
+  /**
+   * @brief Numeric material id used by world material interaction lookup.
+   */
   std::int32_t material_id{0};
-  /** @brief Boundary collision layer bitset for broad-phase filtering. */
+
+  /**
+   * @brief Broad-phase layer bitset for this boundary.
+   *
+   * Defaults to all bits set (interacts with all layers unless masked out).
+   */
   std::uint32_t collision_layer_bits{0xFFFFFFFFu};
-  /** @brief Boundary collision mask bitset for broad-phase filtering. */
+
+  /**
+   * @brief Broad-phase mask bitset for this boundary.
+   *
+   * Defaults to all bits set (accepts all layers unless masked out).
+   */
   std::uint32_t collision_mask_bits{0xFFFFFFFFu};
-  /** @brief Enables or disables collisions without removing the boundary. */
+
+  /**
+   * @brief Active flag for enabling/disabling participation without removal.
+   */
   bool is_active{true};
 
   /**
-   * @brief Returns the default world-space normal vector (+Z up).
-   * @return Const reference to a constant {0, 0, 1} unit vector.
-   * @note TODO: Generalize to return orientation-dependent normals for all shape types.
+   * @brief Returns a default world-space normal vector.
+   * @return Const reference to a {0, 0, 1} unit vector.
+   *
+   * @note This is a placeholder helper. A future implementation can compute
+   * orientation-aware normals per boundary geometry and contact point.
    */
   const Vector3& normal() const {
     static const Vector3 default_normal(0.0, 0.0, 1.0);

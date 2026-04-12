@@ -29,8 +29,17 @@ enum class IntegrationMethod {
 };
 
 /**
- * @brief Simulated rigid body with linear/angular dynamics and optional drag
- * geometry.
+ * @brief Simulated rigid body with translational/angular dynamics and optional aero metadata.
+ *
+ * This type stores canonical rigid-body state (pose, linear velocity, angular
+ * velocity, mass, inertia) and supports force/torque accumulation followed by
+ * fixed-step integration.
+ *
+ * Key behavior:
+ * - Forces accumulate until @ref integrate is called.
+ * - Gravity application is controlled by per-body flags and world config.
+ * - Optional material metadata informs contact response in @ref PhysicsWorld.
+ * - Optional aerodynamic geometry supports runtime drag-area estimation.
  */
 class RigidBody {
  public:
@@ -44,33 +53,46 @@ class RigidBody {
     kZ,
   };
 
-  /** @brief Geometric data used to estimate drag reference area. */
+  /**
+   * @brief Geometric metadata used to estimate drag reference area.
+   *
+   * Area estimation can be explicit (via @ref reference_area_m2) or inferred from
+   * a primitive shape. Inferred area depends on velocity direction and orientation
+   * for non-spherical shapes.
+   */
   struct AerodynamicGeometry {
-    /** @brief Shape model used for area estimation. */
+    /** @brief Primitive shape model used for reference-area estimation. */
     enum class Shape {
-      /** @brief Caller-provided area only. */
+      /** @brief Use only explicit caller-provided area (no shape inference). */
       kCustom,
-      /** @brief Sphere model using `radius_m`. */
+      /** @brief Sphere model parameterized by @ref radius_m. */
       kSphere,
-      /** @brief Box model using `box_dimensions_m`. */
+      /** @brief Box model parameterized by @ref box_dimensions_m. */
       kBox,
-      /** @brief Cylinder model using `radius_m`, `cylinder_length_m`, and axis.
-       */
+      /** @brief Cylinder model parameterized by radius, length, and axis. */
       kCylinder,
     };
 
-    /** @brief Shape used for drag-area estimation. */
+    /** @brief Selected shape model. */
     Shape shape{Shape::kCustom};
-    /** @brief Explicit reference area in square meters (overrides shape calc
-     * when > 0). */
+
+    /**
+     * @brief Explicit area override in square meters.
+     *
+     * When > 0, this value bypasses shape-based area estimation.
+     */
     double reference_area_m2{0.0};
+
     /** @brief Sphere/cylinder radius in meters. */
     double radius_m{0.0};
-    /** @brief Box dimensions in meters. */
+
+    /** @brief Box dimensions (x, y, z) in meters. */
     Vector3 box_dimensions_m{0.0, 0.0, 0.0};
-    /** @brief Cylinder body length in meters. */
+
+    /** @brief Cylinder length in meters along @ref cylinder_axis_local. */
     double cylinder_length_m{0.0};
-    /** @brief Cylinder axis in local body coordinates. */
+
+    /** @brief Cylinder principal axis expressed in local body coordinates. */
     Vector3 cylinder_axis_local{0.0, 0.0, 1.0};
   };
 
@@ -230,19 +252,40 @@ class RigidBody {
     return material_ ? &(*material_) : nullptr;
   }
 
-  /** @brief Sets numeric material identifier used by world interaction tables. */
+  /**
+   * @brief Sets numeric material identifier used by world interaction tables.
+   * @param material_id Application-defined material id.
+   */
   void setMaterialId(std::int32_t material_id) { material_id_ = material_id; }
-  /** @brief Gets numeric material identifier used by world interaction tables. */
+
+  /**
+   * @brief Gets numeric material identifier used by world interaction tables.
+   * @return Material id currently assigned to this body.
+   */
   std::int32_t materialId() const { return material_id_; }
 
-  /** @brief Sets collision layer bitset used for broad interaction filtering. */
+  /**
+   * @brief Sets broad-phase collision layer bits for this body.
+   * @param layer_bits Layer membership bitset.
+   */
   void setCollisionLayer(std::uint32_t layer_bits) { collision_layer_bits_ = layer_bits; }
-  /** @brief Gets collision layer bitset. */
+
+  /**
+   * @brief Gets broad-phase collision layer bits.
+   * @return Layer membership bitset.
+   */
   std::uint32_t collisionLayer() const { return collision_layer_bits_; }
 
-  /** @brief Sets collision mask bitset used for broad interaction filtering. */
+  /**
+   * @brief Sets broad-phase collision mask bits for this body.
+   * @param mask_bits Interaction acceptance bitset.
+   */
   void setCollisionMask(std::uint32_t mask_bits) { collision_mask_bits_ = mask_bits; }
-  /** @brief Gets collision mask bitset. */
+
+  /**
+   * @brief Gets broad-phase collision mask bits.
+   * @return Interaction acceptance bitset.
+   */
   std::uint32_t collisionMask() const { return collision_mask_bits_; }
 
   /** @brief Sets optional aerodynamic geometry metadata. */
@@ -307,10 +350,19 @@ class RigidBody {
   }
 
   /**
-   * @brief Computes drag reference area for current geometry and motion
-   * direction.
-   * @param velocity_world World-space velocity direction source.
+   * @brief Computes effective drag reference area for current geometry and motion direction.
+   * @param velocity_world World-space velocity vector used to infer projected area.
    * @return Effective reference area in square meters.
+   *
+   * Behavior by geometry mode:
+   * - No geometry configured: returns 0.
+   * - Explicit reference area > 0: returns explicit value.
+   * - Sphere: returns pi * r^2.
+   * - Box: estimates projected area from local velocity direction and face areas.
+   * - Cylinder: blends end-cap and side projected areas using axis alignment.
+   *
+   * For zero velocity vectors, a stable fallback direction is used to avoid NaN
+   * behavior during normalization.
    */
   double dragReferenceAreaM2(const Vector3& velocity_world) const {
     if (!aerodynamic_geometry_)
@@ -419,12 +471,21 @@ class RigidBody {
   }
 
   /**
-   * @brief Advances translational and rotational state by one timestep.
-   * @param dt_s Step duration in seconds.
-   * @param method Linear integration method.
-   * @param gravity_mps2 World-space gravity acceleration vector in m/s^2.
+   * @brief Advances translational and rotational state by one fixed timestep.
+   * @param dt_s Timestep duration in seconds.
+   * @param method Translation integration strategy.
+   * @param gravity_mps2 World-space gravity acceleration in m/s^2.
    * @param linear_damping_per_s Linear damping coefficient in 1/s.
    * @param angular_damping_per_s Angular damping coefficient in 1/s.
+   *
+   * Integration sequence:
+   * 1. Early-out for kinematic bodies (accumulators are still cleared).
+   * 2. Sum accumulated forces and optional gravity contribution.
+   * 3. Integrate linear state using selected method.
+   * 4. Apply linear damping attenuation.
+   * 5. Integrate angular velocity and orientation.
+   * 6. Apply angular damping attenuation.
+   * 7. Clear accumulated force/torque buffers.
    */
   void integrate(double dt_s, IntegrationMethod method,
                  const Vector3& gravity_mps2, double linear_damping_per_s,
