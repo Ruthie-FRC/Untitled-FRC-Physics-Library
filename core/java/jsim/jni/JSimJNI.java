@@ -140,48 +140,26 @@ public class JSimJNI {
       double frictionStatic,
       double collisionDamping);
 
-    /**
-     * Sets numeric material identifier used by world material-interaction tables.
-     *
-     * @param worldHandle the native world handle
-     * @param bodyIndex the native body index
-     * @param materialId numeric material id
-     * @return zero on success
-     */
-    public static native int setBodyMaterialId(long worldHandle, int bodyIndex, int materialId);
+  /**
+   * Sets numeric material identifier used by world material-interaction tables.
+   *
+   * @param worldHandle the native world handle
+   * @param bodyIndex the native body index
+   * @param materialId numeric material id
+   * @return zero on success
+   */
+  public static native int setBodyMaterialId(long worldHandle, int bodyIndex, int materialId);
 
-    /**
-     * Sets collision layer and mask filters for this body.
-     *
-     * @param worldHandle the native world handle
-     * @param bodyIndex the native body index
-     * @param collisionLayerBits body layer bitmask
-     * @param collisionMaskBits body mask bitmask
-     * @return zero on success
-     */
-    public static native int setBodyCollisionFilter(
-      long worldHandle, int bodyIndex, int collisionLayerBits, int collisionMaskBits);
-
-    /**
-     * Sets numeric material identifier used by world material-interaction tables.
-     *
-     * @param worldHandle the native world handle
-     * @param bodyIndex the native body index
-     * @param materialId numeric material id
-     * @return zero on success
-     */
-    public static native int setBodyMaterialId(long worldHandle, int bodyIndex, int materialId);
-
-    /**
-     * Sets collision layer and mask filters for this body.
-     *
-     * @param worldHandle the native world handle
-     * @param bodyIndex the native body index
-     * @param collisionLayerBits body layer bitmask
-     * @param collisionMaskBits body mask bitmask
-     * @return zero on success
-     */
-    public static native int setBodyCollisionFilter(
+  /**
+   * Sets collision layer and mask filters for this body.
+   *
+   * @param worldHandle the native world handle
+   * @param bodyIndex the native body index
+   * @param collisionLayerBits body layer bitmask
+   * @param collisionMaskBits body mask bitmask
+   * @return zero on success
+   */
+  public static native int setBodyCollisionFilter(
       long worldHandle, int bodyIndex, int collisionLayerBits, int collisionMaskBits);
 
   /**
@@ -248,37 +226,18 @@ public class JSimJNI {
       double defaultDragCoefficient,
       double defaultReferenceAreaM2);
 
-    /**
-     * Sets per-material-pair contact interaction overrides.
-     *
-     * @param worldHandle the native world handle
-     * @param materialAId first material id
-     * @param materialBId second material id
-     * @param restitution override restitution [0, 1]
-     * @param friction override kinetic friction coefficient
-     * @param enabled true to enable this pair override
-     * @return zero on success
-     */
-    public static native int setMaterialInteraction(
-      long worldHandle,
-      int materialAId,
-      int materialBId,
-      double restitution,
-      double friction,
-      boolean enabled);
-
-    /**
-     * Sets per-material-pair contact interaction overrides.
-     *
-     * @param worldHandle the native world handle
-     * @param materialAId first material id
-     * @param materialBId second material id
-     * @param restitution override restitution [0, 1]
-     * @param friction override kinetic friction coefficient
-     * @param enabled true to enable this pair override
-     * @return zero on success
-     */
-    public static native int setMaterialInteraction(
+  /**
+   * Sets per-material-pair contact interaction overrides.
+   *
+   * @param worldHandle the native world handle
+   * @param materialAId first material id
+   * @param materialBId second material id
+   * @param restitution override restitution [0, 1]
+   * @param friction override kinetic friction coefficient
+   * @param enabled true to enable this pair override
+   * @return zero on success
+   */
+  public static native int setMaterialInteraction(
       long worldHandle,
       int materialAId,
       int materialBId,
