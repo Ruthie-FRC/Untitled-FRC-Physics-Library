@@ -6,6 +6,16 @@ Scope note: `cad-import` is responsible for generating and validating season JSO
 Runtime state tracking, NT publishing, and live visualization should be implemented
 inside the vendordep/runtime layer.
 
+## CAD Source Format Policy (Onshape)
+
+Use STEP as the source export format from Onshape.
+
+- Export from Onshape as `.step`/`.stp`.
+- Do not treat glTF as the source-of-truth CAD artifact.
+- If you need to use the current importer path, convert STEP to glTF as a preprocessing step.
+
+This keeps a stable neutral CAD source while preserving compatibility with the current importer.
+
 ## Quick Start
 
 For students/teams using JSim vendordep in robot code:
@@ -72,6 +82,11 @@ When a new season is announced:
 ### Step 2: Create Field Definition JSON
 
 Define the new season's field with all elements:
+
+For code-level API documentation templates (Doxygen/Javadoc-style) when adding
+new season arenas/layouts/game elements, see:
+
+- `mkdocs/docs/season_authoring.md`
 
 `field_dimensions` should be treated as a bounding box. The actual playable
 shape is defined by `field_boundary.vertices`, which supports both rectangles

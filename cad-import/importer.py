@@ -1,7 +1,8 @@
 """
 Main CAD import system.
 
-Handles OnShape to glTF conversion and CAD assembly import.
+Uses STEP as the preferred Onshape export source and supports CAD assembly import
+through glTF ingestion after preprocessing conversion.
 From discussion #36: Focus on grouped mechanisms, not individual components.
 """
 
@@ -18,7 +19,13 @@ logger = logging.getLogger(__name__)
 
 
 class OnShapeCADImporter:
-    """Imports CAD from OnShape exports (glTF format) with grouped mechanisms."""
+    """Imports CAD from Onshape exports via glTF with grouped mechanisms.
+
+    Workflow note:
+    - Export STEP from Onshape as the source CAD artifact.
+    - Convert STEP to glTF as preprocessing.
+    - Call import_gltf on the converted file.
+    """
     
     def __init__(self, accuracy_level: AccuracyLevel = AccuracyLevel.MEDIUM):
         """Initialize CAD importer.
@@ -33,10 +40,10 @@ class OnShapeCADImporter:
         self.import_metadata: Dict[str, Any] = {}
     
     def import_gltf(self, gltf_path: str) -> bool:
-        """Import glTF file from OnShape export.
+        """Import glTF file from preprocessed Onshape export.
         
         Args:
-            gltf_path: Path to glTF file (.gltf or .glb)
+            gltf_path: Path to glTF file (.gltf or .glb), typically converted from STEP
         
         Returns:
             True if import successful

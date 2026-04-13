@@ -2,7 +2,8 @@
 JSim CAD Import System
 
 Comprehensive CAD import framework for FRC robot and field simulations.
-Supports OnShape STEP-based workflows (converted to glTF), multiple accuracy levels, and grouped mechanisms.
+Uses an Onshape STEP-first workflow, with optional STEP-to-glTF preprocessing for the current importer path.
+Supports multiple accuracy levels and grouped mechanisms.
 
 Example Usage:
 
@@ -11,6 +12,7 @@ Example Usage:
     # Create importer with medium accuracy
     importer = OnShapeCADImporter(AccuracyLevel.MEDIUM)
     
+    # Recommended: export STEP from Onshape, convert to glTF, then import
     # Import CAD from converted glTF (.gltf/.glb)
     importer.import_gltf("robot.gltf")
     
