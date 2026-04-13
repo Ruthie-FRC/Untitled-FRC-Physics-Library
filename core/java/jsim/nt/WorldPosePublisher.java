@@ -20,6 +20,7 @@ import jsim.jni.JSimJNI;
  * <p>Publishes both:
  * <ul>
  *   <li>Structured Pose3d array: {@code /jsim/world/bodyPoses}</li>
+ *   <li>Flat full state [x,y,z,qw,qx,qy,qz,vx,vy,vz,wx,wy,wz...]: {@code /jsim/world/bodyState13Flat}</li>
  *   <li>Flat pose buffer [x,y,z,qw,qx,qy,qz...]: {@code /jsim/world/bodyPose7Flat}</li>
  *   <li>Flat velocity buffer [vx,vy,vz,wx,wy,wz...]: {@code /jsim/world/bodyVelocity6Flat}</li>
  * </ul>
@@ -29,11 +30,11 @@ public class WorldPosePublisher implements AutoCloseable {
   private final int maxBodies;
 
   private final StructArrayPublisher<Pose3d> bodyPosesPublisher;
+  private final DoubleArrayPublisher bodyStateFlatPublisher;
   private final DoubleArrayPublisher bodyPoseFlatPublisher;
   private final DoubleArrayPublisher bodyVelocityFlatPublisher;
 
-  private final double[] pose7Buffer;
-  private final double[] velocity6Buffer;
+  private final double[] state13Buffer;
 
   /**
    * Creates a new world publisher under {@code /jsim/world}.
@@ -60,11 +61,11 @@ public class WorldPosePublisher implements AutoCloseable {
       String baseTopic) {
     this.worldHandle = worldHandle;
     this.maxBodies = Math.max(1, maxBodies);
-    this.pose7Buffer = new double[this.maxBodies * 7];
-    this.velocity6Buffer = new double[this.maxBodies * 6];
+    this.state13Buffer = new double[this.maxBodies * 13];
 
     NetworkTable table = ntInstance.getTable(baseTopic);
     this.bodyPosesPublisher = table.getStructArrayTopic("bodyPoses", Pose3d.struct).publish();
+    this.bodyStateFlatPublisher = table.getDoubleArrayTopic("bodyState13Flat").publish();
     this.bodyPoseFlatPublisher = table.getDoubleArrayTopic("bodyPose7Flat").publish();
     this.bodyVelocityFlatPublisher = table.getDoubleArrayTopic("bodyVelocity6Flat").publish();
   }
@@ -75,40 +76,51 @@ public class WorldPosePublisher implements AutoCloseable {
    * @return number of body entries published, or negative on native error
    */
   public int publishFrame() {
-    int poseCount = JSimJNI.getBodyPose7Array(worldHandle, pose7Buffer);
-    if (poseCount < 0) {
-      return poseCount;
+    int count = JSimJNI.getBodyState13Array(worldHandle, state13Buffer);
+    if (count < 0) {
+      return count;
     }
 
-    int velocityCount = JSimJNI.getBodyVelocity6Array(worldHandle, velocity6Buffer);
-    if (velocityCount < 0) {
-      return velocityCount;
-    }
-
-    int count = Math.min(poseCount, velocityCount);
     Pose3d[] poses = new Pose3d[count];
+    double[] poseFlat = new double[count * 7];
+    double[] velocityFlat = new double[count * 6];
     for (int i = 0; i < count; i++) {
-      int base = i * 7;
+      int stateBase = i * 13;
+      int poseBase = i * 7;
+      int velBase = i * 6;
+
+      poseFlat[poseBase] = state13Buffer[stateBase];
+      poseFlat[poseBase + 1] = state13Buffer[stateBase + 1];
+      poseFlat[poseBase + 2] = state13Buffer[stateBase + 2];
+      poseFlat[poseBase + 3] = state13Buffer[stateBase + 3];
+      poseFlat[poseBase + 4] = state13Buffer[stateBase + 4];
+      poseFlat[poseBase + 5] = state13Buffer[stateBase + 5];
+      poseFlat[poseBase + 6] = state13Buffer[stateBase + 6];
+
+      velocityFlat[velBase] = state13Buffer[stateBase + 7];
+      velocityFlat[velBase + 1] = state13Buffer[stateBase + 8];
+      velocityFlat[velBase + 2] = state13Buffer[stateBase + 9];
+      velocityFlat[velBase + 3] = state13Buffer[stateBase + 10];
+      velocityFlat[velBase + 4] = state13Buffer[stateBase + 11];
+      velocityFlat[velBase + 5] = state13Buffer[stateBase + 12];
+
       Translation3d translation =
-          new Translation3d(pose7Buffer[base], pose7Buffer[base + 1], pose7Buffer[base + 2]);
+          new Translation3d(poseFlat[poseBase], poseFlat[poseBase + 1], poseFlat[poseBase + 2]);
       Rotation3d rotation =
           new Rotation3d(
               new Quaternion(
-                  pose7Buffer[base + 3],
-                  pose7Buffer[base + 4],
-                  pose7Buffer[base + 5],
-                  pose7Buffer[base + 6]));
+                  poseFlat[poseBase + 3],
+                  poseFlat[poseBase + 4],
+                  poseFlat[poseBase + 5],
+                  poseFlat[poseBase + 6]));
       poses[i] = new Pose3d(translation, rotation);
     }
 
     bodyPosesPublisher.set(poses);
-
-    double[] poseFlat = new double[count * 7];
-    System.arraycopy(pose7Buffer, 0, poseFlat, 0, poseFlat.length);
+    double[] stateFlat = new double[count * 13];
+    System.arraycopy(state13Buffer, 0, stateFlat, 0, stateFlat.length);
+    bodyStateFlatPublisher.set(stateFlat);
     bodyPoseFlatPublisher.set(poseFlat);
-
-    double[] velocityFlat = new double[count * 6];
-    System.arraycopy(velocity6Buffer, 0, velocityFlat, 0, velocityFlat.length);
     bodyVelocityFlatPublisher.set(velocityFlat);
 
     return count;
@@ -117,6 +129,7 @@ public class WorldPosePublisher implements AutoCloseable {
   @Override
   public void close() {
     bodyPosesPublisher.close();
+    bodyStateFlatPublisher.close();
     bodyPoseFlatPublisher.close();
     bodyVelocityFlatPublisher.close();
   }

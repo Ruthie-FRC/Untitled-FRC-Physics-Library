@@ -292,4 +292,14 @@ public class JSimJNI {
    * @return the number of body blocks written, or negative on error
    */
   public static native int getBodyVelocity6Array(long worldHandle, double[] outVelocity6);
+
+  /**
+   * Exports flattened full body state as
+   * [x, y, z, qw, qx, qy, qz, vx, vy, vz, wx, wy, wz] blocks.
+   *
+   * @param worldHandle the native world handle
+   * @param outState13 the destination array sized for N*13 entries
+   * @return the number of body blocks written, or negative on error
+   */
+  public static native int getBodyState13Array(long worldHandle, double[] outState13);
 }

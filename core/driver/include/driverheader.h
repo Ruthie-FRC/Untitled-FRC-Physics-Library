@@ -291,6 +291,31 @@ int c_rsGetBodyPose7Array(uint64_t world_handle, double* out_pose7,
 int c_rsGetBodyVelocity6Array(uint64_t world_handle, double* out_velocity6,
                               int max_bodies);
 
+/**
+ * @brief Exports full body state as a tightly packed 13-tuple array.
+ * @param world_handle Target world handle.
+ * @param out_state13 Output buffer of length at least (13 * max_bodies).
+ * @param max_bodies Maximum number of bodies to write.
+ * @return Number of bodies written on success (>= 0), negative on failure.
+ *
+ * Layout per body i:
+ * - out_state13[i * 13 + 0] = x (m)
+ * - out_state13[i * 13 + 1] = y (m)
+ * - out_state13[i * 13 + 2] = z (m)
+ * - out_state13[i * 13 + 3] = qw
+ * - out_state13[i * 13 + 4] = qx
+ * - out_state13[i * 13 + 5] = qy
+ * - out_state13[i * 13 + 6] = qz
+ * - out_state13[i * 13 + 7] = vx (m/s)
+ * - out_state13[i * 13 + 8] = vy (m/s)
+ * - out_state13[i * 13 + 9] = vz (m/s)
+ * - out_state13[i * 13 + 10] = wx (rad/s)
+ * - out_state13[i * 13 + 11] = wy (rad/s)
+ * - out_state13[i * 13 + 12] = wz (rad/s)
+ */
+int c_rsGetBodyState13Array(uint64_t world_handle, double* out_state13,
+                            int max_bodies);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

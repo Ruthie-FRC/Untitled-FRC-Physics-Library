@@ -144,6 +144,23 @@ public final class PhysicsWorld implements AutoCloseable {
 	}
 
 	/**
+	 * Exports full body state blocks.
+	 *
+	 * <p>Layout per body is: [x, y, z, qw, qx, qy, qz, vx, vy, vz, wx, wy, wz].
+	 *
+	 * @param outState13 destination array sized for N*13 entries
+	 * @return number of body blocks written
+	 */
+	public int getBodyState13Array(double[] outState13) {
+		ensureOpen();
+		int rc = JSimJNI.getBodyState13Array(worldHandle, outState13);
+		if (rc < 0) {
+			throw new IllegalStateException("Failed to get body state array: rc=" + rc);
+		}
+		return rc;
+	}
+
+	/**
 	 * Advances the simulation by one step.
 	 */
 	public void step() {

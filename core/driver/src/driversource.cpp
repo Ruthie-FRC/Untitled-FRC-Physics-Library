@@ -368,4 +368,43 @@ int c_rsGetBodyVelocity6Array(uint64_t world_handle, double* out_velocity6,
   }
   return count;
 }
+
+int c_rsGetBodyState13Array(uint64_t world_handle, double* out_state13,
+                            int max_bodies) {
+  if (!out_state13 || max_bodies < 0) {
+    return -1;
+  }
+
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world) {
+    return -1;
+  }
+
+  const auto& bodies = world->bodies();
+  const int count = std::min(max_bodies, static_cast<int>(bodies.size()));
+  for (int i = 0; i < count; ++i) {
+    const auto& body = bodies[static_cast<std::size_t>(i)];
+    const auto p = body.position();
+    const auto q = body.orientation();
+    const auto v = body.linearVelocity();
+    const auto w = body.angularVelocity();
+
+    const int base = i * 13;
+    out_state13[base + 0] = p.x;
+    out_state13[base + 1] = p.y;
+    out_state13[base + 2] = p.z;
+    out_state13[base + 3] = q.w;
+    out_state13[base + 4] = q.x;
+    out_state13[base + 5] = q.y;
+    out_state13[base + 6] = q.z;
+    out_state13[base + 7] = v.x;
+    out_state13[base + 8] = v.y;
+    out_state13[base + 9] = v.z;
+    out_state13[base + 10] = w.x;
+    out_state13[base + 11] = w.y;
+    out_state13[base + 12] = w.z;
+  }
+  return count;
+}
 }  // extern "C"

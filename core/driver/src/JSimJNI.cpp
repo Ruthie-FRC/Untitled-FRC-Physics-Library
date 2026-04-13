@@ -378,3 +378,33 @@ Java_jsim_jni_JSimJNI_getBodyVelocity6Array
   env->ReleaseDoubleArrayElements(out_velocity6, data, 0);
   return static_cast<jint>(rc);
 }
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    getBodyState13Array
+ * Signature: (J[D)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_getBodyState13Array
+  (JNIEnv* env, jclass, jlong world_handle, jdoubleArray out_state13)
+{
+  if (out_state13 == nullptr) {
+    return -1;
+  }
+
+  const jsize len = env->GetArrayLength(out_state13);
+  if (len < 13) {
+    return -1;
+  }
+
+  const int max_bodies = static_cast<int>(len / 13);
+  jdouble* data = env->GetDoubleArrayElements(out_state13, nullptr);
+  if (data == nullptr) {
+    return -1;
+  }
+
+  const int rc = c_rsGetBodyState13Array(static_cast<uint64_t>(world_handle),
+                                         data, max_bodies);
+  env->ReleaseDoubleArrayElements(out_state13, data, 0);
+  return static_cast<jint>(rc);
+}
