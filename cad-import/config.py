@@ -6,7 +6,6 @@ Based on discussion #36: OnShape to glTF with multiple accuracy tiers.
 """
 
 from enum import Enum
-from dataclasses import dataclass
 from typing import Dict, Any
 
 
@@ -22,50 +21,34 @@ class AccuracyLevel(Enum):
     LOW = "low"
 
 
-@dataclass
-class AccuracyConfig:
-    """Configuration for each accuracy level."""
-    
-    # Whether to include collision geometry for all components
-    include_collision_detail: bool
-    
-    # Whether to simulate small/fastener components
-    simulate_fasteners: bool
-    
-    # Minimum component mass to include (kg)
-    min_mass_threshold: float
-    
-    # Whether to simulate cosmetic features
-    include_cosmetic_features: bool
-    
-    # Maximum number of collision primitives per mechanism
-    max_collision_primitives: int
-
-
-# Accuracy level configurations
-ACCURACY_CONFIGS: Dict[AccuracyLevel, AccuracyConfig] = {
-    AccuracyLevel.HIGH: AccuracyConfig(
-        include_collision_detail=True,
-        simulate_fasteners=True,
-        min_mass_threshold=0.001,  # 1 gram
-        include_cosmetic_features=True,
-        max_collision_primitives=100,
-    ),
-    AccuracyLevel.MEDIUM: AccuracyConfig(
-        include_collision_detail=True,
-        simulate_fasteners=False,
-        min_mass_threshold=0.05,  # 50 grams
-        include_cosmetic_features=False,
-        max_collision_primitives=50,
-    ),
-    AccuracyLevel.LOW: AccuracyConfig(
-        include_collision_detail=True,
-        simulate_fasteners=False,
-        min_mass_threshold=0.1,  # 100 grams
-        include_cosmetic_features=False,
-        max_collision_primitives=20,
-    ),
+# Import-side filtering profiles used by cad-import preprocessing only.
+# Runtime/state-tracking configs belong in vendordep/runtime.
+IMPORT_ACCURACY_PROFILES: Dict[AccuracyLevel, Dict[str, Any]] = {
+    AccuracyLevel.HIGH: {
+        "include_collision_detail": True,
+        "simulate_fasteners": True,
+        "min_mass_threshold": 0.001,  # 1 gram
+        "include_cosmetic_features": True,
+        "max_collision_primitives": 100,
+    },
+    AccuracyLevel.MEDIUM: {
+        "include_collision_detail": True,
+        "simulate_fasteners": False,
+        "min_mass_threshold": 0.05,  # 50 grams
+        "include_cosmetic_features": False,
+        "max_collision_primitives": 50,
+    },
+    AccuracyLevel.LOW: {
+        "include_collision_detail": True,
+        "simulate_fasteners": False,
+        "min_mass_threshold": 0.1,  # 100 grams
+        "include_cosmetic_features": False,
+        "max_collision_primitives": 20,
+    },
 }
+
+# Backward-compatible alias for existing imports.
+ACCURACY_CONFIGS = IMPORT_ACCURACY_PROFILES
 
 
 # Material properties database
