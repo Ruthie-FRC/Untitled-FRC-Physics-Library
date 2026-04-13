@@ -162,44 +162,37 @@ class AdvantageKitVisualizer:
         """
         code = f'''package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import org.littletonrobotics.junction.Logger;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
-    * OPTIONAL: Auto-generated visualizer for JSim game pieces in {game_year}.
- * Publishes game piece poses to AdvantageScope via NetworkTables.
+ * OPTIONAL: Auto-generated helper for formatting JSim game pieces in {game_year}.
+ * Returns plain pose data with no default AdvantageKit dependency.
  */
 public class GamePieceVisualizer {{
     
-    private static final String NT_ROOT = "/jsim/game_pieces";
-    
     /**
-     * Update game piece visualization in AdvantageScope.
+     * Format game piece poses for downstream visualization.
      * 
      * Call this at ~20ms intervals (in robotPeriodic or main loop).
      * 
      * @param gamePieces List of game piece poses
+     * @return Array of poses for visualization
      */
-    public static void updateGamePieces(List<Pose3d> gamePieces) {{
-        // Create array of poses for AdvantageScope
-        Pose3d[] poses = gamePieces.toArray(new Pose3d[0]);
-        
-        // Optional AdvantageKit logger integration.
-        Logger.recordOutput(NT_ROOT + "/poses", poses);
+    public static Pose3d[] updateGamePieces(List<Pose3d> gamePieces) {{
+        return gamePieces.toArray(new Pose3d[0]);
     }}
     
     /**
-     * Optional robot pose output for visualization.
+     * Format a robot pose for downstream visualization.
+     *
+     * @param robotPose Robot pose
+     * @return The same pose, for consistency with pose pipelines
      */
-    public static void updateRobotPose(Pose3d robotPose) {{
-        Logger.recordOutput("/jsim/robot/pose", robotPose);
+    public static Pose3d updateRobotPose(Pose3d robotPose) {{
+        return robotPose;
     }}
     
     /**
@@ -220,7 +213,7 @@ public class GamePieceVisualizer {{
         try:
             with open(output_path, 'w') as f:
                 f.write(code)
-            logger.info(f"Generated AdvantageKit visualizer: {output_path}")
+            logger.info(f"Generated JSim visualizer: {output_path}")
             return True
         except Exception as e:
             logger.error(f"Failed to generate visualizer: {e}")
@@ -228,7 +221,7 @@ public class GamePieceVisualizer {{
     
     @staticmethod
     def generate_pose3d_updater_java(output_path: str) -> bool:
-        """Generate Java code for updating Pose3d in robot code.
+        """Generate a legacy Java pose adapter.
         
         Args:
             output_path: Path to output Java file
@@ -239,44 +232,29 @@ public class GamePieceVisualizer {{
         code = '''package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.networktables.DoubleArrayTopic;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
- * Optional utility for updating Pose3d via NetworkTables from JSim.
+ * Legacy compatibility helper for pose data from JSim.
  * 
- * Subscribes to JSim-published poses and updates robot state.
+ * JSim now owns the runtime pose-tracking integration directly.
  */
-public class JSImPose3dUpdater implements Runnable {{
+public class JSImPose3dUpdater {{
     
-    private static final String NT_PREFIX = "/jsim";
-    private NetworkTable table;
-    private DoubleArrayTopic poseTopic;
     private volatile Pose3d currentPose;
     
     public JSImPose3dUpdater() {{
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        table = inst.getTable(NT_PREFIX);
-        
-        // Subscribe to robot pose updates
-        poseTopic = table.getDoubleArrayTopic("robot/pose");
         currentPose = new Pose3d();
     }}
     
     /**
-     * Update pose from NetworkTables.
+     * Update pose from a JSim-provided pose array.
      * Expected format: [x, y, z, roll, pitch, yaw]
      */
-    public void updatePose() {{
-        double[] poseArray = poseTopic.getEntry(new double[6]).get();
-        
+    public void updatePose(double[] poseArray) {{
         if (poseArray.length == 6) {{
             currentPose = new Pose3d(
-                new Translation3d(poseArray[0], poseArray[1], poseArray[2]),
-                new Rotation3d(poseArray[3], poseArray[4], poseArray[5])
+                new edu.wpi.first.math.geometry.Translation3d(poseArray[0], poseArray[1], poseArray[2]),
+                new edu.wpi.first.math.geometry.Rotation3d(poseArray[3], poseArray[4], poseArray[5])
             );
         }}
     }}
@@ -286,21 +264,6 @@ public class JSImPose3dUpdater implements Runnable {{
      */
     public synchronized Pose3d getPose() {{
         return currentPose;
-    }}
-    
-    @Override
-    public void run() {{
-        // High-frequency update loop (50Hz)
-        while (!Thread.currentThread().isInterrupted()) {{
-            updatePose();
-            
-            try {{
-                Thread.sleep(20);  // 20ms cycle
-            }} catch (InterruptedException e) {{
-                Thread.currentThread().interrupt();
-                break;
-            }}
-        }}
     }}
 }}
 '''
