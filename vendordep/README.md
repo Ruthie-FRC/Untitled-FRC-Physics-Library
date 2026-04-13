@@ -35,6 +35,21 @@ Current Java API includes:
 - Step simulation by N steps
 - Read body position/velocity
 
+### Built-in Field Definitions (No Python Runtime Step)
+
+Use vendordep-bundled field JSON by year directly in Java runtime:
+
+```java
+import com.fasterxml.jackson.databind.JsonNode;
+import jsim.field.FieldDefinitionCatalog;
+
+JsonNode field = FieldDefinitionCatalog.loadFieldNode(2024);
+// Use field geometry/elements in runtime setup.
+```
+
+This avoids requiring teams/students to run external Python scripts just to
+load or move field elements.
+
 ### C++
 
 Use `jsim::PhysicsWorld` from `src/main/driver/include/driverheader.h`.

@@ -11,6 +11,7 @@
 #include <unordered_map>
 
 #include "frcsim/physics_world.hpp"
+#include "frcsim/rigidbody/material.hpp"
 
 namespace {
 
@@ -107,6 +108,141 @@ int c_rsSetBodyGravityEnabled(uint64_t world_handle, int body_index,
   return 0;
 }
 
+int c_rsSetBodyMaterial(uint64_t world_handle, int body_index,
+                        double restitution, double friction_kinetic,
+                        double friction_static, double collision_damping) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  frcsim::RigidBody* body = getBody(world, body_index);
+  if (!body) {
+    return -1;
+  }
+
+  frcsim::Material material;
+  material.coefficient_of_restitution =
+      std::clamp(restitution, 0.0, 1.0);
+  material.coefficient_of_friction_kinetic =
+      std::max(0.0, friction_kinetic);
+  material.coefficient_of_friction_static =
+      std::max(0.0, friction_static);
+  material.collision_damping = std::clamp(collision_damping, 0.0, 1.0);
+
+  body->setMaterial(material);
+  return 0;
+}
+
+int c_rsSetBodyMaterialId(uint64_t world_handle, int body_index,
+                          int32_t material_id) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  frcsim::RigidBody* body = getBody(world, body_index);
+  if (!body) {
+    return -1;
+  }
+
+  body->setMaterialId(material_id);
+  return 0;
+}
+
+int c_rsSetBodyCollisionFilter(uint64_t world_handle, int body_index,
+                               uint32_t collision_layer_bits,
+                               uint32_t collision_mask_bits) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  frcsim::RigidBody* body = getBody(world, body_index);
+  if (!body) {
+    return -1;
+  }
+
+  body->setCollisionLayer(collision_layer_bits);
+  body->setCollisionMask(collision_mask_bits);
+  return 0;
+}
+
+int c_rsSetBodyAerodynamicSphere(uint64_t world_handle, int body_index,
+                                 double radius_m, double drag_coefficient) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  frcsim::RigidBody* body = getBody(world, body_index);
+  if (!body) {
+    return -1;
+  }
+
+  frcsim::RigidBody::AerodynamicGeometry geometry;
+  geometry.shape = frcsim::RigidBody::AerodynamicGeometry::Shape::kSphere;
+  geometry.radius_m = std::max(0.0, radius_m);
+  body->setAerodynamicGeometry(geometry);
+
+  world->config().default_drag_coefficient =
+      std::max(0.0, drag_coefficient);
+  return 0;
+}
+
+int c_rsSetBodyAerodynamicBox(uint64_t world_handle, int body_index,
+                              double x_m, double y_m, double z_m,
+                              double drag_coefficient) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  frcsim::RigidBody* body = getBody(world, body_index);
+  if (!body) {
+    return -1;
+  }
+
+  frcsim::RigidBody::AerodynamicGeometry geometry;
+  geometry.shape = frcsim::RigidBody::AerodynamicGeometry::Shape::kBox;
+  geometry.box_dimensions_m =
+      frcsim::Vector3(std::max(0.0, x_m), std::max(0.0, y_m), std::max(0.0, z_m));
+  body->setAerodynamicGeometry(geometry);
+
+  world->config().default_drag_coefficient =
+      std::max(0.0, drag_coefficient);
+  return 0;
+}
+
+int c_rsSetWorldAerodynamics(uint64_t world_handle, int enabled,
+                             double air_density_kgpm3,
+                             double linear_drag_coefficient_n_per_mps,
+                             double magnus_coefficient,
+                             double default_drag_coefficient,
+                             double default_drag_reference_area_m2) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world) {
+    return -1;
+  }
+
+  auto& cfg = world->config();
+  cfg.enable_aerodynamics = (enabled != 0);
+  cfg.air_density_kgpm3 = std::max(0.0, air_density_kgpm3);
+  cfg.linear_drag_coefficient_n_per_mps =
+      std::max(0.0, linear_drag_coefficient_n_per_mps);
+  cfg.magnus_coefficient = magnus_coefficient;
+  cfg.default_drag_coefficient = std::max(0.0, default_drag_coefficient);
+  cfg.default_drag_reference_area_m2 =
+      std::max(0.0, default_drag_reference_area_m2);
+
+  return 0;
+}
+
+int c_rsSetMaterialInteraction(uint64_t world_handle, int32_t material_a_id,
+                               int32_t material_b_id, double restitution,
+                               double friction, int enabled) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world) {
+    return -1;
+  }
+
+  frcsim::PhysicsWorld::MaterialInteraction interaction;
+  interaction.material_a_id = material_a_id;
+  interaction.material_b_id = material_b_id;
+  interaction.restitution = std::clamp(restitution, 0.0, 1.0);
+  interaction.friction = std::max(0.0, friction);
+  interaction.enabled = (enabled != 0);
+  world->setMaterialInteraction(interaction);
+  return 0;
+}
+
 int c_rsStepWorld(uint64_t world_handle, int steps) {
   std::lock_guard<std::mutex> lock(g_world_mutex);
   frcsim::PhysicsWorld* world = getWorld(world_handle);
@@ -172,5 +308,103 @@ int c_rsGetBodyLinearVelocity(uint64_t world_handle, int body_index,
   *vy_mps = v.y;
   *vz_mps = v.z;
   return 0;
+}
+
+int c_rsGetBodyPose7Array(uint64_t world_handle, double* out_pose7,
+                          int max_bodies) {
+  if (!out_pose7 || max_bodies < 0) {
+    return -1;
+  }
+
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world) {
+    return -1;
+  }
+
+  const auto& bodies = world->bodies();
+  const int count = std::min(max_bodies, static_cast<int>(bodies.size()));
+  for (int i = 0; i < count; ++i) {
+    const auto& body = bodies[static_cast<std::size_t>(i)];
+    const auto p = body.position();
+    const auto q = body.orientation();
+    const int base = i * 7;
+    out_pose7[base + 0] = p.x;
+    out_pose7[base + 1] = p.y;
+    out_pose7[base + 2] = p.z;
+    out_pose7[base + 3] = q.w;
+    out_pose7[base + 4] = q.x;
+    out_pose7[base + 5] = q.y;
+    out_pose7[base + 6] = q.z;
+  }
+  return count;
+}
+
+int c_rsGetBodyVelocity6Array(uint64_t world_handle, double* out_velocity6,
+                              int max_bodies) {
+  if (!out_velocity6 || max_bodies < 0) {
+    return -1;
+  }
+
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world) {
+    return -1;
+  }
+
+  const auto& bodies = world->bodies();
+  const int count = std::min(max_bodies, static_cast<int>(bodies.size()));
+  for (int i = 0; i < count; ++i) {
+    const auto& body = bodies[static_cast<std::size_t>(i)];
+    const auto v = body.linearVelocity();
+    const auto w = body.angularVelocity();
+    const int base = i * 6;
+    out_velocity6[base + 0] = v.x;
+    out_velocity6[base + 1] = v.y;
+    out_velocity6[base + 2] = v.z;
+    out_velocity6[base + 3] = w.x;
+    out_velocity6[base + 4] = w.y;
+    out_velocity6[base + 5] = w.z;
+  }
+  return count;
+}
+
+int c_rsGetBodyState13Array(uint64_t world_handle, double* out_state13,
+                            int max_bodies) {
+  if (!out_state13 || max_bodies < 0) {
+    return -1;
+  }
+
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world) {
+    return -1;
+  }
+
+  const auto& bodies = world->bodies();
+  const int count = std::min(max_bodies, static_cast<int>(bodies.size()));
+  for (int i = 0; i < count; ++i) {
+    const auto& body = bodies[static_cast<std::size_t>(i)];
+    const auto p = body.position();
+    const auto q = body.orientation();
+    const auto v = body.linearVelocity();
+    const auto w = body.angularVelocity();
+
+    const int base = i * 13;
+    out_state13[base + 0] = p.x;
+    out_state13[base + 1] = p.y;
+    out_state13[base + 2] = p.z;
+    out_state13[base + 3] = q.w;
+    out_state13[base + 4] = q.x;
+    out_state13[base + 5] = q.y;
+    out_state13[base + 6] = q.z;
+    out_state13[base + 7] = v.x;
+    out_state13[base + 8] = v.y;
+    out_state13[base + 9] = v.z;
+    out_state13[base + 10] = w.x;
+    out_state13[base + 11] = w.y;
+    out_state13[base + 12] = w.z;
+  }
+  return count;
 }
 }  // extern "C"

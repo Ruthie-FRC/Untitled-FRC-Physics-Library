@@ -122,6 +122,78 @@ public class JSimJNI {
   public static native int setBodyGravityEnabled(long worldHandle, int bodyIndex, boolean enabled);
 
   /**
+   * Sets per-body material contact properties.
+   *
+   * @param worldHandle the native world handle
+   * @param bodyIndex the native body index
+   * @param restitution coefficient of restitution [0, 1]
+   * @param frictionKinetic kinetic friction coefficient
+   * @param frictionStatic static friction coefficient
+   * @param collisionDamping damping coefficient [0, 1]
+   * @return zero on success
+   */
+  public static native int setBodyMaterial(
+      long worldHandle,
+      int bodyIndex,
+      double restitution,
+      double frictionKinetic,
+      double frictionStatic,
+      double collisionDamping);
+
+  /**
+   * Sets numeric material identifier used by world material-interaction tables.
+   *
+   * @param worldHandle the native world handle
+   * @param bodyIndex the native body index
+   * @param materialId numeric material id
+   * @return zero on success
+   */
+  public static native int setBodyMaterialId(long worldHandle, int bodyIndex, int materialId);
+
+  /**
+   * Sets collision layer and mask filters for this body.
+   *
+   * @param worldHandle the native world handle
+   * @param bodyIndex the native body index
+   * @param collisionLayerBits body layer bitmask
+   * @param collisionMaskBits body mask bitmask
+   * @return zero on success
+   */
+  public static native int setBodyCollisionFilter(
+      long worldHandle, int bodyIndex, int collisionLayerBits, int collisionMaskBits);
+
+  /**
+   * Assigns sphere aerodynamic geometry to a body (useful for game pieces from CAD).
+   *
+   * @param worldHandle the native world handle
+   * @param bodyIndex the native body index
+   * @param radiusMeters sphere radius in meters
+   * @param dragCoefficient drag coefficient (dimensionless)
+   * @return zero on success
+   */
+  public static native int setBodyAerodynamicSphere(
+      long worldHandle, int bodyIndex, double radiusMeters, double dragCoefficient);
+
+  /**
+   * Assigns box aerodynamic geometry to a body (useful for robot CAD components).
+   *
+   * @param worldHandle the native world handle
+   * @param bodyIndex the native body index
+   * @param xMeters box x dimension in meters
+   * @param yMeters box y dimension in meters
+   * @param zMeters box z dimension in meters
+   * @param dragCoefficient drag coefficient (dimensionless)
+   * @return zero on success
+   */
+  public static native int setBodyAerodynamicBox(
+      long worldHandle,
+      int bodyIndex,
+      double xMeters,
+      double yMeters,
+      double zMeters,
+      double dragCoefficient);
+
+  /**
    * Sets the world's gravity vector in meters per second squared.
    *
    * @param worldHandle the native world handle
@@ -132,6 +204,46 @@ public class JSimJNI {
    */
   public static native int setWorldGravity(
       long worldHandle, double gxMps2, double gyMps2, double gzMps2);
+
+  /**
+   * Configures world-level aerodynamics parameters.
+   *
+   * @param worldHandle the native world handle
+   * @param enabled true to enable aerodynamics
+   * @param airDensityKgPm3 air density in kg/m^3
+   * @param linearDragNPerMps linear drag coefficient in N/(m/s)
+   * @param magnusCoefficient Magnus coefficient
+   * @param defaultDragCoefficient default drag coefficient
+   * @param defaultReferenceAreaM2 default drag reference area in m^2
+   * @return zero on success
+   */
+  public static native int setWorldAerodynamics(
+      long worldHandle,
+      boolean enabled,
+      double airDensityKgPm3,
+      double linearDragNPerMps,
+      double magnusCoefficient,
+      double defaultDragCoefficient,
+      double defaultReferenceAreaM2);
+
+  /**
+   * Sets per-material-pair contact interaction overrides.
+   *
+   * @param worldHandle the native world handle
+   * @param materialAId first material id
+   * @param materialBId second material id
+   * @param restitution override restitution [0, 1]
+   * @param friction override kinetic friction coefficient
+   * @param enabled true to enable this pair override
+   * @return zero on success
+   */
+  public static native int setMaterialInteraction(
+      long worldHandle,
+      int materialAId,
+      int materialBId,
+      double restitution,
+      double friction,
+      boolean enabled);
 
   /**
    * Advances the world by the given number of steps.
@@ -162,4 +274,32 @@ public class JSimJNI {
    */
   public static native int getBodyLinearVelocity(
       long worldHandle, int bodyIndex, double[] outVxyzMps);
+
+  /**
+   * Exports flattened body poses as [x, y, z, qw, qx, qy, qz] blocks.
+   *
+   * @param worldHandle the native world handle
+   * @param outPose7 the destination array sized for N*7 entries
+   * @return the number of body blocks written, or negative on error
+   */
+  public static native int getBodyPose7Array(long worldHandle, double[] outPose7);
+
+  /**
+   * Exports flattened body velocities as [vx, vy, vz, wx, wy, wz] blocks.
+   *
+   * @param worldHandle the native world handle
+   * @param outVelocity6 the destination array sized for N*6 entries
+   * @return the number of body blocks written, or negative on error
+   */
+  public static native int getBodyVelocity6Array(long worldHandle, double[] outVelocity6);
+
+  /**
+   * Exports flattened full body state as
+   * [x, y, z, qw, qx, qy, qz, vx, vy, vz, wx, wy, wz] blocks.
+   *
+   * @param worldHandle the native world handle
+   * @param outState13 the destination array sized for N*13 entries
+   * @return the number of body blocks written, or negative on error
+   */
+  public static native int getBodyState13Array(long worldHandle, double[] outState13);
 }

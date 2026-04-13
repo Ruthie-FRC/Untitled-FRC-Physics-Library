@@ -85,7 +85,7 @@ int main() {
     assert(sim.countBalls() == 8);
     assert(sim.countScoredBalls() <= sim.countBalls());
 
-    // Maple-style projectile lifecycle: in-flight projectile can hit goal or become grounded piece.
+    // projectile lifecycle: in-flight projectile can hit goal or become grounded piece.
     frcsim::BallGamepieceSim projectile_sim;
     projectile_sim.setFieldConfig(frcsim::BallGamepiecePresets::evergreenFieldConfig());
 
@@ -112,7 +112,7 @@ int main() {
         projectile_sim.step(0.01);
     }
 
-    // Maple-style conversion: projectile becomes grounded piece after touch-ground.
+    // conversion: projectile becomes grounded piece after touch-ground.
     assert(projectile_sim.countProjectiles() == 0);
     assert(projectile_sim.countBalls() > 0);
 

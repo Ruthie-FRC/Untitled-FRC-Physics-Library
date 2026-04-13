@@ -68,7 +68,7 @@ mkdocs serve --config-file mkdocs/mkdocs.yml
 
 ### Tooling and Integration
 
-- `cad-import/`: CAD and geometry import utilities
+- `cad-import/`: CAD and geometry import utilities, including JSim-owned snapshot tracking for simulation integrations
 - `examples/`: language-specific examples (C++, Java, Python)
 - `mkdocs/`: docs source and MkDocs configuration
 - `vendordep/`: WPILib vendordep packaging and Gradle-based build/testing

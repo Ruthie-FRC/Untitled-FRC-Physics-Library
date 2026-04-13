@@ -1,0 +1,60 @@
+{
+  "year": 2024,
+  "game": "CRESCENDO",
+  "field_dimensions": {
+    "length": 16.54,
+    "width": 8.21
+  },
+  "field_boundary": {
+    "shape": "rectangle",
+    "vertices": [
+      {"x": 0.0, "y": 0.0},
+      {"x": 16.54, "y": 0.0},
+      {"x": 16.54, "y": 8.21},
+      {"x": 0.0, "y": 8.21}
+    ]
+  },
+  "elements": [
+    {
+      "name": "stage_platform",
+      "type": "platform",
+      "pose": {"x": 8.27, "y": 4.105, "z": 0.108, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+      "dimensions": {"length": 2.286, "width": 2.286, "height": 0.108},
+      "material": "wood",
+      "mass": 50.0
+    },
+    {
+      "name": "speaker_blue",
+      "type": "goal",
+      "pose": {"x": 0.0, "y": 4.105, "z": 2.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+      "dimensions": {"opening_width": 1.05, "opening_height": 0.87},
+      "material": "aluminum",
+      "mass": 100.0,
+      "alliance": "blue"
+    },
+    {
+      "name": "speaker_red",
+      "type": "goal",
+      "pose": {"x": 16.54, "y": 4.105, "z": 2.0, "roll": 0.0, "pitch": 0.0, "yaw": 3.14159},
+      "dimensions": {"opening_width": 1.05, "opening_height": 0.87},
+      "material": "aluminum",
+      "mass": 100.0,
+      "alliance": "red"
+    }
+  ],
+  "game_pieces": [
+    {
+      "type": "note",
+      "initial_count": 5,
+      "mass": 0.235,
+      "material": "rubber_composite",
+      "diameter": 0.375
+    }
+  ],
+  "constraints": {
+    "min_robot_size": 0.15,
+    "max_robot_size": 1.2,
+    "max_robot_height": 1.9,
+    "max_robot_mass": 70.0
+  }
+}

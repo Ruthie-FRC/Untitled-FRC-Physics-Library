@@ -9,6 +9,8 @@
 
 #include "driverheader.h"
 
+extern "C" {
+
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   // Check to ensure the JNI version is valid
 
@@ -121,6 +123,84 @@ Java_jsim_jni_JSimJNI_setBodyGravityEnabled
 
 /*
  * Class:     jsim_jni_JSimJNI
+ * Method:    setBodyMaterial
+ * Signature: (JIDDDD)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_setBodyMaterial
+  (JNIEnv*, jclass, jlong world_handle, jint body_index,
+   jdouble restitution, jdouble friction_kinetic, jdouble friction_static,
+   jdouble collision_damping)
+{
+  return static_cast<jint>(
+      c_rsSetBodyMaterial(static_cast<uint64_t>(world_handle), body_index,
+                          restitution, friction_kinetic, friction_static,
+                          collision_damping));
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    setBodyMaterialId
+ * Signature: (JII)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_setBodyMaterialId
+  (JNIEnv*, jclass, jlong world_handle, jint body_index, jint material_id)
+{
+  return static_cast<jint>(
+      c_rsSetBodyMaterialId(static_cast<uint64_t>(world_handle), body_index,
+                            static_cast<int32_t>(material_id)));
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    setBodyCollisionFilter
+ * Signature: (JIII)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_setBodyCollisionFilter
+  (JNIEnv*, jclass, jlong world_handle, jint body_index,
+   jint collision_layer_bits, jint collision_mask_bits)
+{
+  return static_cast<jint>(
+      c_rsSetBodyCollisionFilter(static_cast<uint64_t>(world_handle),
+                                 body_index,
+                                 static_cast<uint32_t>(collision_layer_bits),
+                                 static_cast<uint32_t>(collision_mask_bits)));
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    setBodyAerodynamicSphere
+ * Signature: (JIDD)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_setBodyAerodynamicSphere
+  (JNIEnv*, jclass, jlong world_handle, jint body_index, jdouble radius_m,
+   jdouble drag_coefficient)
+{
+  return static_cast<jint>(
+      c_rsSetBodyAerodynamicSphere(static_cast<uint64_t>(world_handle),
+                                   body_index, radius_m, drag_coefficient));
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    setBodyAerodynamicBox
+ * Signature: (JIDDDD)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_setBodyAerodynamicBox
+  (JNIEnv*, jclass, jlong world_handle, jint body_index, jdouble x_m,
+   jdouble y_m, jdouble z_m, jdouble drag_coefficient)
+{
+  return static_cast<jint>(
+      c_rsSetBodyAerodynamicBox(static_cast<uint64_t>(world_handle),
+                                body_index, x_m, y_m, z_m, drag_coefficient));
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
  * Method:    setWorldGravity
  * Signature: (JDDD)I
  */
@@ -132,6 +212,44 @@ Java_jsim_jni_JSimJNI_setWorldGravity
   return static_cast<jint>(
       c_rsSetWorldGravity(static_cast<uint64_t>(world_handle),
                           gx_mps2, gy_mps2, gz_mps2));
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    setWorldAerodynamics
+ * Signature: (JZDDDDD)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_setWorldAerodynamics
+  (JNIEnv*, jclass, jlong world_handle, jboolean enabled,
+   jdouble air_density_kgpm3, jdouble linear_drag_n_per_mps,
+   jdouble magnus_coefficient, jdouble default_drag_coefficient,
+   jdouble default_drag_reference_area_m2)
+{
+  return static_cast<jint>(
+      c_rsSetWorldAerodynamics(static_cast<uint64_t>(world_handle),
+                               enabled ? 1 : 0, air_density_kgpm3,
+                               linear_drag_n_per_mps, magnus_coefficient,
+                               default_drag_coefficient,
+                               default_drag_reference_area_m2));
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    setMaterialInteraction
+ * Signature: (JIIDDZ)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_setMaterialInteraction
+  (JNIEnv*, jclass, jlong world_handle, jint material_a_id,
+   jint material_b_id, jdouble restitution, jdouble friction,
+   jboolean enabled)
+{
+  return static_cast<jint>(
+      c_rsSetMaterialInteraction(static_cast<uint64_t>(world_handle),
+                                 static_cast<int32_t>(material_a_id),
+                                 static_cast<int32_t>(material_b_id),
+                                 restitution, friction, enabled ? 1 : 0));
 }
 
 /*
@@ -202,3 +320,94 @@ Java_jsim_jni_JSimJNI_getBodyLinearVelocity
   env->SetDoubleArrayRegion(out_vxyz, 0, 3, values);
   return 0;
 }
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    getBodyPose7Array
+ * Signature: (J[D)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_getBodyPose7Array
+  (JNIEnv* env, jclass, jlong world_handle, jdoubleArray out_pose7)
+{
+  if (out_pose7 == nullptr) {
+    return -1;
+  }
+
+  const jsize len = env->GetArrayLength(out_pose7);
+  if (len < 7) {
+    return -1;
+  }
+
+  const int max_bodies = static_cast<int>(len / 7);
+  jdouble* data = env->GetDoubleArrayElements(out_pose7, nullptr);
+  if (data == nullptr) {
+    return -1;
+  }
+
+  const int rc = c_rsGetBodyPose7Array(static_cast<uint64_t>(world_handle),
+                                       data, max_bodies);
+  env->ReleaseDoubleArrayElements(out_pose7, data, 0);
+  return static_cast<jint>(rc);
+}
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    getBodyVelocity6Array
+ * Signature: (J[D)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_getBodyVelocity6Array
+  (JNIEnv* env, jclass, jlong world_handle, jdoubleArray out_velocity6)
+{
+  if (out_velocity6 == nullptr) {
+    return -1;
+  }
+
+  const jsize len = env->GetArrayLength(out_velocity6);
+  if (len < 6) {
+    return -1;
+  }
+
+  const int max_bodies = static_cast<int>(len / 6);
+  jdouble* data = env->GetDoubleArrayElements(out_velocity6, nullptr);
+  if (data == nullptr) {
+    return -1;
+  }
+
+  const int rc = c_rsGetBodyVelocity6Array(static_cast<uint64_t>(world_handle),
+                                           data, max_bodies);
+  env->ReleaseDoubleArrayElements(out_velocity6, data, 0);
+  return static_cast<jint>(rc);
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    getBodyState13Array
+ * Signature: (J[D)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_getBodyState13Array
+  (JNIEnv* env, jclass, jlong world_handle, jdoubleArray out_state13)
+{
+  if (out_state13 == nullptr) {
+    return -1;
+  }
+
+  const jsize len = env->GetArrayLength(out_state13);
+  if (len < 13) {
+    return -1;
+  }
+
+  const int max_bodies = static_cast<int>(len / 13);
+  jdouble* data = env->GetDoubleArrayElements(out_state13, nullptr);
+  if (data == nullptr) {
+    return -1;
+  }
+
+  const int rc = c_rsGetBodyState13Array(static_cast<uint64_t>(world_handle),
+                                         data, max_bodies);
+  env->ReleaseDoubleArrayElements(out_state13, data, 0);
+  return static_cast<jint>(rc);
+}
+
+}  // extern "C"

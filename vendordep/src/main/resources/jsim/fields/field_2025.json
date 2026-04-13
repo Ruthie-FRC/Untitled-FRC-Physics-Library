@@ -1,0 +1,68 @@
+{
+  "year": 2025,
+  "game": "REEFSCAPE",
+  "field_dimensions": {
+    "length": 16.54,
+    "width": 8.21
+  },
+  "field_boundary": {
+    "shape": "rectangle",
+    "vertices": [
+      {"x": 0.0, "y": 0.0},
+      {"x": 16.54, "y": 0.0},
+      {"x": 16.54, "y": 8.21},
+      {"x": 0.0, "y": 8.21}
+    ]
+  },
+  "elements": [
+    {
+      "name": "reef_left",
+      "type": "reef",
+      "pose": {"x": 2.5, "y": 4.105, "z": 0.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+      "dimensions": {"length": 2.0, "width": 2.0},
+      "material": "plastic",
+      "mass": 50.0
+    },
+    {
+      "name": "reef_right",
+      "type": "reef",
+      "pose": {"x": 14.04, "y": 4.105, "z": 0.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+      "dimensions": {"length": 2.0, "width": 2.0},
+      "material": "plastic",
+      "mass": 50.0
+    },
+    {
+      "name": "barge_blue",
+      "type": "platform",
+      "pose": {"x": 1.0, "y": 0.5, "z": 0.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+      "dimensions": {"length": 3.66, "width": 2.74},
+      "material": "aluminum",
+      "mass": 100.0,
+      "alliance": "blue"
+    },
+    {
+      "name": "barge_red",
+      "type": "platform",
+      "pose": {"x": 15.54, "y": 7.71, "z": 0.0, "roll": 0.0, "pitch": 0.0, "yaw": 3.14159},
+      "dimensions": {"length": 3.66, "width": 2.74},
+      "material": "aluminum",
+      "mass": 100.0,
+      "alliance": "red"
+    }
+  ],
+  "game_pieces": [
+    {
+      "type": "coral",
+      "initial_count": 12,
+      "mass": 0.567,
+      "material": "plastic",
+      "diameter": 0.178
+    }
+  ],
+  "constraints": {
+    "min_robot_size": 0.15,
+    "max_robot_size": 1.2,
+    "max_robot_height": 1.9,
+    "max_robot_mass": 70.0
+  }
+}
