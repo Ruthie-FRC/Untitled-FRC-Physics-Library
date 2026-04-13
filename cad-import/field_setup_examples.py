@@ -16,10 +16,9 @@ from typing import List, Dict, Any
 
 # Import from our modules
 from arena_state import (
-    ArenaState, GamePiece, GamePieceType, Robot, FieldElement, Pose3d
+    ArenaState, GamePiece, GamePieceType, Robot, FieldElement, Pose3d, JSimStateTracker
 )
 from field_definitions import FieldDefinitionManager, Field2024Definition
-from advantagescope_integration import JSimStateTracker
 
 
 def example_1_basic_field_setup():

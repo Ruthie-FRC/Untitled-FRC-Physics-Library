@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Any
 from threading import RLock
 from enum import Enum
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -371,3 +372,38 @@ class ArenaState:
                 "simulation_time": self.simulation_time,
                 "paused": self.paused,
             }
+
+
+class JSimStateTracker:
+    """Owns arena snapshot export for JSim integrations.
+
+    This keeps the state-tracking contract in the core arena-state module so
+    integrations can consume a stable snapshot without adding user-code glue.
+    """
+
+    REQUIREMENTS = (
+        "ArenaState snapshot access",
+        "Periodic export or polling from JSim runtime",
+    )
+
+    INTEGRATIONS = (
+        "snapshot_dict",
+        "snapshot_json",
+    )
+
+    def __init__(self, arena_state: ArenaState):
+        self.arena_state = arena_state
+
+    def snapshot_dict(self) -> Dict[str, Any]:
+        """Return the current arena snapshot."""
+        return self.arena_state.get_state_snapshot()
+
+    def export_snapshot_json(self, output_path: str) -> bool:
+        """Export the current arena snapshot to JSON."""
+        try:
+            with open(output_path, 'w') as f:
+                json.dump(self.snapshot_dict(), f, indent=2)
+            return True
+        except Exception as e:
+            logger.error(f"Failed to export arena snapshot JSON: {e}")
+            return False

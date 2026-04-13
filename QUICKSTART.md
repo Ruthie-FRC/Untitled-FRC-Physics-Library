@@ -94,7 +94,7 @@ This v0.1.0-prerelease focuses on rigid-body dynamics and joint constraints:
 - **Collision detection**: Disabled (planned for v0.2)
 - **Soft body deformation**: Framework exists but not implemented (planned for v0.2)
 - **Field boundaries**: Structure exists but logic not wired (planned for v0.2)
-- **CAD import**: Utilities exist but not integrated (planned for v0.2)
+- **CAD import**: Utilities include JSim-owned snapshot tracking and export helpers; runtime integration is still expanding
 
 ## Test Coverage
 

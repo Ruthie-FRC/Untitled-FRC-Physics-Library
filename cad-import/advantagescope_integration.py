@@ -17,7 +17,7 @@ from typing import Dict, List, Any, Optional, Union
 from dataclasses import asdict
 import logging
 
-from .arena_state import ArenaState
+from .arena_state import ArenaState, JSimStateTracker
 
 logger = logging.getLogger(__name__)
 
@@ -134,25 +134,6 @@ class AdvantageeScopeExporter:
         except Exception as e:
             logger.error(f"Failed to export snapshot JSON: {e}")
             return False
-
-
-class JSimStateTracker:
-    """JSim-owned wrapper for tracking and exporting arena state snapshots.
-
-    This keeps the state tracking concern inside JSim instead of pushing it into
-    user robot code or generated Java helpers.
-    """
-
-    def __init__(self, arena_state: ArenaState):
-        self.arena_state = arena_state
-
-    def snapshot_dict(self) -> Dict[str, Any]:
-        """Return the current arena snapshot."""
-        return AdvantageeScopeExporter.arena_to_snapshot_dict(self.arena_state)
-
-    def export_snapshot_json(self, output_path: str) -> bool:
-        """Export the current arena snapshot to JSON."""
-        return AdvantageeScopeExporter.export_snapshot_json(self.arena_state, output_path)
 
 
 class AdvantageKitVisualizer:

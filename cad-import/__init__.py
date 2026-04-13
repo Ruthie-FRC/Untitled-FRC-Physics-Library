@@ -64,6 +64,7 @@ from .arena_state import (
     Robot,
     FieldElement,
     ArenaState,
+    JSimStateTracker,
 )
 
 from .field_definitions import (
@@ -77,7 +78,6 @@ from .advantagescope_integration import (
     AdvantageeScopeExporter,
     NetworkTablesKeyFormat,
     AdvantageKitVisualizer,
-    JSimStateTracker,
 )
 
 __version__ = "0.2.0"
