@@ -2,6 +2,10 @@
 
 Complete guide for recreating FRC field definitions and game elements for JSim each season.
 
+Scope note: `cad-import` is responsible for generating and validating season JSON.
+Runtime state tracking, NT publishing, and live visualization should be implemented
+inside the vendordep/runtime layer.
+
 ## Quick Start
 
 ### 1. Load Existing Field Definition
@@ -15,65 +19,28 @@ print(f"Game: {field_def['game']}")
 print(f"Elements: {len(field_def['elements'])}")
 ```
 
-### 2. Create Arena with Field Elements
+### 2. Validate Field JSON
 
 ```python
-from arena_state import ArenaState, FieldElement, Pose3d
-
-arena = ArenaState(
-    field_length=16.54,  # meters
-    field_width=8.21
-)
-
-# Add field elements from definition
-for elem_data in field_def['elements']:
-    element = FieldElement(
-        name=elem_data['name'],
-        element_type=elem_data['type'],
-        pose=Pose3d.from_dict(elem_data['pose']),
-        material=elem_data.get('material', 'aluminum'),
-    )
-    arena.add_field_element(element)
+dims = field_def["field_dimensions"]
+assert "length" in dims and "width" in dims
+assert "elements" in field_def
+assert "game_pieces" in field_def
 ```
 
-### 3. Add Robots and Game Pieces
+### 3. Export JSON for Runtime Consumption
 
 ```python
-from arena_state import Robot, GamePiece, GamePieceType
+import json
 
-# Add robots
-robot = Robot(
-    team_number=1690,
-    alliance="blue",
-    pose=Pose3d(x=2.0, y=4.1, z=0.0, roll=0, pitch=0, yaw=0)
-)
-arena.add_robot(robot)
-
-# Add game pieces
-note = GamePiece(
-    id="note_01",
-    type=GamePieceType.NOTE,
-    pose=Pose3d(x=8.0, y=4.0, z=0.2, roll=0, pitch=0, yaw=0),
-    mass=0.235,
-    material="rubber_composite"
-)
-arena.add_game_piece(note)
+with open("field_2026.json", "w") as f:
+    json.dump(field_def, f, indent=2)
 ```
 
-### 4. Export JSim Snapshot (Default)
+### 4. Load in vdep/runtime
 
-```python
-from advantagescope_integration import AdvantageeScopeExporter
-
-state = arena.get_state_snapshot()
-AdvantageeScopeExporter.export_snapshot_json(state, "arena_snapshot.json")
-```
-
-Optional adapter export for NetworkTables-oriented viewers:
-
-```python
-AdvantageeScopeExporter.export_to_nt_json(state, "arena_nt.json")
-```
+Use the exported JSON from your vendordep runtime setup (Java/native side) so
+teams do not need to run a separate Python state-tracker process.
 
 ## Seasonal Workflow
 
@@ -95,6 +62,16 @@ Define the new season's field with all elements:
   "field_dimensions": {
     "length": 16.54,
     "width": 8.21
+    },
+    "field_boundary": {
+        "shape": "rectangle",
+        "vertices": [
+            {"x": 0.0, "y": 0.0},
+            {"x": 16.54, "y": 0.0},
+            {"x": 16.54, "y": 8.21},
+            {"x": 0.0, "y": 8.21}
+        ],
+        "notes": "Use polygon vertices for seasons with angled edges or cut corners."
   },
   "elements": [
     {
@@ -170,96 +147,45 @@ MATERIALS = {
 
 ```python
 from field_definitions import FieldDefinitionManager
-from arena_state import ArenaState, Robot, GamePiece, GamePieceType
+import json
 
 def setup_2026_field():
-    """Initialize field and arena for 2026 season."""
+    """Create a runtime-consumable field JSON for 2026 season."""
     
     # Load field definition
     field_def = FieldDefinitionManager.get_field_definition(2026)
     
-    # Create arena
-    arena = ArenaState(
-        field_length=field_def['field_dimensions']['length'],
-        field_width=field_def['field_dimensions']['width']
-    )
-    
-    # Add all field elements
-    for elem_data in field_def['elements']:
-        # ... add elements
-        pass
-    
-    # Add game pieces
-    for piece_data in field_def['game_pieces']:
-        # ... add pieces
-        pass
-    
-    return arena
+    with open("field_2026.json", "w") as f:
+        json.dump(field_def, f, indent=2)
 
-# In main/robot code
-arena = setup_2026_field()
+    return field_def
+
+# In vdep runtime init
+field = setup_2026_field()
 ```
 
 ## Key Components
 
-### Arena State Management
+### Runtime Ownership
 
-**Thread-safe** state tracking with preallocated storage:
+The vendordep/runtime layer should own:
+- Arena state tracking
+- NT/log publishing
+- Visualization adapters
 
-```python
-arena = ArenaState(field_length=16.54, field_width=8.21)
-```
-
-**Array-based storage** (not linked lists) for performance:
-- Supports 256 game pieces
-- Supports 12 robots
-- Supports 128 field elements
-
-**High-frequency updates** (20ms+):
-
-```python
-# Each simulation cycle
-arena.update_robot_pose(team_num, new_pose, velocity)
-arena.update_game_piece(piece_id, new_pose, velocity)
-arena.step(dt=0.02)
-
-# Export state for visualization
-state = arena.get_state_snapshot()
-```
-
-### Visualization Integration
-
-JSim should own arena state tracking. Visualization tools consume the JSim snapshot:
-
-```python
-# Default: tool-agnostic snapshot
-state = arena.get_state_snapshot()
-AdvantageeScopeExporter.export_snapshot_json(state, "arena_snapshot.json")
-
-# Optional: NetworkTables-style adapter
-AdvantageeScopeExporter.export_to_nt_json(state, "arena_nt.json")
-```
-
-**Key advantages:**
-- Updates at 20ms intervals for smooth visualization
-- JSim is the single source of truth for state
-- Minimal performance impact
-- Optional adapters for NetworkTables or logging stacks
+`cad-import` should only define and validate season field JSON.
 
 ### Game Piece Types
 
-Enum-based game piece identification:
+Define game piece types in field JSON:
 
 ```python
-from arena_state import GamePieceType
-
-note = GamePiece(
-    id="note_01",
-    type=GamePieceType.NOTE,      # Strongly typed
-    pose=pose,
-    mass=0.235,                   # kg
-    material="rubber_composite"
-)
+piece = {
+    "type": "note",
+    "initial_count": 5,
+    "mass": 0.235,
+    "material": "rubber_composite",
+}
 ```
 
 Supported types:
@@ -393,13 +319,13 @@ assert "field_elements" in state
 
 ## Troubleshooting
 
-### Arena "Full" Error
+### Runtime Capacity Error
 
 ```
-WARNING: Arena full: cannot add game piece note_256
+WARNING: Runtime capacity reached for game pieces
 ```
 
-**Solution:** Increase `_max_game_pieces` in `arena_state.py`
+**Solution:** Increase game-piece capacity in the vendordep runtime config.
 
 ```python
 self._max_game_pieces = 512  # Increase limit
@@ -419,26 +345,24 @@ for update in updates:
     arena.update_robot_pose(team, pose, velocity)
 ```
 
-### Slow Visualization Updates
+### Slow Viewer Updates
 
 **Issue:** Visualizer lag in your chosen viewer
 
 **Solution:** 
 1. Reduce update frequency (20ms minimum)
-2. Batch adapter exports
+2. Batch runtime publishes
 3. Reduce number of game pieces being tracked
 
 ```python
 # Update every 50ms instead of 20ms if needed
 if frame_count % (50 / 20) == 0:
-    export_to_nt()
+    publish_runtime_snapshot()
 ```
 
 ## References
 
-- [Arena State Management](arena_state.py)
 - [Field Definitions](field_definitions.py)
-- [AdvantageScope Integration](advantagescope_integration.py)
 - [Field Setup Examples](field_setup_examples.py)
 
 ## Example Timeline: 2026 Season
