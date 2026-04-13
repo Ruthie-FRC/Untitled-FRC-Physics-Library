@@ -77,6 +77,7 @@ from .advantagescope_integration import (
     AdvantageeScopeExporter,
     NetworkTablesKeyFormat,
     AdvantageKitVisualizer,
+    JSimStateTracker,
 )
 
 __version__ = "0.2.0"
@@ -105,4 +106,6 @@ __all__ = [
     # Exporter
     "CADExporter",
     "UniversalCADExporter",
+    # Visualization
+    "JSimStateTracker",
 ]

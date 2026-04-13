@@ -13,9 +13,11 @@ Supports:
 """
 
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from dataclasses import asdict
 import logging
+
+from .arena_state import ArenaState
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +54,7 @@ class AdvantageeScopeExporter:
     """Exports arena state to optional visualization formats."""
 
     @staticmethod
-    def arena_to_snapshot_dict(arena_state: Dict[str, Any]) -> Dict[str, Any]:
+    def arena_to_snapshot_dict(arena_state: Union[Dict[str, Any], ArenaState]) -> Dict[str, Any]:
         """Return a minimal tool-agnostic snapshot dictionary.
 
         Args:
@@ -61,6 +63,9 @@ class AdvantageeScopeExporter:
         Returns:
             Dictionary preserving JSim-oriented state structure
         """
+        if hasattr(arena_state, "get_state_snapshot"):
+            arena_state = arena_state.get_state_snapshot()
+
         return {
             "time": arena_state.get("time", 0.0),
             "paused": arena_state.get("paused", False),
@@ -129,6 +134,25 @@ class AdvantageeScopeExporter:
         except Exception as e:
             logger.error(f"Failed to export snapshot JSON: {e}")
             return False
+
+
+class JSimStateTracker:
+    """JSim-owned wrapper for tracking and exporting arena state snapshots.
+
+    This keeps the state tracking concern inside JSim instead of pushing it into
+    user robot code or generated Java helpers.
+    """
+
+    def __init__(self, arena_state: ArenaState):
+        self.arena_state = arena_state
+
+    def snapshot_dict(self) -> Dict[str, Any]:
+        """Return the current arena snapshot."""
+        return AdvantageeScopeExporter.arena_to_snapshot_dict(self.arena_state)
+
+    def export_snapshot_json(self, output_path: str) -> bool:
+        """Export the current arena snapshot to JSON."""
+        return AdvantageeScopeExporter.export_snapshot_json(self.arena_state, output_path)
 
 
 class AdvantageKitVisualizer:

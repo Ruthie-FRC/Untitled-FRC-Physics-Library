@@ -19,7 +19,7 @@ from arena_state import (
     ArenaState, GamePiece, GamePieceType, Robot, FieldElement, Pose3d
 )
 from field_definitions import FieldDefinitionManager, Field2024Definition
-from advantagescope_integration import AdvantageeScopeExporter
+from advantagescope_integration import JSimStateTracker
 
 
 def example_1_basic_field_setup():
@@ -214,11 +214,9 @@ def example_5_export_to_advantagescope():
     )
     arena.add_game_piece(note)
     
-    # Get arena state
-    state_snapshot = arena.get_state_snapshot()
-    
-    # Export to a plain snapshot format
-    snapshot_dict = AdvantageeScopeExporter.arena_to_snapshot_dict(state_snapshot)
+    # Export through the JSim-owned state tracker
+    tracker = JSimStateTracker(arena)
+    snapshot_dict = tracker.snapshot_dict()
     
     print(f"✓ Generated {len(snapshot_dict)} snapshot entries")
     
@@ -357,8 +355,8 @@ with arena._lock:
     arena.step(dt)
 
 # Export once per cycle
-state = arena.get_state_snapshot()
-AdvantageeScopeExporter.export_snapshot_json(state, output_path)
+tracker = JSimStateTracker(arena)
+tracker.export_snapshot_json(output_path)
     '''
     
     print("Efficient Update Loop Example:")
