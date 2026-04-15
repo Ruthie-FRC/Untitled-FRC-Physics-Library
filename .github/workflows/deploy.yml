@@ -17,6 +17,8 @@ jobs:
   build-site:
     name: "Build - MkDocs"
     runs-on: ubuntu-latest
+    env:
+      releaseVersion: ${{ inputs.releaseVersion }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,6 +46,8 @@ jobs:
   build-docs:
     name: "Build - Javadocs/Doxygen"
     runs-on: ubuntu-latest
+    env:
+      releaseVersion: ${{ inputs.releaseVersion }}
     steps:
       - uses: actions/checkout@v4
         with:
