@@ -71,7 +71,8 @@ class CADExporter:
         except Exception as e:
             logger.error(f"Failed to export JSON: {e}")
             return False
-    
+
+    // TODO: document function
     def _mechanism_to_json(
         self,
         mechanism: GroupedMechanism,
