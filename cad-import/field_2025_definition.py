@@ -19,6 +19,7 @@ class Field2025WeldedDefinition:
     FIELD_WIDTH = 8.052
 
     @staticmethod
+    // TODO: document function
     def get_field_definition() -> Dict[str, Any]:
         """Get complete field definition."""
         return {
