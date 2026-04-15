@@ -68,7 +68,7 @@ def example_robot_import():
     
     return mechanisms
 
-
+// TODO: document function
 def example_accuracy_levels():
     """Example: Compare different accuracy levels."""
     print("\n\nExample: Accuracy Levels Comparison")
