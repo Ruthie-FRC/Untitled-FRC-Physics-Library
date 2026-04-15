@@ -15,7 +15,6 @@ from cad_import import (
 )
 import json
 
-
 def example_robot_import():
     """Example: Import robot CAD from OnShape export."""
     print("Example: Robot CAD Import")
@@ -67,7 +66,6 @@ def example_robot_import():
         print("✓ Successfully exported to Java code")
     
     return mechanisms
-
 
 def example_accuracy_levels():
     """Example: Compare different accuracy levels."""
@@ -123,7 +121,6 @@ def example_material_customization():
     exporter.export(mechanisms, "robot_custom_materials.json", ExportFormat.JSON)
     print("✓ Exported with custom materials")
 
-
 def example_field_import():
     """Example: Import FRC field elements."""
     print("\n\nExample: FRC Field Import")
@@ -151,7 +148,6 @@ def example_field_import():
     exporter = UniversalCADExporter()
     exporter.export(mechanisms, "field_2024_jsim.json", ExportFormat.JSON)
     print("\n✓ Exported field to field_2024_jsim.json")
-
 
 def example_batch_import():
     """Example: Batch import multiple robot CAD files."""
@@ -193,7 +189,6 @@ def example_batch_import():
     print(f"Successfully imported: {len(all_exports)}/{len(robot_files)} files")
     for name, data in all_exports.items():
         print(f"  {name}: {data['summary']['total_mechanisms']} mechanisms")
-
 
 def example_metadata_format():
     """Example: OnShape metadata format for mechanism definitions.

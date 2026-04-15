@@ -68,7 +68,6 @@ from .field_definitions import (
     Field2026AndyMarkDefinition,
 )
 
-
 def get_apriltag_layout(year: int, variant: str = None):
     """Convenience helper to fetch normalized AprilTag layout by year."""
     return FieldDefinitionManager.get_apriltag_layout(year, variant=variant)

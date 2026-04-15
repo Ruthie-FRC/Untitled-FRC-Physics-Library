@@ -1,7 +1,7 @@
 # JSim Physics Library
 
 [![CI](https://github.com/Ruthie-FRC/JSim/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ruthie-FRC/JSim/actions/workflows/ci.yml)
-[![Deploy to jsim.dev](https://github.com/Ruthie-FRC/JSim/actions/workflows/deploy-mkdocs.yml/badge.svg?branch=main)](https://github.com/Ruthie-FRC/JSim/actions/workflows/deploy-mkdocs.yml)
+[![jsim.dev](https://github.com/Ruthie-FRC/JSim/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/Ruthie-FRC/JSim/actions/workflows/deploy-mkdocs.yml)
 [![License](https://img.shields.io/github/license/Ruthie-FRC/JSim)](LICENSE.txt)
 [![Open Issues](https://img.shields.io/github/issues/Ruthie-FRC/JSim)](https://github.com/Ruthie-FRC/JSim/issues)
 
