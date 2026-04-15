@@ -15,7 +15,6 @@ from cad_import import (
 )
 import json
 
-// TODO: document function
 def example_robot_import():
     """Example: Import robot CAD from OnShape export."""
     print("Example: Robot CAD Import")
@@ -68,7 +67,6 @@ def example_robot_import():
     
     return mechanisms
 
-// TODO: document function
 def example_accuracy_levels():
     """Example: Compare different accuracy levels."""
     print("\n\nExample: Accuracy Levels Comparison")
@@ -88,7 +86,6 @@ def example_accuracy_levels():
             print(f"  Components: {total_components}")
 
 
-// TODO: document function 
 def example_material_customization():
     """Example: Customize materials for imported components."""
     print("\n\nExample: Material Customization")
@@ -124,7 +121,6 @@ def example_material_customization():
     exporter.export(mechanisms, "robot_custom_materials.json", ExportFormat.JSON)
     print("✓ Exported with custom materials")
 
-// TODO: document function
 def example_field_import():
     """Example: Import FRC field elements."""
     print("\n\nExample: FRC Field Import")
@@ -153,7 +149,6 @@ def example_field_import():
     exporter.export(mechanisms, "field_2024_jsim.json", ExportFormat.JSON)
     print("\n✓ Exported field to field_2024_jsim.json")
 
-// TODO: document function
 def example_batch_import():
     """Example: Batch import multiple robot CAD files."""
     print("\n\nExample: Batch Import")
@@ -195,7 +190,6 @@ def example_batch_import():
     for name, data in all_exports.items():
         print(f"  {name}: {data['summary']['total_mechanisms']} mechanisms")
 
-// TODO: document function
 def example_metadata_format():
     """Example: OnShape metadata format for mechanism definitions.
     
