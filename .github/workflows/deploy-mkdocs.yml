@@ -43,7 +43,7 @@ jobs:
       - name: Generate maven and API docs
         working-directory: vendordep
         run: |
-          ./gradlew build publish
+          ./gradlew publish
       - name: Build docs site and stage API references
         run: |
           mkdocs build --config-file mkdocs/mkdocs.yml
