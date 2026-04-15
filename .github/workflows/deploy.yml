@@ -216,8 +216,7 @@ jobs:
           find deploy/artifacts -type f 
       - name: Add mkdocs to JSim.dev
         run: |
-          mkdir -p deploy/artifacts/jsim.dev/mkdocs/
-          rsync -a --delete deploy/artifacts/mkdocs/*/* deploy/artifacts/jsim.dev/
+          mv deploy/artifacts/jsim.dev/mkdocs deploy/artifacts/jsim.dev/jsim.dev
       - name: Add Maven to JSim.dev
         run: |
           mkdir -p deploy/artifacts/jsim.dev/maven/releases/
