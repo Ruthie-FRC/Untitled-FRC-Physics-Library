@@ -174,7 +174,6 @@ jobs:
 #          path: vendordep/build/maven/
 
   build-maven:
-    needs: [ build-docker, build-host ]
     name: "Build - Maven"
     runs-on: ubuntu-latest
     env:
@@ -201,8 +200,8 @@ jobs:
           find vendordep/build/maven -type f
       - uses: actions/upload-artifact@v4
         with:
-          name: Maven-vdep
-          path: vendordep/build/maven
+          name: vdep
+          path: vendordep/build/repos/
 
   combine:
     name: Combine
@@ -221,6 +220,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: combiner/products/build/allOutputs
+      - name: Add version.txt
+        run: echo $releaseVersion > combiner/products/build/allOutputs/version.txt
       - name: Flatten Artifacts
         run:  |
           rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
@@ -230,7 +231,7 @@ jobs:
           distribution: 'temurin'
           java-version: 21
       - name: Combine
-        run: ./gradlew publish -Pthirdparty
+        run: ./gradlew publish -Pthirdparty -PreleaseRepoPublish
         working-directory: combiner
       - name: Output Artifacts
         run: |
@@ -238,7 +239,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Maven
-          path: ~/releases/maven/development
+          path: ~/releases/
 
   deploy:
     name: Deploy
@@ -265,8 +266,8 @@ jobs:
           mv deploy/artifacts/mkdocs deploy/artifacts/jsim.dev/
       - name: Add Maven to JSim.dev
         run: |
-          mkdir -p deploy/artifacts/jsim.dev/maven/releases/
-          rsync -a --delete deploy/artifacts/Maven/*/* deploy/artifacts/jsim.dev/maven/releases/
+          mkdir -p deploy/artifacts/jsim.dev/maven/
+          rsync -a --delete deploy/artifacts/Maven/*/* deploy/artifacts/jsim.dev/maven/
       - name: Add Javadocs to JSim.dev
         run: |
           mkdir -p deploy/artifacts/jsim.dev/api/javadocs/
