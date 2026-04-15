@@ -268,7 +268,8 @@ jobs:
         run: |
           mkdir -p deploy/artifacts/jsim.dev/maven/
           rsync -a --delete deploy/artifacts/Maven/*/* deploy/artifacts/jsim.dev/maven/
-          mv deploy/artifacts/vdep/JSim.json deploy/artifacts/jsim.dev/
+      - name: Add vendordep to JSim.dev
+        run: mv deploy/artifacts/vdep/JSim.json deploy/artifacts/jsim.dev/
       - name: Add Javadocs to JSim.dev
         run: |
           mkdir -p deploy/artifacts/jsim.dev/api/javadocs/
