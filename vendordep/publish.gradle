@@ -48,9 +48,9 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from(task.archiveFile)
 }
 
-def driverZipBaseName = "_GROUP_jsim_ID_${baseArtifactId}-driver_CLS"
-def zipBaseName = "_GROUP_jsim_ID_${baseArtifactId}-cpp_CLS"
-def javaBaseName = "_GROUP_jsim_ID_${baseArtifactId}-java_CLS"
+def driverZipBaseName = "${baseArtifactId}-driver"
+def zipBaseName = "${baseArtifactId}-cpp"
+def javaBaseName = "${baseArtifactId}-java"
 
 task cppHeadersZip(type: Zip) {
     destinationDirectory = outputsFolder

@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   build-site:
-    name: "Build Site"
+    name: "Build MkDocs"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,8 +31,6 @@ jobs:
           python-version: '3.x'
       - name: Install docs toolchain
         run: |
-          sudo apt-get update
-          sudo apt-get install -y doxygen
           pip install mkdocs mkdocs-material ghp-import
       - name: Build docs site and stage API references
         run: |
@@ -200,18 +198,26 @@ jobs:
           python-version: '3.x'
       - name: Install docs toolchain
         run: |
-          sudo apt-get update
-          sudo apt-get install -y doxygen
           pip install mkdocs mkdocs-material ghp-import
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: deploy/artifacts/
-      - name: Flatten Artifacts
-        run: rsync -a --delete deploy/artifacts/*/* deploy/artifacts/
-      - name: Output tree
+      - name: Prepare JSim.dev
         run: |
-          find deploy/artifacts -type f
+          mkdir -p deploy/artifacts/jsim.dev/maven/
+          mkdir -p deploy/artifacts/jsim.dev/api/javadocs/
+          mkdir -p deploy/artifacts/jsim.dev/doxygen/
+          rsync -a --delete deploy/artifacts/javadocs/*/* deploy/artifacts/jsim.dev/api/javadocs/
+          rsync -a --delete deploy/artifacts/doxygen/*/* deploy/artifacts/jsim.dev/api/doxygen/
+          rsync -a --delete deploy/artifacts/Maven/*/* deploy/artifacts/jsim.dev/maven/
+          rsync -a --delete deploy/artifacts/mkdocs/*/* deploy/artifacts/jsim.dev/
+          find deploy/artifacts/jsim.dev -type f
+      - name: Upload JSim artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: JSim
+          path: deploy/artifacts/jsim.dev/
       - name: Configure git identity for deployment
         run: |
           git config --global user.name github-actions[bot]
