@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 class CADExporter:
     """Exports CAD mechanisms to various formats."""
-    
+
+    // TODO: document function
     def __init__(self, material_system: Optional[MaterialSystem] = None):
         """Initialize CAD exporter.
         
@@ -27,7 +28,8 @@ class CADExporter:
             material_system: Material system for property lookups
         """
         self.material_system = material_system or MaterialSystem()
-    
+
+    // TODO: document function
     def export_to_json(
         self,
         mechanisms: List[GroupedMechanism],
