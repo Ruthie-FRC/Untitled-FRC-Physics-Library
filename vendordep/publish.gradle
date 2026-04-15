@@ -13,7 +13,7 @@ def baseArtifactId = 'JSim'
 def outputsFolder = file("$buildDir/outputs")
 
 def versionFile = file("$outputsFolder/version.txt")
-def releasesRepoUrl = "$releasePath/releases"
+//def releasesRepoUrl = "$releasePath/releases"
 
 task outputVersions() {
     description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
@@ -186,16 +186,16 @@ libraryBuild.dependsOn build
 publishing {
     repositories {
         maven {
-            url = releasesRepoUrl
+//            url = releasesRepoUrl
         }
     }
 }
-
-task cleanReleaseRepo(type: Delete) {
-    delete releasesRepoUrl
-}
-
-tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
+//
+//task cleanReleaseRepo(type: Delete) {
+//    delete releasesRepoUrl
+//}
+//
+//tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
 
 model {
     publishing {

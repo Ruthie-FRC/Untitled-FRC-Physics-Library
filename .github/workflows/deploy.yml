@@ -159,6 +159,38 @@ jobs:
           name: ${{ matrix.artifact-name }}
           path: vendordep/build/allOutputs
 
+#  build-maven:
+#    name: "Build - Maven"
+#    runs-on: ubuntu-latest
+#    env:
+#      releaseVersion: ${{ inputs.releaseVersion }}
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-java@v3
+#        with:
+#          distribution: 'temurin'
+#          java-version: 17
+#      - run: chmod +x gradlew
+#        working-directory: vendordep
+#      - name: Install roboRio toolchain
+#        run: ./gradlew installRoboRioToolchain
+#        working-directory: vendordep
+#      - name: Build vendordep
+#        run: ./gradlew build
+#        working-directory: vendordep
+#      - name: Publish vendordep
+#        run: ./gradlew publish
+#        working-directory: vendordep
+#      - name: Create new vendor JSON
+#        run: cp vendordep/build/maven/yams.json vendordep/build/maven/yams-${{inputs.releaseVersion}}.json
+#      - name: Output artifact list
+#        run: find vendordep/build/maven -type f
+#      - name: Upload Maven artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: JSIM
+#          path: vendordep/build/maven/
+
   combine:
     name: Combine
     needs: [ build-docker, build-host ]
@@ -214,7 +246,7 @@ jobs:
           path: deploy/artifacts/
       - name: Output artifact list
         run: |
-          find deploy/artifacts -type f 
+          find deploy/artifacts -type f
       - name: Add mkdocs to JSim.dev
         run: |
           mv deploy/artifacts/mkdocs deploy/artifacts/jsim.dev/
