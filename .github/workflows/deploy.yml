@@ -272,11 +272,11 @@ jobs:
       - name: Add Javadocs to JSim.dev
         run: |
           mkdir -p deploy/artifacts/jsim.dev/api/javadocs/
-          rsync -a --delete deploy/artifacts/javadocs/ deploy/artifacts/jsim.dev/api/javadocs/
+          rsync -a --delete deploy/artifacts/javadocs/ deploy/artifacts/jsim.dev/api/
       - name: Add Doxygen to JSim.dev
         run: |
           mkdir -p deploy/artifacts/jsim.dev/api/doxygen/
-          rsync -a --delete deploy/artifacts/doxygen/ deploy/artifacts/jsim.dev/api/doxygen/
+          rsync -a --delete deploy/artifacts/doxygen/ deploy/artifacts/jsim.dev/api/
       - name: Output JSim.dev tree
         run: |
           find deploy/artifacts/jsim.dev -type f
