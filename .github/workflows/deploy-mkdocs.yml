@@ -57,7 +57,9 @@ jobs:
       - name: Publish JSim Maven
         working-directory: vendordep
         run: |
+          ./gradlew clean
           ./gradlew publish
+          find build/maven -type f
       - name: Stage maven on docs site
         run: |
           mkdir -p mkdocs/site/maven
