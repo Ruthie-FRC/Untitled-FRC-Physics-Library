@@ -20,6 +20,13 @@ std::unordered_map<std::uint64_t, std::unique_ptr<frcsim::PhysicsWorld>>
     g_worlds;
 std::uint64_t g_next_handle = 1;
 
+
+/**
+ * @brief Retrieves a pointer to the PhysicsWorld associated with the given handle.
+ *
+ * @param handle The unique handle identifying the PhysicsWorld.
+ * @return Pointer to the PhysicsWorld if found, nullptr otherwise.
+ */
 frcsim::PhysicsWorld* getWorld(std::uint64_t handle) {
   const auto it = g_worlds.find(handle);
   if (it == g_worlds.end()) {
@@ -28,6 +35,13 @@ frcsim::PhysicsWorld* getWorld(std::uint64_t handle) {
   return it->second.get();
 }
 
+/**
+ * @brief Retrieves a pointer to a RigidBody from a PhysicsWorld by index.
+ *
+ * @param world Pointer to the PhysicsWorld containing the bodies.
+ * @param body_index Index of the body to retrieve.
+ * @return Pointer to the RigidBody if found, nullptr otherwise.
+ */
 frcsim::RigidBody* getBody(frcsim::PhysicsWorld* world, int body_index) {
   if (!world || body_index < 0) {
     return nullptr;
@@ -43,8 +57,20 @@ frcsim::RigidBody* getBody(frcsim::PhysicsWorld* world, int body_index) {
 }  // namespace
 
 extern "C" {
+
+/**
+ * @brief Example placeholder function. Does nothing.
+ */
 void c_doThing(void) {}
 
+
+/**
+ * @brief Creates a new PhysicsWorld and returns its handle.
+ *
+ * @param fixed_dt_s The fixed timestep in seconds for the simulation. Defaults to 0.01 if <= 0.
+ * @param enable_gravity Nonzero to enable gravity, zero to disable.
+ * @return Handle to the newly created PhysicsWorld.
+ */
 uint64_t c_rsCreateWorld(double fixed_dt_s, int enable_gravity) {
   std::lock_guard<std::mutex> lock(g_world_mutex);
   frcsim::PhysicsConfig config;
@@ -56,6 +82,12 @@ uint64_t c_rsCreateWorld(double fixed_dt_s, int enable_gravity) {
   return handle;
 }
 
+
+/**
+ * @brief Destroys the PhysicsWorld associated with the given handle.
+ *
+ * @param world_handle The handle of the PhysicsWorld to destroy.
+ */
 void c_rsDestroyWorld(uint64_t world_handle) {
   std::lock_guard<std::mutex> lock(g_world_mutex);
   g_worlds.erase(world_handle);
