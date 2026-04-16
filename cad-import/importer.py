@@ -28,10 +28,11 @@ class OnShapeCADImporter:
     """
     
     def __init__(self, accuracy_level: AccuracyLevel = AccuracyLevel.MEDIUM):
-        """Initialize CAD importer.
-        
-        Args:
-            accuracy_level: Desired accuracy level for simulation
+        """
+        Initialize the OnShapeCADImporter.
+
+        @param accuracy_level: Desired accuracy level for simulation (HIGH, MEDIUM, LOW).
+        @details Sets up the importer with the specified accuracy profile, initializes the material system and mechanism extractor, and prepares import metadata storage.
         """
         self.accuracy_level = accuracy_level
         self.accuracy_config = ACCURACY_CONFIGS[accuracy_level]
@@ -40,13 +41,12 @@ class OnShapeCADImporter:
         self.import_metadata: Dict[str, Any] = {}
     
     def import_gltf(self, gltf_path: str) -> bool:
-        """Import glTF file from preprocessed Onshape export.
-        
-        Args:
-            gltf_path: Path to glTF file (.gltf or .glb), typically converted from STEP
-        
-        Returns:
-            True if import successful
+        """
+        Import a glTF file from a preprocessed Onshape export.
+
+        @param gltf_path: Path to the glTF file (.gltf or .glb), typically converted from STEP.
+        @return True if import is successful, False otherwise.
+        @details Checks file existence and format, logs errors, and processes the file for import.
         """
         gltf_path = Path(gltf_path)
         

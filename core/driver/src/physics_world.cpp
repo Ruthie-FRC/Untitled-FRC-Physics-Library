@@ -12,6 +12,12 @@
 
 namespace frcsim {
 
+/**
+ * @brief Creates and adds a new RigidBody to the PhysicsWorld.
+ *
+ * @param mass_kg The mass of the body in kilograms.
+ * @return Reference to the newly created RigidBody.
+ */
 RigidBody& PhysicsWorld::createBody(double mass_kg) {
   bodies_.emplace_back(mass_kg);
   if (!config_.enable_gravity) {
@@ -20,11 +26,23 @@ RigidBody& PhysicsWorld::createBody(double mass_kg) {
   return bodies_.back();
 }
 
+/**
+ * @brief Creates and adds a new RigidAssembly to the PhysicsWorld.
+ *
+ * @return Reference to the newly created RigidAssembly.
+ */
 RigidAssembly& PhysicsWorld::createAssembly() {
   assemblies_.emplace_back();
   return assemblies_.back();
 }
 
+/**
+ * @brief Creates and adds a new BallPhysicsSim3D to the PhysicsWorld.
+ *
+ * @param config Configuration for the ball simulation.
+ * @param properties Physical properties of the ball.
+ * @return Reference to the newly created BallPhysicsSim3D.
+ */
 BallPhysicsSim3D& PhysicsWorld::createBall(
     const BallPhysicsSim3D::Config& config,
     const BallPhysicsSim3D::BallProperties& properties) {
@@ -32,11 +50,21 @@ BallPhysicsSim3D& PhysicsWorld::createBall(
   return balls_.back();
 }
 
+/**
+ * @brief Adds a new EnvironmentalBoundary to the PhysicsWorld.
+ *
+ * @return Reference to the newly added EnvironmentalBoundary.
+ */
 EnvironmentalBoundary& PhysicsWorld::addBoundary() {
   boundaries_.emplace_back();
   return boundaries_.back();
 }
 
+/**
+ * @brief Adds a global force generator to the PhysicsWorld.
+ *
+ * @param generator Shared pointer to the force generator to add.
+ */
 void PhysicsWorld::addGlobalForceGenerator(
     const std::shared_ptr<ForceGenerator>& generator) {
   if (generator) {
@@ -44,6 +72,11 @@ void PhysicsWorld::addGlobalForceGenerator(
   }
 }
 
+/**
+ * @brief Sets the material interaction properties between two materials.
+ *
+ * @param interaction The MaterialInteraction to set.
+ */
 void PhysicsWorld::setMaterialInteraction(
     const MaterialInteraction& interaction) {
   const std::int32_t a = std::min(interaction.material_a_id,

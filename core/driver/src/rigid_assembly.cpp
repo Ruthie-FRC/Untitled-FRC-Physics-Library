@@ -12,11 +12,26 @@
 
 namespace frcsim {
 
+
+/**
+ * @brief Adds a new RigidBody to the assembly.
+ *
+ * @param mass_kg The mass of the body in kilograms.
+ * @return Pointer to the newly added RigidBody.
+ */
 RigidBody* RigidAssembly::addBody(double mass_kg) {
   bodies_.emplace_back(mass_kg);
   return &bodies_.back();
 }
 
+/**
+ * @brief Adds a new RevoluteJoint between two bodies in the assembly.
+ *
+ * @param body_a_idx Index of the first body.
+ * @param body_b_idx Index of the second body.
+ * @param axis_local The local axis of rotation.
+ * @return Pointer to the newly added RevoluteJoint, or nullptr if indices are invalid.
+ */
 RevoluteJoint* RigidAssembly::addRevoluteJoint(size_t body_a_idx,
                                                size_t body_b_idx,
                                                const Vector3& axis_local) {
@@ -29,6 +44,14 @@ RevoluteJoint* RigidAssembly::addRevoluteJoint(size_t body_a_idx,
   return ptr;
 }
 
+/**
+ * @brief Adds a new PrismaticJoint between two bodies in the assembly.
+ *
+ * @param body_a_idx Index of the first body.
+ * @param body_b_idx Index of the second body.
+ * @param axis_local The local axis of translation.
+ * @return Pointer to the newly added PrismaticJoint, or nullptr if indices are invalid.
+ */
 PrismaticJoint* RigidAssembly::addPrismaticJoint(size_t body_a_idx,
                                                  size_t body_b_idx,
                                                  const Vector3& axis_local) {
@@ -41,6 +64,13 @@ PrismaticJoint* RigidAssembly::addPrismaticJoint(size_t body_a_idx,
   return ptr;
 }
 
+/**
+ * @brief Adds a new FixedJoint between two bodies in the assembly.
+ *
+ * @param body_a_idx Index of the first body.
+ * @param body_b_idx Index of the second body.
+ * @return Pointer to the newly added FixedJoint, or nullptr if indices are invalid.
+ */
 FixedJoint* RigidAssembly::addFixedJoint(size_t body_a_idx, size_t body_b_idx) {
   if (body_a_idx >= bodies_.size() || body_b_idx >= bodies_.size())
     return nullptr;
@@ -51,6 +81,11 @@ FixedJoint* RigidAssembly::addFixedJoint(size_t body_a_idx, size_t body_b_idx) {
   return ptr;
 }
 
+/**
+ * @brief Sets the root body index for the assembly.
+ *
+ * @param idx Index of the root body.
+ */
 void RigidAssembly::setRootBodyIndex(size_t idx) {
   if (idx < bodies_.size()) {
     root_body_idx_ = idx;

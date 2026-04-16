@@ -11,6 +11,14 @@
 
 extern "C" {
 
+
+/**
+ * @brief Called when the JNI library is loaded. Used for initialization.
+ *
+ * @param vm Pointer to the JavaVM.
+ * @param reserved Reserved for future use.
+ * @return JNI version on success, JNI_ERR on failure.
+ */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   // Check to ensure the JNI version is valid
 
@@ -24,12 +32,26 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   return JNI_VERSION_1_6;
 }
 
+/**
+ * @brief Called when the JNI library is unloaded. Used for cleanup.
+ *
+ * @param vm Pointer to the JavaVM.
+ * @param reserved Reserved for future use.
+ */
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {}
 
 /*
  * Class:     jsim_jni_JSimJNI
  * Method:    initialize
  * Signature: ()I
+ */
+
+/**
+ * @brief JNI wrapper for initializing the JSim library.
+ *
+ * @param env JNI environment pointer (unused).
+ * @param clazz Java class (unused).
+ * @return Always returns 1.
  */
 JNIEXPORT jint JNICALL
 Java_jsim_jni_JSimJNI_initialize
@@ -43,6 +65,16 @@ Java_jsim_jni_JSimJNI_initialize
  * Class:     jsim_jni_JSimJNI
  * Method:    createWorld
  * Signature: (DZ)J
+ */
+
+/**
+ * @brief JNI wrapper for creating a PhysicsWorld.
+ *
+ * @param env JNI environment pointer (unused).
+ * @param clazz Java class (unused).
+ * @param fixed_dt_seconds Fixed timestep in seconds.
+ * @param enable_gravity Boolean to enable gravity.
+ * @return Handle to the created PhysicsWorld as a jlong.
  */
 JNIEXPORT jlong JNICALL
 Java_jsim_jni_JSimJNI_createWorld
