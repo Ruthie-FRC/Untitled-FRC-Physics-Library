@@ -28,10 +28,19 @@ using frcsim::detail::worldAxisOrFallback;
 
 namespace frcsim {
 
-// FixedJoint constraint solver: enforce zero relative position and rotation.
+/**
+ * @brief FixedJoint constraint solver: enforce zero relative position and rotation.
+ *
+ * This function enforces the fixed joint constraint by correcting both position and velocity
+ * errors between the two connected bodies. It also applies angular corrections based on the
+ * kinematic state and inverse mass of the bodies.
+ *
+ * @param dt_s The timestep in seconds (unused).
+ * @param iterations The number of solver iterations (unused).
+ */
 void FixedJoint::solveConstraint(double /*dt_s*/, int /*iterations*/) {
   if (!is_enabled_ || !body_a_ || !body_b_)
-    return;
+  return;
 
   const Vector3 world_a = worldAnchor(body_a_, anchor_a_);
   const Vector3 world_b = worldAnchor(body_b_, anchor_b_);
@@ -39,25 +48,25 @@ void FixedJoint::solveConstraint(double /*dt_s*/, int /*iterations*/) {
   applyPositionCorrection(body_a_, body_b_, positional_error, 0.8);
 
   const Vector3 relative_linear_velocity =
-      body_b_->linearVelocity() - body_a_->linearVelocity();
+    body_b_->linearVelocity() - body_a_->linearVelocity();
   applyVelocityCorrection(body_a_, body_b_, relative_linear_velocity, 0.65);
 
   const double inv_a =
-      body_a_->flags().is_kinematic ? 0.0 : body_a_->inverseMass();
+    body_a_->flags().is_kinematic ? 0.0 : body_a_->inverseMass();
   const double inv_b =
-      body_b_->flags().is_kinematic ? 0.0 : body_b_->inverseMass();
+    body_b_->flags().is_kinematic ? 0.0 : body_b_->inverseMass();
   const double total_inv = inv_a + inv_b;
   if (total_inv <= kJointEpsilon)
-    return;
+  return;
 
   const Vector3 relative_angular_velocity =
-      body_b_->angularVelocity() - body_a_->angularVelocity();
+    body_b_->angularVelocity() - body_a_->angularVelocity();
   const Vector3 angular_correction_a =
-      relative_angular_velocity * (0.6 * (inv_a / total_inv));
+    relative_angular_velocity * (0.6 * (inv_a / total_inv));
   const Vector3 angular_correction_b =
-      relative_angular_velocity * (0.6 * (inv_b / total_inv));
+    relative_angular_velocity * (0.6 * (inv_b / total_inv));
   if (!body_a_->flags().is_kinematic) {
-    body_a_->setAngularVelocity(body_a_->angularVelocity() +
+  body_a_->setAngularVelocity(body_a_->angularVelocity() +
                                 angular_correction_a);
   }
   if (!body_b_->flags().is_kinematic) {
