@@ -27,10 +27,10 @@ if (project.hasProperty('releaseMode')) {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
-var javaVersion = "17"
+var javaVersion = "21"
 
 // Apply C++ configuration
 apply from: 'config.gradle'
