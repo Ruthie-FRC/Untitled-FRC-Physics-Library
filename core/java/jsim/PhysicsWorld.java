@@ -13,6 +13,13 @@ public final class PhysicsWorld implements AutoCloseable {
 	private long worldHandle;
 
 	/**
+	 * Returns the native world handle for JNI consumers.
+	 */
+	public long getHandle() {
+		return worldHandle;
+	}
+
+	/**
 	 * Creates a native physics world.
 	 *
 	 * @param fixedDtSeconds fixed simulation timestep in seconds
