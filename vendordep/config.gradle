@@ -1,4 +1,4 @@
-import org.gradle.internal.os.OperatingSystem
+
 
 nativeUtils.addWpiNativeUtils()
 nativeUtils.withCrossRoboRIO()
@@ -40,36 +40,22 @@ model {
     }
 }
 
-ext.appendDebugPathToBinaries = { binaries->
-    binaries.withType(StaticLibraryBinarySpec) {
-        if (it.buildType.name.contains('debug')) {
-            def staticFileDir = it.staticLibraryFile.parentFile
-            def staticFileName = it.staticLibraryFile.name
-            def staticFileExtension = staticFileName.substring(staticFileName.lastIndexOf('.'))
-            staticFileName = staticFileName.substring(0, staticFileName.lastIndexOf('.'))
-            staticFileName = staticFileName + 'd' + staticFileExtension
-            def newStaticFile = new File(staticFileDir, staticFileName)
-            it.staticLibraryFile = newStaticFile
-        }
-    }
-    binaries.withType(SharedLibraryBinarySpec) {
-        if (it.buildType.name.contains('debug')) {
-            def sharedFileDir = it.sharedLibraryFile.parentFile
-            def sharedFileName = it.sharedLibraryFile.name
-            def sharedFileExtension = sharedFileName.substring(sharedFileName.lastIndexOf('.'))
-            sharedFileName = sharedFileName.substring(0, sharedFileName.lastIndexOf('.'))
-            sharedFileName = sharedFileName + 'd' + sharedFileExtension
-            def newSharedFile = new File(sharedFileDir, sharedFileName)
 
-            def sharedLinkFileDir = it.sharedLibraryLinkFile.parentFile
-            def sharedLinkFileName = it.sharedLibraryLinkFile.name
-            def sharedLinkFileExtension = sharedLinkFileName.substring(sharedLinkFileName.lastIndexOf('.'))
-            sharedLinkFileName = sharedLinkFileName.substring(0, sharedLinkFileName.lastIndexOf('.'))
-            sharedLinkFileName = sharedLinkFileName + 'd' + sharedLinkFileExtension
-            def newLinkFile = new File(sharedLinkFileDir, sharedLinkFileName)
-
-            it.sharedLibraryLinkFile = newLinkFile
-            it.sharedLibraryFile = newSharedFile
+// Modern Gradle 2026+ debug suffix logic for cpp-library/cpp-application
+// Usage: call appendDebugSuffixToDebugBinaries(library)
+ext.appendDebugSuffixToDebugBinaries = { library ->
+    library.binaries.configureEach { binary ->
+        if (binary.optimized == false && binary.debuggable == true) {
+            // This is a debug binary
+            def file = binary.linkFile ?: binary.archiveFile
+            if (file != null) {
+                def fileName = file.name
+                def ext = fileName.lastIndexOf('.') >= 0 ? fileName.substring(fileName.lastIndexOf('.')) : ''
+                def base = fileName.lastIndexOf('.') >= 0 ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName
+                def newFile = new File(file.parentFile, base + 'd' + ext)
+                if (binary.hasProperty('linkFile')) binary.linkFile = newFile
+                if (binary.hasProperty('archiveFile')) binary.archiveFile = newFile
+            }
         }
     }
 }
@@ -145,29 +131,33 @@ ext.createAllCombined = { list, name, base, type, project ->
     return task
 }
 
-ext.includeStandardZipFormat = { task, value ->
-    value.each { binary ->
-        if (binary.buildable) {
-            if (binary instanceof SharedLibraryBinarySpec) {
-                task.dependsOn binary.tasks.link
-                task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
-                    into nativeUtils.getPlatformPath(binary) + '/shared'
-                }
-                def sharedPath = binary.sharedLibraryFile.absolutePath
-                sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
 
-                task.from(new File(sharedPath + '.pdb')) {
+// Modern Gradle 2026+ zip packaging for cpp-library/cpp-application
+// Usage: call includeModernCppZipFormat(task, library)
+ext.includeModernCppZipFormat = { task, library ->
+    library.binaries.configureEach { binary ->
+        if (binary.buildable) {
+            if (binary.linkFile != null) {
+                task.dependsOn binary.linkTask
+                task.from(binary.linkFile) {
                     into nativeUtils.getPlatformPath(binary) + '/shared'
                 }
-                task.from(binary.sharedLibraryFile) {
-                    into nativeUtils.getPlatformPath(binary) + '/shared'
+                // Optionally include debug symbols or .pdb if present
+                def debugFile = new File(binary.linkFile.absolutePath + '.debug')
+                if (debugFile.exists()) {
+                    task.from(debugFile) {
+                        into nativeUtils.getPlatformPath(binary) + '/shared'
+                    }
                 }
-                task.from(binary.sharedLibraryLinkFile) {
-                    into nativeUtils.getPlatformPath(binary) + '/shared'
+                def pdbFile = new File(binary.linkFile.parentFile, binary.linkFile.name.replace('.dll', '.pdb'))
+                if (pdbFile.exists()) {
+                    task.from(pdbFile) {
+                        into nativeUtils.getPlatformPath(binary) + '/shared'
+                    }
                 }
-            } else  if (binary instanceof StaticLibraryBinarySpec) {
-                task.dependsOn binary.tasks.createStaticLib
-                task.from(binary.staticLibraryFile) {
+            } else if (binary.archiveFile != null) {
+                task.dependsOn binary.archiveTask
+                task.from(binary.archiveFile) {
                     into nativeUtils.getPlatformPath(binary) + '/static'
                 }
             }
