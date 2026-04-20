@@ -11,6 +11,19 @@ plugins {
     id 'org.ysb33r.doxygen' version "2.1.1"
     id 'com.diffplug.spotless' version '8.0.0'
 }
+// Ensure driver cpp directory exists to avoid Gradle errors
+def driverCppDir = file('src/main/driver/cpp')
+if (!driverCppDir.exists() || !driverCppDir.isDirectory()) {
+    if (driverCppDir.exists()) driverCppDir.delete()
+    driverCppDir.mkdirs()
+}
+
+// Ensure driver include directory exists to avoid Gradle errors
+def driverIncludeDir = file('src/main/driver/include')
+if (!driverIncludeDir.exists() || !driverIncludeDir.isDirectory()) {
+    if (driverIncludeDir.exists()) driverIncludeDir.delete()
+    driverIncludeDir.mkdirs()
+}
 
 // Ensure native cpp directory exists to avoid Gradle errors
 def nativeCppDir = file('src/main/native/cpp')
