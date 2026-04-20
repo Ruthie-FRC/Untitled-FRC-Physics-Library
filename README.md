@@ -11,8 +11,6 @@ JSim is an open source, FRC physics library for simulation, analysis, and roboti
 
 This repository is organized as a monorepo containing the core simulation engine, language bindings, runtime apps, examples, and documentation tooling.
 
-## Quick Start
-
 ## Vendordep URL
 ```
 https://jsim.dev/JSim.json
