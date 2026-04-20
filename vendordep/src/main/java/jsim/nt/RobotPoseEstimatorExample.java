@@ -10,6 +10,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * Example usage of RobotPoseEstimator in a JSim simulation loop.
  */
 public class RobotPoseEstimatorExample {
+    /**
+     * Runs the RobotPoseEstimator simulation example.
+     *
+     * @param args Command-line arguments (not used)
+     */
     public static void main(String[] args) {
         // Create a physics world with 20ms timestep and gravity enabled
         PhysicsWorld world = new PhysicsWorld(0.02, true);

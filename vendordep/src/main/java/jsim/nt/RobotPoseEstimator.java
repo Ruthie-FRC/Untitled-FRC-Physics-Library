@@ -12,6 +12,8 @@ public class RobotPoseEstimator {
     private final DifferentialDriveOdometry odometry;
 
     /**
+     * Constructs a RobotPoseEstimator.
+     *
      * @param initialPose Initial robot pose
      * @param initialGyroRadians Initial gyro angle (radians, CCW+)
      */
@@ -26,6 +28,7 @@ public class RobotPoseEstimator {
 
     /**
      * Updates the pose estimator with new sensor readings.
+     *
      * @param leftMeters Total left encoder distance (meters)
      * @param rightMeters Total right encoder distance (meters)
      * @param gyroRadians Current gyro angle (radians, CCW+)
@@ -37,6 +40,8 @@ public class RobotPoseEstimator {
 
     /**
      * Gets the current estimated pose.
+     *
+     * @return The current estimated pose
      */
     public Pose2d getEstimatedPose() {
         return odometry.getPoseMeters();

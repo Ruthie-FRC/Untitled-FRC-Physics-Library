@@ -12,6 +12,8 @@ public class AdvancedRobotPoseEstimator {
     private final DifferentialDrivePoseEstimator estimator;
 
     /**
+     * Constructs an AdvancedRobotPoseEstimator.
+     *
      * @param kinematics DifferentialDriveKinematics instance for your robot
      * @param initialPose Initial robot pose
      * @param initialGyroRadians Initial gyro angle (radians, CCW+)
@@ -37,11 +39,11 @@ public class AdvancedRobotPoseEstimator {
 
     /**
      * Updates the pose estimator with new sensor readings.
+     *
      * @param gyroRadians Current gyro angle (radians, CCW+)
      * @param leftMeters Total left encoder distance (meters)
      * @param rightMeters Total right encoder distance (meters)
-     * @param wheelSpeeds Current wheel speeds (m/s)
-     * @param dtSeconds Time since last update (seconds)
+     * @param timestampSeconds Timestamp of the measurement (seconds)
      * @return Estimated robot pose
      */
     public Pose2d update(double gyroRadians, double leftMeters, double rightMeters, double timestampSeconds) {
@@ -55,6 +57,7 @@ public class AdvancedRobotPoseEstimator {
 
     /**
      * Adds a vision measurement to the estimator.
+     *
      * @param visionPose The pose measured by vision
      * @param timestampSeconds The timestamp of the vision measurement
      */
@@ -64,6 +67,8 @@ public class AdvancedRobotPoseEstimator {
 
     /**
      * Gets the current estimated pose.
+     *
+     * @return The current estimated pose
      */
     public Pose2d getEstimatedPose() {
         return estimator.getEstimatedPosition();
