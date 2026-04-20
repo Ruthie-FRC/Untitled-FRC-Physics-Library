@@ -37,9 +37,9 @@ public class AdvancedRobotPoseEstimator {
             0.0, // initial left encoder
             0.0, // initial right encoder
             initialPose,
-            VecBuilder.fill(stateStdDevs[0], stateStdDevs[1], stateStdDevs[2]),
-            VecBuilder.fill(localMeasurementStdDevs[0], localMeasurementStdDevs[1], localMeasurementStdDevs[2]),
-            VecBuilder.fill(visionMeasurementStdDevs[0], visionMeasurementStdDevs[1], visionMeasurementStdDevs[2])
+            VecBuilder.fill(stateStdDevs[0], stateStdDevs[1], stateStdDevs[2]).reshape(3, 1),
+            VecBuilder.fill(localMeasurementStdDevs[0], localMeasurementStdDevs[1], localMeasurementStdDevs[2]).reshape(3, 1),
+            VecBuilder.fill(visionMeasurementStdDevs[0], visionMeasurementStdDevs[1], visionMeasurementStdDevs[2]).reshape(3, 1)
         );
     }
 
