@@ -23,7 +23,7 @@ public class RobotPoseEstimatorExample {
         // Initial pose and gyro
         Pose2d initialPose = new Pose2d(0.0, 0.0, new Rotation2d(0.0));
         double initialGyro = 0.0;
-    PoseEstimator estimator = new PoseEstimator(initialPose, initialGyro);
+    RobotPoseEstimator estimator = new RobotPoseEstimator(initialPose, initialGyro);
 
     // Simulated encoder and gyro values
     double leftEncoder = 0.0;
@@ -38,22 +38,23 @@ public class RobotPoseEstimatorExample {
         leftEncoder += wheelDelta;
         rightEncoder += wheelDelta;
         // Simulate gyro (no rotation)
-            gyro = 0.0;
+        gyro = 0.0;
 
-            // Update estimator
-            Pose2d estimatedPose = estimator.update(leftEncoder, rightEncoder, gyro);
+        // Update estimator
+        Pose2d estimatedPose = estimator.update(leftEncoder, rightEncoder, gyro);
 
-            // Optionally, update the robot's true position in the world (for ground truth)
-            robot.setPosition(new Vec3(estimatedPose.getX(), estimatedPose.getY(), 0.0));
+        // Optionally, update the robot's true position in the world (for ground truth)
+        robot.setPosition(new Vec3(estimatedPose.getX(), estimatedPose.getY(), 0.0));
 
-            // Print estimated pose
-            System.out.printf("Step %d: Estimated Pose: x=%.3f, y=%.3f, theta=%.3f\n",
-                i, estimatedPose.getX(), estimatedPose.getY(), estimatedPose.getRotation().getRadians());
+        // Print estimated pose
+        System.out.printf("Step %d: Estimated Pose: x=%.3f, y=%.3f, theta=%.3f\n",
+            i, estimatedPose.getX(), estimatedPose.getY(), estimatedPose.getRotation().getRadians());
 
-            // Advance simulation
-            world.step();
-        }
-
-        world.close();
+        // Advance simulation
+        world.step();
     }
+
+    world.close();
+}
+// Add missing closing brace for class
 }
