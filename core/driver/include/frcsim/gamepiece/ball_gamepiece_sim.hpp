@@ -41,7 +41,7 @@ class BallGamepieceSim {
    * APIs. */
   enum class GamePieceType {
   kBall,
-  kFuel, // Fuel gamepiece type
+  kFuel2026, // Fuel gamepiece type
   kCustom1,
   kCustom2,
   kCustom3,
