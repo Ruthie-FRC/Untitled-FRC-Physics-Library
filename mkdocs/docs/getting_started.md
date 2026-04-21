@@ -2,6 +2,12 @@
 
 Use this section as the entry point for integrating JSim into your project.
 
+## Vendordep URL
+
+```
+https://jsim.dev/JSim.json
+```
+
 ## Build and Test
 
 From the repository root:
