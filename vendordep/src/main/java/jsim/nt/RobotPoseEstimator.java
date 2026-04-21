@@ -31,6 +31,37 @@ public class RobotPoseEstimator {
 	/** True if using advanced estimator. */
 	private boolean advanced = false;
 
+	/** Internal pose for direct chassis speeds integration (for swerve/mecanum sim). */
+	private Pose2d directPose = null;
+
+	/**
+	 * Updates the pose using chassis speeds (vx, vy, omega) and timestep.
+	 * This is useful for swerve/mecanum simulation where the sim provides chassis speeds directly.
+	 *
+	 * @param vxMetersPerSec Chassis velocity in X (meters/sec, field-relative)
+	 * @param vyMetersPerSec Chassis velocity in Y (meters/sec, field-relative)
+	 * @param omegaRadPerSec Chassis angular velocity (radians/sec, CCW+)
+	 * @param dtSeconds Timestep (seconds)
+	 * @return Updated pose after integration
+	 */
+	public Pose2d updateWithChassisSpeeds(double vxMetersPerSec, double vyMetersPerSec, double omegaRadPerSec, double dtSeconds) {
+		Pose2d pose = getEstimatedPose();
+		double newX = pose.getX() + vxMetersPerSec * dtSeconds;
+		double newY = pose.getY() + vyMetersPerSec * dtSeconds;
+		double newTheta = pose.getRotation().getRadians() + omegaRadPerSec * dtSeconds;
+		Pose2d newPose = new Pose2d(newX, newY, new Rotation2d(newTheta));
+
+		// If using odometry/estimator, forcibly reset their internal pose
+		if (advanced && estimator != null) {
+			estimator.resetPosition(new Rotation2d(newTheta), 0.0, 0.0, newPose);
+		} else if (odometry != null) {
+			odometry.resetPosition(new Rotation2d(newTheta), 0.0, 0.0, newPose);
+		}
+		// Also store for direct mode
+		directPose = newPose;
+		return newPose;
+	}
+
 	/**
 	 * Constructs a simple odometry estimator (no vision integration).
 	 *
