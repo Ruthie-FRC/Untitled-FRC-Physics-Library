@@ -124,7 +124,7 @@ Assumptions and limitations:
 
 When these effects are omitted, indicate expected mismatch regimes (for example, direction reversals, near-zero speed hold).
 
-## Shooter wheel baseline
+## Flywheel wheel baseline
 
 Rotational speed dynamics:
 

@@ -141,7 +141,7 @@ class ShotCalculator3D {
 
   /**
    * @brief Computes a shot solution for current robot/target kinematics.
-   * @param shooter_origin_m Shooter origin in world coordinates.
+   * @param shooter_origin_m Flywheel origin in world coordinates.
    * @param robot_velocity_mps Robot chassis velocity in world frame.
    * @param target_position_m Target center position in world coordinates.
    * @param now_s Current timestamp in seconds.

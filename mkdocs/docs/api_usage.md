@@ -34,7 +34,7 @@ Typical flow:
 Use the Java example as the reference entry point:
 
 ```java
-// See examples/java/ShooterPredictionExample.java for usage.
+// See examples/java/FlywheelPredictionExample.java for usage.
 ```
 
 Typical flow:

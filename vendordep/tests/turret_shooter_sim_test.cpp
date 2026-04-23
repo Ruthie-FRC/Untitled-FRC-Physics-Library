@@ -4,7 +4,7 @@
 #include "frcsim/mechanisms/turret_shooter_sim.hpp"
 
 int main() {
-    frcsim::TurretShooterSim::Config config;
+    frcsim::TurretFlywheelSim::Config config;
     config.turret_mount_position_m = frcsim::Vector3(1.0, 2.0, 0.6);
     config.muzzle_offset_local_m = frcsim::Vector3(0.4, 0.0, 0.2);
     config.intake_offset_local_m = frcsim::Vector3(0.2, 0.0, 0.0);
@@ -15,7 +15,7 @@ int main() {
     config.differential.m10 = 0.5;
     config.differential.m11 = -0.5;
 
-    frcsim::TurretShooterSim sim(config);
+    frcsim::TurretFlywheelSim sim(config);
 
     frcsim::DoubleDifferentialMechanism::MotorState motors;
     // Yaw=(a+b)/2=0.5 rad, Pitch=(a-b)/2=0.1 rad.

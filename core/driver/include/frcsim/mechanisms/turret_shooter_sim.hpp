@@ -16,7 +16,7 @@ namespace frcsim {
 
 /** @brief Integrated turret + shooter + carried-ball simulator for aiming,
  * pickup, and firing flows. */
-class TurretShooterSim {
+class TurretFlywheelSim {
  public:
   /** @brief Configuration for differential kinematics, ball model, and local mount geometry. */
   struct Config {
@@ -42,13 +42,13 @@ class TurretShooterSim {
     Vector3 carry_offset_local_m{0.05, 0.0, -0.02};
   };
 
-  TurretShooterSim() = default;
+  TurretFlywheelSim() = default;
 
   /**
    * @brief Constructs simulator from explicit configuration.
    * @param config Initial turret/shooter/ball configuration.
    */
-  explicit TurretShooterSim(const Config& config)
+  explicit TurretFlywheelSim(const Config& config)
       : config_(config),
         differential_(config.differential),
         ball_(config.ball_config, config.ball_properties) {}
@@ -180,10 +180,10 @@ class TurretShooterSim {
 
   /**
    * @brief Fires the ball using wheel-estimated exit velocity.
-   * @param wheel Shooter wheel model used for speed estimate.
+   * @param wheel Flywheel wheel model used for speed estimate.
    * @param spin_radps Launch spin vector in rad/s.
    */
-  void shootWithWheel(const ShooterWheelSim& wheel,
+  void shootWithWheel(const FlywheelWheelSim& wheel,
                       const Vector3& spin_radps = Vector3::zero()) {
     shoot(wheel.estimatedExitVelocityMps(), spin_radps);
   }

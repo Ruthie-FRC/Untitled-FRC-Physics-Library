@@ -6,8 +6,8 @@ import jsim.PhysicsBody;
 import jsim.PhysicsWorld;
 import jsim.Vec3;
 
-public final class ShooterPredictionExample {
-	private ShooterPredictionExample() {}
+public final class FlywheelPredictionExample {
+	private FlywheelPredictionExample() {}
 
 	public static void main(String[] args) {
 		try (PhysicsWorld world = new PhysicsWorld(0.01, true)) {

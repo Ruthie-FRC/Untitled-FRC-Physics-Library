@@ -11,7 +11,7 @@ namespace frcsim {
 
 /** @brief Single-wheel shooter velocity model with optional closed-loop speed
  * command behavior. */
-class ShooterWheelSim {
+class FlywheelWheelSim {
  public:
   /** @brief DC motor approximation constants for shooter drive. */
   struct MotorConfig {
@@ -73,7 +73,7 @@ class ShooterWheelSim {
     }
   };
 
-  /** @brief Shooter wheel inertial/friction and ball-coupling parameters. */
+  /** @brief Flywheel wheel inertial/friction and ball-coupling parameters. */
   struct WheelConfig {
     double radius_m{0.05};
     double inertia_kgm2{0.0025};
@@ -101,7 +101,7 @@ class ShooterWheelSim {
     double friction_voltage_v{0.0};
   };
 
-  ShooterWheelSim() = default;
+  FlywheelWheelSim() = default;
 
   /**
    * @brief Constructs a wheel simulator with explicit motor and wheel
@@ -109,7 +109,7 @@ class ShooterWheelSim {
    * @param motor Motor configuration constants.
    * @param wheel Wheel mechanical configuration.
    */
-  ShooterWheelSim(const MotorConfig& motor, const WheelConfig& wheel)
+  FlywheelWheelSim(const MotorConfig& motor, const WheelConfig& wheel)
       : motor_(motor), wheel_(wheel) {}
 
   /** @brief Sets motor constants. @param motor New motor configuration. */

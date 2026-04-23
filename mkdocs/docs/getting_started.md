@@ -35,7 +35,7 @@ mkdocs serve --config-file mkdocs/mkdocs.yml
 ## Example Entry Points
 
 - C++: `examples/cpp/minimal_world.cpp`
-- Java: `examples/java/ShooterPredictionExample.java`
+- Java: `examples/java/FlywheelPredictionExample.java`
 - Python: `examples/python/simple_world_demo.py`
 
 ## Repository Areas

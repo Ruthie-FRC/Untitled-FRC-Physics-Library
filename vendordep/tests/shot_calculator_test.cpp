@@ -90,7 +90,7 @@ int main() {
     assert(!bad_query.is_valid);
 
     // Integration with turret differential math.
-    frcsim::TurretShooterSim sim;
+    frcsim::TurretFlywheelSim sim;
     const bool applied = sim.applyAim(shot.turret_yaw_rad, shot.hood_pitch_rad);
     assert(applied);
 

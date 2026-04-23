@@ -40,7 +40,7 @@ cd vendordep
 
 - C++: `examples/cpp/minimal_world.cpp`
 - Python: `examples/python/simple_world_demo.py`
-- Java: `examples/java/ShooterPredictionExample.java`
+- Java: `examples/java/FlywheelPredictionExample.java`
 
 
 ## Documentation Map

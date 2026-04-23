@@ -23,7 +23,7 @@ Complete vendordep package with:
 - `Vec3`: 3D vector type
 
 ### Examples
-- [ShooterPredictionExample.java](examples/java/ShooterPredictionExample.java): Projectile trajectory with gravity
+- [FlywheelPredictionExample.java](examples/java/FlywheelPredictionExample.java): Projectile trajectory with gravity
 
 ## Building
 
