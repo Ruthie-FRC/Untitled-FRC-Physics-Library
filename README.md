@@ -22,13 +22,6 @@ https://jsim.dev/JSim.json
 ./scripts/build-all.sh
 ```
 
-For vendordep-only builds:
-
-```bash
-cd vendordep
-./gradlew test
-```
-
 ### Run Tests
 
 Run the vendordep Gradle test task used in CI:
@@ -40,7 +33,7 @@ cd vendordep
 
 This command runs Java tests plus the standalone native verification suite in `vendordep/tests/` through Gradle.
 
-Vendordep build tooling currently requires Java 21.
+Vendordep build tooling requires Java 21.
 
 ### Preview Docs Locally
 
