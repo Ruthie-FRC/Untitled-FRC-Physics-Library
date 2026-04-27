@@ -1,4 +1,3 @@
-
 package jsim.api;
 
 import jsim.driver.WPILibClones.Translation2d;
@@ -8,7 +7,11 @@ import jsim.api.RobotID;
 import jsim.api.FieldState;
 import jsim.core.StateManager;
 
-public class SimRobot {
+/**
+ * Minimal simulation-side robot representation used by example code.
+ * The createRobot factory mirrors the usage in examples and stores a simple footprint.
+ */
+public final class SimRobot {
     private final RobotID robotID;
     private final StateManager stateManager;
     private final FieldState<RobotState> stateManagerRef;
