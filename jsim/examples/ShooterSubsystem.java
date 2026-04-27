@@ -1,9 +1,9 @@
 
-package jsim.examples;
+package examples;
 
-import jsim.api.SimRobot;
-import jsim.api.GamepieceZone;
-import jsim.driver.WPILibClones.Rotation3d;
+import api.SimRobot;
+import api.GamepieceZone;
+import driver.WPILibClones.Rotation3d;
 
 public class ShooterSubsystem {
     private final GamepieceZone zone;

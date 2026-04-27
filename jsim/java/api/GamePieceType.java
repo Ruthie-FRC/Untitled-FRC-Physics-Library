@@ -1,4 +1,4 @@
-package jsim.api;
+package api;
 
 /**
  * Minimal game piece type enum used by the user-facing API and examples.

@@ -1,4 +1,4 @@
-package jsim.api;
+package api;
 
 public class FieldState<T> {
     private T state;

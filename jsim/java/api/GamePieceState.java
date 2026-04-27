@@ -1,8 +1,8 @@
-package jsim.api;
+package api;
 
-import jsim.driver.WPILibClones.Rotation3d;
-import jsim.driver.WPILibClones.Translation2d;
-import jsim.driver.WPILibClones.Translation3d;
+import driver.WPILibClones.Rotation3d;
+import driver.WPILibClones.Translation2d;
+import driver.WPILibClones.Translation3d;
 
 public class GamePieceState {
     private GamePieceType type;
@@ -72,7 +72,7 @@ public class GamePieceState {
     // Children classes for specific game pieces
     public static class Fuel2026 extends GamePieceState {
         public Fuel2026() { super(GamePieceType.FUEL); }
-        public void shoot(jsim.driver.WPILibClones.Translation3d relativeStart, double timeOfFlight, jsim.driver.WPILibClones.Rotation3d exitAngle) {
+        public void shoot(driver.WPILibClones.Translation3d relativeStart, double timeOfFlight, driver.WPILibClones.Rotation3d exitAngle) {
             // Minimal placeholder: record exit angle and velocity magnitude/time if needed.
             setExitAngle(exitAngle);
             // TODO: implement domain-specific prediction if required
@@ -81,7 +81,7 @@ public class GamePieceState {
 
     public static class Coral2025 extends GamePieceState {
         public Coral2025() { super(GamePieceType.CORAL); }
-        public void place(jsim.driver.WPILibClones.Pose3d branch) {
+        public void place(driver.WPILibClones.Pose3d branch) {
             // TODO: Implement placement logic — placeholder to satisfy API surface.
         }
     }

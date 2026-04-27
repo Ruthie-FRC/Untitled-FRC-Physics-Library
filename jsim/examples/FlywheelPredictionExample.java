@@ -1,10 +1,10 @@
 
-package jsim.examples;
+package examples;
 
-import jsim.api.SimRobot;
-import jsim.api.GamepieceZone;
-import jsim.driver.WPILibClones.Rotation3d;
-import jsim.driver.WPILibClones.Translation2d;
+import api.SimRobot;
+import api.GamepieceZone;
+import driver.WPILibClones.Rotation3d;
+import driver.WPILibClones.Translation2d;
 
 public final class FlywheelPredictionExample {
     private FlywheelPredictionExample() {}

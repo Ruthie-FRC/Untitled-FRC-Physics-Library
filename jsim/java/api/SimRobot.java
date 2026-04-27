@@ -1,11 +1,11 @@
-package jsim.api;
+package api;
 
-import jsim.driver.WPILibClones.Translation2d;
-import jsim.driver.WPILibClones.Pose2d;
-import jsim.driver.WPILibClones.ChassisSpeeds;
-import jsim.api.RobotID;
-import jsim.api.FieldState;
-import jsim.core.StateManager;
+import driver.WPILibClones.Translation2d;
+import driver.WPILibClones.Pose2d;
+import driver.WPILibClones.ChassisSpeeds;
+import api.RobotID;
+import api.FieldState;
+import core.StateManager;
 
 /**
  * Minimal simulation-side robot representation used by example code.
