@@ -1,18 +1,20 @@
+
 package frc.robot.sim.core;
 
 import frc.robot.sim.api.GamePieceState;
 import frc.robot.sim.api.GamePieceType;
 import edu.wpi.first.math.geometry.Rotation3d;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*
-;
 
 public class StateManager {
-
     private final Map<String, List<GamePieceState>> robotInventory = new HashMap<>();
     private final Map<String, Integer> robotCapacity = new HashMap<>();
     private final Map<GamePieceType, PieceConfig> pieceConfigs = new HashMap<>();
-
     private final List<GamePieceState> fieldPieces = new ArrayList<>();
     private final Map<GamePieceType, Integer> fieldCounts = new HashMap<>();
 
@@ -53,56 +55,51 @@ public class StateManager {
     public boolean intake(String robotId, GamePieceState piece) {
         robotInventory.putIfAbsent(robotId, new ArrayList<>());
         List<GamePieceState> held = robotInventory.get(robotId);
-
-        if (held.size() >= getRobotCapacity(robotId)) return false;
-
+        if (held.size() >= getRobotCapacity(robotId)) {
+            return false;
+        }
         fieldPieces.remove(piece);
         decrementField(piece.getType());
-
         held.add(piece);
         return true;
     }
 
     public boolean outtake(String robotId, GamePieceType type, double velocity, Rotation3d rotation) {
         List<GamePieceState> held = robotInventory.get(robotId);
-        if (held == null || held.isEmpty()) return false;
-
+        if (held == null || held.isEmpty()) {
+            return false;
+        }
         Iterator<GamePieceState> it = held.iterator();
-
         while (it.hasNext()) {
             GamePieceState p = it.next();
-
             if (p.getType() == type) {
                 it.remove();
-
                 GamePieceState spawned = spawnFieldPiece(type, velocity, rotation);
-                if (spawned == null) return false;
-
+                if (spawned == null) {
+                    return false;
+                }
                 fieldPieces.add(spawned);
                 return true;
             }
         }
-
         return false;
     }
 
     private GamePieceState spawnFieldPiece(GamePieceType type, double velocity, Rotation3d rotation) {
         PieceConfig cfg = pieceConfigs.get(type);
-
         if (cfg != null) {
-            if (cfg.spawnedSoFar >= cfg.maxSpawnTotal) return null;
-            if (getFieldCount(type) >= cfg.maxOnField) return null;
-
+            if (cfg.spawnedSoFar >= cfg.maxSpawnTotal) {
+                return null;
+            }
+            if (getFieldCount(type) >= cfg.maxOnField) {
+                return null;
+            }
             cfg.spawnedSoFar++;
         }
-
         GamePieceState piece = new GamePieceState(type);
-
         piece.setVelocity(velocity);
         piece.setRotation(rotation);
-
         incrementField(type);
-
         return piece;
     }
 }
