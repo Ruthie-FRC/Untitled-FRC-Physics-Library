@@ -211,14 +211,13 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/driver/cpp'
+                        srcDirs '../../core/cpp', '../../core/jni'                       
                         include '**/*.cpp'
                         exclude nativeFromDriverExcludes
                         exclude driverWpilibCExcludes
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/driver/include'
-                    }
+                        srcDirs '../../core/cpp'                    }
                 }
             }
             binaries.all {
@@ -237,13 +236,12 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/driver/cpp'
+                        srcDirs '../../core/cpp', '../../core/jni'                        
                         include '**/*.cpp'
                         exclude driverWpilibCExcludes
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/driver/include'
-                    }
+                        srcDirs '../../core/cpp'                    }
                 }
             }
 
