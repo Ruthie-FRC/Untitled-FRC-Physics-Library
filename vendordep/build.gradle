@@ -212,7 +212,7 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/driver/cpp'
-                        include 'src/main/driver/include'
+                        include '**/*.cpp'
                         exclude nativeFromDriverExcludes
                         exclude driverWpilibCExcludes
                     }
@@ -229,7 +229,6 @@ model {
 
         JSimDriver(JniNativeLibrarySpec) {
             enableCheckTask true
-            linkage = ['shared']
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             // Leave these for future proofing
