@@ -145,42 +145,7 @@ public class GamePieceState {
 
     // Children classes for specific game pieces
 
-    /**
-     * Represents a 2026 Fuel game piece.
-     */
-    public static class Fuel2026 extends GamePieceState {
-        /**
-         * Constructs a Fuel2026 game piece.
-         */
-        public Fuel2026() { super(GamePieceType.FUEL); }
+    // Fuel2026 class moved to its own file.
 
-        /**
-         * Simulates shooting the fuel game piece.
-         * @param relativeStart The relative start position.
-         * @param timeOfFlight The time of flight.
-         * @param exitAngle The exit angle.
-         */
-        public void shoot(Translation3d relativeStart, double timeOfFlight, Rotation3d exitAngle) {
-            setExitAngle(exitAngle);
-            // TODO: implement domain-specific prediction if required
-        }
-    }
-
-    /**
-     * Represents a 2025 Coral game piece.
-     */
-    public static class Coral2025 extends GamePieceState {
-        /**
-         * Constructs a Coral2025 game piece.
-         */
-        public Coral2025() { super(GamePieceType.CORAL); }
-
-        /**
-         * Simulates placing the coral game piece.
-         * @param branch The pose where the coral is placed.
-         */
-        public void place(api.Pose3d branch) {
-            // TODO: Implement placement logic — placeholder to satisfy API surface.
-        }
-    }
+    // Coral2025 class moved to its own file.
 }
