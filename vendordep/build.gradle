@@ -229,6 +229,7 @@ model {
 
         JSimDriver(JniNativeLibrarySpec) {
             enableCheckTask true
+            linkage = ['shared']
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             // Leave these for future proofing
