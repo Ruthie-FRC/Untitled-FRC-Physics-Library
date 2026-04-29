@@ -1,5 +1,3 @@
-package frc.robot.sim.core;
-
 import api.GamePieceState;
 import api.GamePieceType;
 import api.Rotation3d;
