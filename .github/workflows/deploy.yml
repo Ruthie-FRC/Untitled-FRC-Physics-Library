@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 17
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 17
       - name: Install Doxygen
         run: |
           sudo apt-get update
@@ -173,7 +173,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 17
           architecture: ${{ matrix.architecture }}
       - name: Build with Gradle
         working-directory: vendordep
@@ -257,7 +257,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 17
       - name: Combine
         run: ./gradlew publish -Pthirdparty -PreleaseRepoPublish
         working-directory: combiner

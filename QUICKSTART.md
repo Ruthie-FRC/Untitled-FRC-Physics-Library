@@ -35,7 +35,7 @@ Complete vendordep package with:
 This script is safe to run from any working directory and handles both native and vendordep builds.
 
 ### Vendordep (Java)
-Requires Java 21:
+Requires Java 17:
 ```bash
 cd vendordep
 ./gradlew build
