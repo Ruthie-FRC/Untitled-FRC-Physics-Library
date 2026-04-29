@@ -212,7 +212,7 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/driver/cpp'
-                        include 'src/main/drvier/include'
+                        include 'src/main/driver/include'
                         exclude nativeFromDriverExcludes
                         exclude driverWpilibCExcludes
                     }
