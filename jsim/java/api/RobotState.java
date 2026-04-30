@@ -1,10 +1,10 @@
 package api;
 
 public class RobotState {
-    private Pose2d pose;
-    private Translation2d[] frameVertices;
-    private ChassisSpeeds chassisSpeeds;
-    private final RobotID id;
+    public Pose2d pose;
+    public final Translation2d[] frameVertices;
+    public ChassisSpeeds chassisSpeeds;
+    public final RobotID id;
 
     public RobotState(RobotID id, Pose2d pose, Translation2d[] frameVertices) {
         this.id = id;
@@ -13,23 +13,23 @@ public class RobotState {
         this.chassisSpeeds = new ChassisSpeeds(0,0,0);
     }
 
-    public Pose2d getPose() {
+    public Pose2d getPose(RobotID id) {
         return pose;
     }
 
-    public void setPose(Pose2d pose) {
+    public void setPose(Pose2d pose, RobotID id) {
         this.pose = pose;
     }
 
-    public Translation2d[] getFrameVertices() {
+    public Translation2d[] getFrameVertices(RobotID id) {
         return frameVertices;
     }
 
-    public ChassisSpeeds getChassisSpeeds() {
+    public ChassisSpeeds getChassisSpeeds(RobotID id) {
         return chassisSpeeds;
     }
 
-    public void setChassisSpeeds(ChassisSpeeds speeds) {
+    public void setChassisSpeeds(ChassisSpeeds speeds, RobotID id) {
         this.chassisSpeeds = speeds;
     }
 }
