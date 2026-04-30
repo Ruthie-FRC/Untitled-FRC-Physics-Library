@@ -133,8 +133,6 @@ doxygen {
 nativeUtils {
     exportsConfigs {
         JSim {
-            exportsFile = project.file("build/tmp/jsim.exports.txt")
-
             x86ExcludeSymbols = [
                 '_CT??_R0?AV_System_error',
                 '_CT??_R0?AVexception',
@@ -148,13 +146,11 @@ nativeUtils {
                 '_TI3?AVout_of_range',
                 '_CT??_R0?AVbad_cast'
             ]
-            
             x64ExcludeSymbols = x86ExcludeSymbols
         }
     }
 
     privateExportsConfigs {
-        // JNI layer → ONLY export what Java needs
         JSimDriver {
             exportsFile = project.file("src/main/driver/symbols.txt")
         }
