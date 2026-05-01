@@ -11,17 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Handles all robot-related simulation state:
- * - Pose
- * - Chassis speeds
- * - FieldState reference
- *
- * Separate from game piece logic (StateManager).
+ * Owns and mutates RobotState for simulation.
+ * Single source of truth for robot motion state.
  */
 public class RobotStateManager {
 
-    private final Map<RobotID, Pose2d> robotPoses = new HashMap<>();
-    private final Map<RobotID, ChassisSpeeds> robotSpeeds = new HashMap<>();
     private final Map<RobotID, FieldState<RobotState>> robotStates = new HashMap<>();
 
     /**
@@ -32,8 +26,8 @@ public class RobotStateManager {
             Pose2d initialPose,
             Translation2d[] frameDimensions
     ) {
-        robotPoses.put(id, initialPose);
-        robotSpeeds.put(id, new ChassisSpeeds(0, 0, 0));
+        RobotState state = new RobotState(id, initialPose, frameDimensions);
+        FieldState<RobotState> fieldState = new FieldState<>(state);
 
         FieldState<RobotState> state =
             new FieldState<>(new RobotState(id, initialPose, frameDimensions));        
@@ -41,52 +35,47 @@ public class RobotStateManager {
         return state;
     }
 
-    /**
-     * Returns the current pose of the robot.
-     */
+    // =========================
+    // POSE CONTROL
+    // =========================
+
     public Pose2d getRobotPose(RobotID id) {
-        Pose2d pose = robotPoses.get(id);
-        if (pose == null) {
-            throw new IllegalStateException("Robot not initialized: " + id);
-        }
-        return pose;
+        return get(id).getState().pose;
     }
 
-    /**
-     * Hard reset of robot pose.
-     */
     public void resetRobotPose(RobotID id, Pose2d pose) {
-        if (!robotPoses.containsKey(id)) {
-            throw new IllegalStateException("Robot not initialized: " + id);
-        }
-        robotPoses.put(id, pose);
+        get(id).getState().pose = pose;
     }
 
-    /**
-     * Sets chassis speeds (vx, vy, omega).
-     */
+    // =========================
+    // CHASSIS SPEEDS
+    // =========================
+
     public void setChassisSpeeds(RobotID id, ChassisSpeeds speeds) {
-        if (!robotSpeeds.containsKey(id)) {
-            throw new IllegalStateException("Robot not initialized: " + id);
-        }
-        robotSpeeds.put(id, speeds);
+        get(id).getState().chassisSpeeds = speeds;
     }
 
-    /**
-     * Optional: expose speeds if your sim loop needs them.
-     */
     public ChassisSpeeds getChassisSpeeds(RobotID id) {
-        ChassisSpeeds speeds = robotSpeeds.get(id);
-        if (speeds == null) {
-            throw new IllegalStateException("Robot not initialized: " + id);
-        }
-        return speeds;
+        return get(id).getState().chassisSpeeds;
     }
 
-    /**
-     * Access to the FieldState reference.
-     */
+    // =========================
+    // FIELD STATE ACCESS
+    // =========================
+
     public FieldState<RobotState> getFieldState(RobotID id) {
+        FieldState<RobotState> state = robotStates.get(id);
+        if (state == null) {
+            throw new IllegalStateException("Robot not initialized: " + id);
+        }
+        return state;
+    }
+
+    // =========================
+    // INTERNAL
+    // =========================
+
+    private FieldState<RobotState> get(RobotID id) {
         FieldState<RobotState> state = robotStates.get(id);
         if (state == null) {
             throw new IllegalStateException("Robot not initialized: " + id);
