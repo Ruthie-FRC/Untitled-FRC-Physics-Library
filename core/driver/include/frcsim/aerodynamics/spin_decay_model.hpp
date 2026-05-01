@@ -21,11 +21,20 @@ namespace frcsim::aerodynamics {
  */
 class SpinDecayModel {
  public:
-  SpinDecayModel(const MagnusModel& magnus_model = MagnusModel())
+  /**
+   * @brief Constructs a spin decay model.
+   * Marked explicit to satisfy wpiformat rules and avoid implicit conversions.
+   */
+  explicit SpinDecayModel(const MagnusModel& magnus_model = MagnusModel())
       : magnus_model_(magnus_model) {}
 
   /**
-   * @brief Advance angular velocity
+   * @brief Advance angular velocity in time
+   *
+   * @param omegaLocal angular velocity in body frame
+   * @param velocityWorld linear velocity in world frame
+   * @param orientation body orientation quaternion
+   * @param dt timestep
    */
   Vector3 step(const Vector3& omegaLocal,
                const Vector3& velocityWorld,
@@ -35,45 +44,49 @@ class SpinDecayModel {
     Matrix3 R = Matrix3::fromQuaternion(orientation);
     Matrix3 Rinv = R.transpose();
 
+    // body -> world angular velocity
     Vector3 omegaWorld = R * omegaLocal;
 
     double vMag = velocityWorld.norm();
     double wMag = omegaWorld.norm();
 
-    // --- Base damping ---
+    // --- Angular damping terms ---
     Vector3 linearDamping = omegaWorld * m_linearDecay;
 
-    // --- Velocity-coupled damping ---
     Vector3 velocityDamping = omegaWorld * (m_velocityCoupling * vMag);
 
-    // --- Nonlinear spin drag ---
     Vector3 nonlinearDamping = omegaWorld * (m_nonlinearDecay * wMag);
 
-    // --- Magnus force (USE EXISTING MODEL) ---
+    // --- Magnus coupling (external model, no duplication) ---
     Vector3 magnusForce =
         magnus_model_.computeForce(velocityWorld, omegaWorld);
 
-    // --- Convert force → torque ---
+    // torque = r × F
     Vector3 magnusTorque = m_radiusVector.cross(magnusForce);
 
-    // --- Total angular change ---
+    // --- Angular acceleration ---
     Vector3 domega =
         magnusTorque
         - linearDamping
         - velocityDamping
         - nonlinearDamping;
 
+    // integrate in world frame
     omegaWorld = omegaWorld + domega * dt;
 
+    // world -> body
     return Rinv * omegaWorld;
   }
 
-  // --- Tunables (because you will tweak these obsessively) ---
+  // --- Tunables ---
 
-  void setLinearDecay(double k) { m_linearDecay = k; }
-  void setVelocityCoupling(double k) { m_velocityCoupling = k; }
-  void setNonlinearDecay(double k) { m_nonlinearDecay = k; }
-  void setRadiusVector(const Vector3& r) { m_radiusVector = r; }
+  void setLinearDecay(double k) noexcept { m_linearDecay = k; }
+
+  void setVelocityCoupling(double k) noexcept { m_velocityCoupling = k; }
+
+  void setNonlinearDecay(double k) noexcept { m_nonlinearDecay = k; }
+
+  void setRadiusVector(const Vector3& r) noexcept { m_radiusVector = r; }
 
  private:
   MagnusModel magnus_model_;
@@ -86,4 +99,4 @@ class SpinDecayModel {
   Vector3 m_radiusVector{0.0, 0.0, 0.05};
 };
 
-} // namespace frcsim::aerodynamics
+}  // namespace frcsim::aerodynamics
