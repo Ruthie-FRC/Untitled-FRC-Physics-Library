@@ -4,6 +4,7 @@ import api.Translation2d;
 import api.Pose2d;
 import api.ChassisSpeeds;
 import api.RobotID;
+import api.RobotState;
 import api.FieldState;
 import frc.robot.sim.core.RobotStateManager;
 import frc.robot.sim.core.GamepieceStateManager;
