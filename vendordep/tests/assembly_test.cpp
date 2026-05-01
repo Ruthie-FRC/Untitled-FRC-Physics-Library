@@ -110,7 +110,7 @@ int main() {
         
         assembly.addBody(1.0);
         assembly.addBody(1.0);
-
+        
         // Create prismatic joint
         frcsim::PrismaticJoint* pris = assembly.addPrismaticJoint(
             0, 1, frcsim::Vector3(0.0, 1.0, 0.0));
