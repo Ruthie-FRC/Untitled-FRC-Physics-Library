@@ -5,7 +5,8 @@ import api.Pose2d;
 import api.ChassisSpeeds;
 import api.RobotID;
 import api.FieldState;
-import core.StateManager;
+import frc.robot.sim.core.RobotStateManager;
+import frc.robot.sim.core.GamepieceStateManager;
 
 /**
  * Minimal simulation-side robot representation used by example code.
@@ -13,18 +14,20 @@ import core.StateManager;
  */
 public final class SimRobot {
     private final RobotID robotID;
-    private final StateManager stateManager;
+    private final RobotStateManager stateManager;
+    private final GamepieceStateManager gamepieceStateManager;
     private final FieldState<RobotState> stateManagerRef;
 
-    private SimRobot(RobotID robotID, StateManager stateManager, FieldState<RobotState> stateManagerRef) {
+    private SimRobot(RobotID robotID, RobotStateManager stateManager, GamepieceStateManager gamepieceStateManager, FieldState<RobotState> stateManagerRef) {
         this.robotID = robotID;
         this.stateManager = stateManager;
+        this.gamepieceStateManager = gamepieceStateManager;
         this.stateManagerRef = stateManagerRef;
     }
 
-    public static SimRobot createRobot(Translation2d[] frameDimensions, StateManager stateManager, RobotID robotID) {
+    public static SimRobot createRobot(Translation2d[] frameDimensions, RobotStateManager stateManager, GamepieceStateManager gamepieceStateManager, RobotID robotID) {
         FieldState<RobotState> ref = stateManager.initializeRobot(robotID, new Pose2d(0,0,0), frameDimensions);
-        return new SimRobot(robotID, stateManager, ref);
+        return new SimRobot(robotID, stateManager, gamepieceStateManager, ref);
     }
 
     public Pose2d getPose() {

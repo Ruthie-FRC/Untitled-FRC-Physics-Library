@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class StateManager {
+public class GamepieceStateManager {
     private final Map<String, List<GamePieceState>> robotInventory = new HashMap<>();
     private final Map<String, Integer> robotCapacity = new HashMap<>();
     private final Map<GamePieceType, PieceConfig> pieceConfigs = new HashMap<>();
