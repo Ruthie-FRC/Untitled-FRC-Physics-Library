@@ -1,14 +1,3 @@
-    /**
-     * Internal JNI constructor from pointer.
-     */
-    Vector3(long ptr) {
-        nativePtr = ptr;
-    }
-
-    /**
-     * Returns the native pointer (for JNI use).
-     */
-    long getNativePtr() { return nativePtr; }
 package api;
 
 /**
@@ -16,7 +5,6 @@ package api;
  */
 public class Vector3 {
     private long nativePtr;
-
 
     /**
      * Constructs a native vector.
@@ -32,13 +20,15 @@ public class Vector3 {
      * Internal JNI constructor from pointer.
      */
     Vector3(long ptr) {
-        nativePtr = ptr;
+        this.nativePtr = ptr;
     }
 
     /**
      * Returns the native pointer (for JNI use).
      */
-    long getNativePtr() { return nativePtr; }
+    long getNativePtr() {
+        return nativePtr;
+    }
 
     /**
      * Returns the norm (magnitude) of the vector.
@@ -60,6 +50,6 @@ public class Vector3 {
     private native void nativeDelete(long ptr);
 
     static {
-        System.loadLibrary("jsimcore"); // Name of the built DLL/shared lib
+        System.loadLibrary("jsimcore");
     }
 }
