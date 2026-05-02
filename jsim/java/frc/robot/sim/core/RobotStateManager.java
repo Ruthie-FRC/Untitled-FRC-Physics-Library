@@ -27,12 +27,11 @@ public class RobotStateManager {
             Translation2d[] frameDimensions
     ) {
         RobotState state = new RobotState(id, initialPose, frameDimensions);
-        FieldState<RobotState> fieldState = new FieldState<>(state);
 
-        FieldState<RobotState> state =
-            new FieldState<>(new RobotState(id, initialPose, frameDimensions));        
-            robotStates.put(id, state);
-        return state;
+        FieldState<RobotState> fieldState =
+            new FieldState<>(state);        
+            robotStates.put(id, fieldState);
+        return fieldState;
     }
 
     // =========================
