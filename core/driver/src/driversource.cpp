@@ -11,7 +11,6 @@
 #include <unordered_map>
 
 #include "frcsim/physics_world.hpp"
-// #include "frcsim/physics/physics_config.hpp" // Removed: file no longer exists
 #include "frcsim/rigidbody/material.hpp"
 
 namespace {
