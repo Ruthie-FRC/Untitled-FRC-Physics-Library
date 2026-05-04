@@ -9,6 +9,10 @@ package jsim.api;
 public class FieldState<T> {
     private final T state;
 
+    /**
+     * Creates a new FieldState wrapper with the given state.
+     * @param state The state object to wrap and manage.
+     */
     protected FieldState(T state) {
         this.state = state;
     }

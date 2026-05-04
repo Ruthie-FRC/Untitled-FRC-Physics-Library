@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * System Rules:
  * - Single source of truth for all simulation state.
- * - Only system allowed to mutate FieldState<T>.
+ * - Only system allowed to mutate FieldState&lt;T&gt;.
  * - External APIs are read/write proxies ONLY through defined methods.
  */
 public class StateManager {
@@ -30,18 +30,12 @@ public class StateManager {
 
     /**
      * Loads JSON field definition and builds all FieldElements and collision zones.
-     */
-    /**
-     * Loads JSON field definition and builds all FieldElements and collision zones.
      * @param config The field configuration to initialize.
      */
     public void initializeField(FieldConfig config) {
         // Build collision zones based on parsed config schemas
     }
 
-    /**
-     * Creates a robot instance, assigns starting pose, and registers it in the simulation.
-     */
     /**
      * Creates a robot instance, assigns starting pose, and registers it in the simulation.
      * @param id The RobotID for the robot.
