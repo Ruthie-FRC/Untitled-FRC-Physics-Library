@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['phase_0',['phase',['../structfrcsim_1_1IntakeSimulation_1_1ContactEvent.html#adc0da77147ade9e43b79a01bb08c18c0',1,'frcsim::IntakeSimulation::ContactEvent']]],
+  ['phase_5fdelay_5fs_1',['phase_delay_s',['../structfrcsim_1_1ShotCalculator3D_1_1Config.html#ab5e5a473a61020f6c3801560802510a9',1,'frcsim::ShotCalculator3D::Config']]],
+  ['physics_2',['physics',['../classjsim_1_1api_1_1GamePieceState.html#a461c314d56e9aa8381aea7aa130f7b90',1,'jsim::api::GamePieceState']]],
+  ['physics_5fconfig_3',['physics_config',['../structfrcsim_1_1BallGamepieceSim_1_1GamePieceInfo.html#a1f1aa8336d91b0dc9e6190958fb87acb',1,'frcsim::BallGamepieceSim::GamePieceInfo']]],
+  ['pitch_5frad_4',['pitch_rad',['../structfrcsim_1_1BallGamepieceSim_1_1ExitTrajectoryParameters.html#a94984253846d8715899f8837367800e7',1,'frcsim::BallGamepieceSim::ExitTrajectoryParameters::pitch_rad'],['../structfrcsim_1_1DoubleDifferentialMechanism_1_1JointState.html#aeb7c7ea7fdf8513666098f7dff904a10',1,'frcsim::DoubleDifferentialMechanism::JointState::pitch_rad']]],
+  ['pitch_5fscale_5',['pitch_scale',['../structfrcsim_1_1DoubleDifferentialMechanism_1_1Config.html#af83b836709ee515385ac0a73ce7f116d',1,'frcsim::DoubleDifferentialMechanism::Config']]],
+  ['pitch_5fvelocity_5fradps_6',['pitch_velocity_radps',['../structfrcsim_1_1DoubleDifferentialMechanism_1_1JointState.html#a64b4edd9b1e962e1481f5b536dbc3d7b',1,'frcsim::DoubleDifferentialMechanism::JointState']]],
+  ['plow_5fball_5fvelocity_5fretention_7',['plow_ball_velocity_retention',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#a93b4329af43c6accbbb658388a6f5485',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['plow_5frobot_5fvelocity_5fgain_8',['plow_robot_velocity_gain',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#a5a21acdb02969896a28c2cbb8c5ee947',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['pointona_9',['pointOnA',['../structfrcsim_1_1ContactPoint.html#a7e6a187a2de6c3eeef82fe4d10916878',1,'frcsim::ContactPoint']]],
+  ['pointonb_10',['pointOnB',['../structfrcsim_1_1ContactPoint.html#a0f29d16a194e387c16d96b570454a851',1,'frcsim::ContactPoint']]],
+  ['position_11',['position',['../classjsim_1_1api_1_1GamePieceState.html#a0200a65882cabc61201d6633ce8b7266',1,'jsim.api.GamePieceState.position'],['../classjsim_1_1field_1_1FieldElement.html#adecc71b27b67c1d30a9cd6a0141ee73f',1,'jsim.field.FieldElement.position']]],
+  ['position_5fm_12',['position_m',['../structfrcsim_1_1BallGamepieceSim_1_1RobotState.html#a0a9d701c121ee2adc0897d99808e19bb',1,'frcsim::BallGamepieceSim::RobotState::position_m'],['../structfrcsim_1_1BallGamepieceSim_1_1ProjectileEntity.html#a4055894ca69972b97f1205477bd47a37',1,'frcsim::BallGamepieceSim::ProjectileEntity::position_m'],['../structfrcsim_1_1BallPhysicsSim3D_1_1BallState.html#a7d39d16a2ad8b72d9dc83e55ff98a42f',1,'frcsim::BallPhysicsSim3D::BallState::position_m'],['../structfrcsim_1_1EnvironmentalBoundary.html#a2cd735e8559f4524e80d6d8b36aea033',1,'frcsim::EnvironmentalBoundary::position_m']]],
+  ['projectile_5fdrag_5fcoefficient_13',['projectile_drag_coefficient',['../structfrcsim_1_1ShotCalculator3D_1_1Config.html#a45f5533934acc22716da096327192637',1,'frcsim::ShotCalculator3D::Config']]],
+  ['projectile_5fmass_5fkg_14',['projectile_mass_kg',['../structfrcsim_1_1ShotCalculator3D_1_1Config.html#a6c994c9fc2959ac51a22c6dcb1ea5adb',1,'frcsim::ShotCalculator3D::Config']]],
+  ['projectile_5freference_5farea_5fm2_15',['projectile_reference_area_m2',['../structfrcsim_1_1ShotCalculator3D_1_1Config.html#a2abd9afd0e50a6bcc30c0a40c3136c26',1,'frcsim::ShotCalculator3D::Config']]]
+];

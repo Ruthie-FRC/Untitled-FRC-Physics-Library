@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['capacity_0',['capacity',['../structfrcsim_1_1IntakeSimulation_1_1Config.html#aad33cb0836ddc0c1b83a48aafd99ca9b',1,'frcsim::IntakeSimulation::Config']]],
+  ['capture_5fradius_5fm_1',['capture_radius_m',['../structfrcsim_1_1BallPhysicsSim3D_1_1PickupRequest.html#af7f0a600c43dd0839553cae1f144c899',1,'frcsim::BallPhysicsSim3D::PickupRequest']]],
+  ['carried_5fball_5findex_2',['carried_ball_index',['../structfrcsim_1_1BallGamepieceSim_1_1RobotState.html#aa22420238d668f35a746f5708dfaa0f4',1,'frcsim::BallGamepieceSim::RobotState']]],
+  ['carry_5foffset_5flocal_5fm_3',['carry_offset_local_m',['../structfrcsim_1_1TurretFlywheelSim_1_1Config.html#a9924fe4972cbe7f88982235e59bcb679',1,'frcsim::TurretFlywheelSim::Config']]],
+  ['carry_5foffset_5fm_4',['carry_offset_m',['../structfrcsim_1_1BallGamepieceSim_1_1RobotState.html#a1bd886f92853f727c8615f08b2c9d989',1,'frcsim::BallGamepieceSim::RobotState::carry_offset_m'],['../structfrcsim_1_1BallPhysicsSim3D_1_1PickupRequest.html#aa4f31d2e7ebe4c1362c0feac6cef6fae',1,'frcsim::BallPhysicsSim3D::PickupRequest::carry_offset_m']]],
+  ['ccd_5fenabled_5',['ccd_enabled',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#aff1b9fd7981a2ab860ab6dac320be10b',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['ccd_5fspeed_5fthreshold_5fmps_6',['ccd_speed_threshold_mps',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#a63696a9d2f6ca62685768e69bfa72e7e',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['center_5fm_7',['center_m',['../structfrcsim_1_1BallGamepieceSim_1_1GoalZone.html#ada78eda276f3a6e050ea126ea440b0b6',1,'frcsim::BallGamepieceSim::GoalZone::center_m'],['../structfrcsim_1_1GoalStructure.html#ac08a11f15269b5b4980899d4ce1c0add',1,'frcsim::GoalStructure::center_m']]],
+  ['coefficient_5fof_5ffriction_5fkinetic_8',['coefficient_of_friction_kinetic',['../structfrcsim_1_1Material.html#a065156cb69f58510b47aea03a55dfb79',1,'frcsim::Material']]],
+  ['coefficient_5fof_5ffriction_5fstatic_9',['coefficient_of_friction_static',['../structfrcsim_1_1Material.html#acc40c222898155c75b99c6d688922247',1,'frcsim::Material']]],
+  ['coefficient_5fof_5frestitution_10',['coefficient_of_restitution',['../structfrcsim_1_1Material.html#ab132464d9d3c6627d7c28de17c1b4f87',1,'frcsim::Material']]],
+  ['collision_5fdamping_11',['collision_damping',['../structfrcsim_1_1Material.html#a3290a2e06af98e73dffac9c35e53d04e',1,'frcsim::Material']]],
+  ['collision_5flayer_5fbits_12',['collision_layer_bits',['../structfrcsim_1_1EnvironmentalBoundary.html#a46b376a415d7f657356309add911ec88',1,'frcsim::EnvironmentalBoundary']]],
+  ['collision_5fmask_5fbits_13',['collision_mask_bits',['../structfrcsim_1_1EnvironmentalBoundary.html#ac41fdafd27e4f5cc0aea82dc65a726d5',1,'frcsim::EnvironmentalBoundary']]],
+  ['command_5fvoltage_5fv_14',['command_voltage_v',['../structfrcsim_1_1FlywheelWheelSim_1_1ControlInput.html#a5be092475ee3fc8b1620e9199b3fdec0',1,'frcsim::FlywheelWheelSim::ControlInput']]],
+  ['contacts_15',['contacts',['../structfrcsim_1_1CollisionManifold.html#a5da3897e86de3c8b73babb5beea6ae80',1,'frcsim::CollisionManifold']]],
+  ['cross_5fsection_5farea_5fm2_16',['cross_section_area_m2',['../structfrcsim_1_1Vector3_1_1DragForceDetails.html#a3236b24752bb559de2bc4cafd727ed84',1,'frcsim::Vector3::DragForceDetails']]],
+  ['current_5flimit_5fa_17',['current_limit_a',['../structfrcsim_1_1FlywheelWheelSim_1_1ControlInput.html#ab4fcfe1abeb927036019c76924f9e388',1,'frcsim::FlywheelWheelSim::ControlInput']]],
+  ['custom_5fposition_5fchecker_18',['custom_position_checker',['../structfrcsim_1_1GoalStructure.html#a5814ab4ab387f968991312a7cf4dd67c',1,'frcsim::GoalStructure']]],
+  ['custom_5fvelocity_5fvalidator_19',['custom_velocity_validator',['../structfrcsim_1_1BallGamepieceSim_1_1GoalZone.html#ab1a978a239736eb143e59d30fba508ee',1,'frcsim::BallGamepieceSim::GoalZone::custom_velocity_validator'],['../structfrcsim_1_1GoalStructure.html#ab30a496db1e29b054c224a9af19ec3f8',1,'frcsim::GoalStructure::custom_velocity_validator']]],
+  ['cylinder_5faxis_5flocal_20',['cylinder_axis_local',['../structfrcsim_1_1RigidBody_1_1AerodynamicGeometry.html#a9ef822e53b6164c2da3b0c6f1f5eb862',1,'frcsim::RigidBody::AerodynamicGeometry']]],
+  ['cylinder_5flength_5fm_21',['cylinder_length_m',['../structfrcsim_1_1RigidBody_1_1AerodynamicGeometry.html#abac1df6b4fe6ad775b7d5868c7d7f547',1,'frcsim::RigidBody::AerodynamicGeometry']]]
+];

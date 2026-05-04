@@ -1,0 +1,27 @@
+var math__jni_8h =
+[
+    [ "Java_api_Matrix3_nativeCreate", "math__jni_8h.html#a2279a938225df5177a8c10ebcbcf267a", null ],
+    [ "Java_api_Matrix3_nativeDelete", "math__jni_8h.html#a40bfc65026a1f7a9e9805b573ddc450a", null ],
+    [ "Java_api_Matrix3_nativeFromQuaternion", "math__jni_8h.html#a5ab5d1ac8749ccf71007684a7814282f", null ],
+    [ "Java_api_Matrix3_nativeMultiply", "math__jni_8h.html#a1adf1289282bccd12b6e1a497e03824f", null ],
+    [ "Java_api_Matrix3_nativeTransform", "math__jni_8h.html#a0eaf09f34e21b3b082d9bc3c4fac7fc2", null ],
+    [ "Java_api_Matrix3_nativeTranspose", "math__jni_8h.html#a88c5ac2b84120c4f280d3820d57af54f", null ],
+    [ "Java_api_Quaternion_nativeConjugate", "math__jni_8h.html#aacb548cc05a73afde9176390ec383783", null ],
+    [ "Java_api_Quaternion_nativeCreate", "math__jni_8h.html#a17902b7cfb9bbbb9f6944038262e78b0", null ],
+    [ "Java_api_Quaternion_nativeDelete", "math__jni_8h.html#a83e7bcc3d30c09429098de9a4b7f19d7", null ],
+    [ "Java_api_Quaternion_nativeFromAxisAngle", "math__jni_8h.html#ab953793c4b6ad50bb2c75c2d6df3cfc4", null ],
+    [ "Java_api_Quaternion_nativeMultiply", "math__jni_8h.html#a5ee45c5f7e8be7ad3ab47036574f3ead", null ],
+    [ "Java_api_Quaternion_nativeNormalize", "math__jni_8h.html#a48b03b068d2459a70761bd7951912b14", null ],
+    [ "Java_api_Quaternion_nativeRotate", "math__jni_8h.html#aadfb14f222bb290f9e612718f8eb4e4e", null ],
+    [ "Java_api_Vector3_nativeAdd", "math__jni_8h.html#a4444615fd8f31aca095a375f948c88cd", null ],
+    [ "Java_api_Vector3_nativeCreate", "math__jni_8h.html#a09f29f548236fbecb5804cdb879a8f9d", null ],
+    [ "Java_api_Vector3_nativeCross", "math__jni_8h.html#a9e1544a200c822ad9c0e087057efd439", null ],
+    [ "Java_api_Vector3_nativeDelete", "math__jni_8h.html#a7c5218791448008ef0da01ce42bc4765", null ],
+    [ "Java_api_Vector3_nativeDot", "math__jni_8h.html#adc3e17c07e3731124903e4e5f4a5d3ae", null ],
+    [ "Java_api_Vector3_nativeGetX", "math__jni_8h.html#aa4ecfcb7056f160730f6ce86d72c1351", null ],
+    [ "Java_api_Vector3_nativeGetY", "math__jni_8h.html#a07126eb1a2de14b40fba2e0eedb6630e", null ],
+    [ "Java_api_Vector3_nativeGetZ", "math__jni_8h.html#a355d4900894faf8cd680ba35f9c5e414", null ],
+    [ "Java_api_Vector3_nativeNorm", "math__jni_8h.html#a6cccf4c5c22c33eae94cac382bb3abd4", null ],
+    [ "Java_api_Vector3_nativeScale", "math__jni_8h.html#a4d6c5f9229995203de4fc36bca4a3fd9", null ],
+    [ "Java_api_Vector3_nativeSub", "math__jni_8h.html#a464c8a9f0b62ecad2346c0173ba54b5d", null ]
+];

@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['scored_5fin_5fnet_0',['scored_in_net',['../structfrcsim_1_1BallGamepieceSim_1_1BallEntity.html#a54f19e9b1151463862a3331963b77065',1,'frcsim::BallGamepieceSim::BallEntity']]],
+  ['season_1',['season',['../classjsim_1_1field_1_1FieldConfig.html#ae32982322fac5f2a787f4c63874d7088',1,'jsim::field::FieldConfig']]],
+  ['shape_2',['shape',['../structfrcsim_1_1BallGamepieceSim_1_1GoalZone.html#a740b9c96feced317919e983416bfda00',1,'frcsim::BallGamepieceSim::GoalZone::shape'],['../structfrcsim_1_1RigidBody_1_1AerodynamicGeometry.html#a56e3c60062a028e4d531c0ec1dd2ff65',1,'frcsim::RigidBody::AerodynamicGeometry::shape'],['../structfrcsim_1_1GoalStructure.html#a55aa9168ea15cf8f57d591ef673ba365',1,'frcsim::GoalStructure::shape']]],
+  ['sim_3',['sim',['../structfrcsim_1_1BallGamepieceSim_1_1BallEntity.html#aaf8159ee0ce482bd68cf9bdd34cfb04a',1,'frcsim::BallGamepieceSim::BallEntity']]],
+  ['singularity_5fepsilon_4',['singularity_epsilon',['../structfrcsim_1_1DoubleDifferentialMechanism_1_1Config.html#ae69543f14ef85a235c5599dae0401f40',1,'frcsim::DoubleDifferentialMechanism::Config']]],
+  ['sleep_5fframe_5fcount_5',['sleep_frame_count',['../structfrcsim_1_1BallGamepieceSim_1_1BallEntity.html#aa22177bcbf89ffe924ce1c0d1a193803',1,'frcsim::BallGamepieceSim::BallEntity']]],
+  ['sleep_5fframe_5fthreshold_6',['sleep_frame_threshold',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#aa922b956b45d90f4bdde9dc5532d2e97',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['sleep_5fspin_5fthreshold_5fradps_7',['sleep_spin_threshold_radps',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#a7452b46dcbaa16f32e20878507cf3303',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['sleep_5fvelocity_5fthreshold_5fmps_8',['sleep_velocity_threshold_mps',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#a13d8c3d5aab3a8e4d099982b92b48c08',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['sleeping_9',['sleeping',['../structfrcsim_1_1BallGamepieceSim_1_1BallEntity.html#a889c141d2cda7bff1737747c89ce8e47',1,'frcsim::BallGamepieceSim::BallEntity']]],
+  ['sleeping_5fenabled_10',['sleeping_enabled',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#a9f228e18e0eb3c4c04e6efe10de25604',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['solver_5fiterations_11',['solver_iterations',['../structfrcsim_1_1BallGamepieceSim_1_1FieldConfig.html#a5b4a2f56813e4bf9be99cda391e625a7',1,'frcsim::BallGamepieceSim::FieldConfig']]],
+  ['spawn_5fon_5fground_5fafter_5fprojectile_12',['spawn_on_ground_after_projectile',['../structfrcsim_1_1BallGamepieceSim_1_1GamePieceInfo.html#a5387342f765a40b6a0548e5a5ccf17b5',1,'frcsim::BallGamepieceSim::GamePieceInfo']]],
+  ['spawn_5fon_5fground_5fafter_5ftouch_13',['spawn_on_ground_after_touch',['../structfrcsim_1_1BallGamepieceSim_1_1ProjectileEntity.html#aa997c3ee2f96991c3917585f148a5045',1,'frcsim::BallGamepieceSim::ProjectileEntity']]],
+  ['spawned_14',['SPAWNED',['../enumjsim_1_1api_1_1GamePieceState_1_1Lifecycle.html#a1f722b24d4d9251c1e32e3e86cccbd75',1,'jsim::api::GamePieceState::Lifecycle']]],
+  ['speed_15',['speed',['../structfrcsim_1_1SwerveModuleState.html#acabac72e796f328f36a40bec23db88ea',1,'frcsim::SwerveModuleState']]],
+  ['speed_5fdistance_5fslope_5fmpspm_16',['speed_distance_slope_mpspm',['../structfrcsim_1_1ShotCalculator3D_1_1Config.html#a874f9c568e29b322e56bf22fff596735',1,'frcsim::ShotCalculator3D::Config']]],
+  ['speed_5fmps_17',['speed_mps',['../structfrcsim_1_1Vector3_1_1DragForceDetails.html#a74553d97121ecc36dd44c4da97dd4dd9',1,'frcsim::Vector3::DragForceDetails']]],
+  ['speed_5foffset_5fmps_18',['speed_offset_mps',['../structfrcsim_1_1ShotCalculator3D_1_1Config.html#ae382456754756a40c23ef988dfe5933e',1,'frcsim::ShotCalculator3D::Config']]],
+  ['speed_5fsquared_5fmps2_19',['speed_squared_mps2',['../structfrcsim_1_1Vector3_1_1DragForceDetails.html#ace6a0356947fcfb645ee54abddd7c668',1,'frcsim::Vector3::DragForceDetails']]],
+  ['spin_5fradps_20',['spin_radps',['../structfrcsim_1_1BallGamepieceSim_1_1ExitTrajectoryParameters.html#a24f689d0bd99d5dd0803ad408d86821e',1,'frcsim::BallGamepieceSim::ExitTrajectoryParameters::spin_radps'],['../structfrcsim_1_1BallGamepieceSim_1_1ProjectileEntity.html#a3a57da3955da8ffc3d5a51fd81340085',1,'frcsim::BallGamepieceSim::ProjectileEntity::spin_radps'],['../structfrcsim_1_1BallPhysicsSim3D_1_1BallState.html#ad1d4edf63d69356feb698a140d54fd05',1,'frcsim::BallPhysicsSim3D::BallState::spin_radps']]],
+  ['stall_5fcurrent_5fa_21',['stall_current_a',['../structfrcsim_1_1FlywheelWheelSim_1_1MotorConfig.html#a01c1634b3b6b594110423cd263c0907b',1,'frcsim::FlywheelWheelSim::MotorConfig']]],
+  ['stall_5ftorque_5fnm_22',['stall_torque_nm',['../structfrcsim_1_1FlywheelWheelSim_1_1MotorConfig.html#ae2e365ffa0d4135e5711c669aed32264',1,'frcsim::FlywheelWheelSim::MotorConfig']]]
+];

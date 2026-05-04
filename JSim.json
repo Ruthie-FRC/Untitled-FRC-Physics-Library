@@ -1,0 +1,71 @@
+{
+    "fileName": "JSim.json",
+    "name": "JSim",
+    "version": "2026.05.04-p2",
+    "frcYear": "2026",
+    "uuid": "a87eb0a9-efa5-4de6-9bb0-9ca5565d20c1",
+    "mavenUrls": [
+        "https://jsim.dev/maven/release/"
+    ],
+    "jsonUrl": "https://jsim.dev/JSim.json",
+    "javaDependencies": [
+        {
+            "groupId": "jsim",
+            "artifactId": "JSim-java",
+            "version": "2026.05.04-p2"
+        }
+    ],
+    "jniDependencies": [
+        {
+            "groupId": "jsim",
+            "artifactId": "JSim-driver",
+            "version": "2026.05.04-p2",
+            "skipInvalidPlatforms": true,
+            "isJar": false,
+            "validPlatforms": [
+                "windowsx86-64",
+                "linuxarm64",
+                "linuxx86-64",
+                "linuxathena",
+                "linuxarm32",
+                "osxuniversal"
+            ]
+        }
+    ],
+    "cppDependencies": [
+        {
+            "groupId": "jsim",
+            "artifactId": "JSim-cpp",
+            "version": "2026.05.04-p2",
+            "libName": "JSim",
+            "headerClassifier": "headers",
+            "sharedLibrary": false,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "windowsx86-64",
+                "linuxarm64",
+                "linuxx86-64",
+                "linuxathena",
+                "linuxarm32",
+                "osxuniversal"
+            ]
+        },
+        {
+            "groupId": "jsim",
+            "artifactId": "JSim-driver",
+            "version": "2026.05.04-p2",
+            "libName": "JSimDriver",
+            "headerClassifier": "headers",
+            "sharedLibrary": false,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "windowsx86-64",
+                "linuxarm64",
+                "linuxx86-64",
+                "linuxathena",
+                "linuxarm32",
+                "osxuniversal"
+            ]
+        }
+    ]
+}
