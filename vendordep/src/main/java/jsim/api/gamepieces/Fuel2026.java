@@ -1,7 +1,7 @@
 package jsim.api.gamepieces;
 
 import jsim.api.GamePieceState;
-import jsim.api.GamePiecePhysics;
+import jsim.api.BallGamePiecePhysics;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
@@ -12,9 +12,12 @@ public class Fuel2026 extends GamePieceState {
 
     /**
      * Creates a new Fuel2026 game piece.
+     * Mass and diameter are based on 2026 game piece specifications.
+     * Mass: 216 grams (0.216 kg)
+     * Diameter: 150 mm (0.075 m radius)
      */
     public Fuel2026() {
-        super(new GamePiecePhysics());
+        super(new BallGamePiecePhysics(0.216, 0.075));
     }
 
     /**

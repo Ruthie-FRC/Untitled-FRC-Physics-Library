@@ -19,6 +19,7 @@ import jsim.jni.JSimJNI;
 public final class PhysicsWorld implements AutoCloseable {
 	private long worldHandle;
 	private final List<Ball> balls = new ArrayList<>();
+	private final List<RectangularPrism> rectangularPrisms = new ArrayList<>();
 	private final List<Runnable> stepListeners = new ArrayList<>();
 
 	/**
@@ -68,12 +69,43 @@ public final class PhysicsWorld implements AutoCloseable {
 	}
 
 	/**
+	 * Creates a new rectangular-prism hitbox in the world.
+	 *
+	 * @param lengthMeters prism length in meters along the local x axis
+	 * @param widthMeters prism width in meters along the local y axis
+	 * @param heightMeters prism height in meters along the local z axis
+	 * @return the created rectangular-prism handle
+	 */
+	public RectangularPrism createRectangularPrism(
+			double lengthMeters, double widthMeters, double heightMeters) {
+		int index = JSimJNI.createBody(worldHandle, 1.0);
+		if (index < 0) {
+			throw new JSimException("Failed to create rectangular prism in physics world", index,
+				"The physics world may have reached its maximum capacity or internal resources are exhausted. Ensure the world is properly initialized.");
+		}
+
+		RectangularPrism prism = new RectangularPrism(
+				this, index, lengthMeters, widthMeters, heightMeters);
+		rectangularPrisms.add(prism);
+		return prism;
+	}
+
+	/**
 	 * Returns the balls created through this world wrapper in insertion order.
 	 *
 	 * @return immutable view of the created balls
 	 */
 	public List<Ball> balls() {
 		return Collections.unmodifiableList(balls);
+	}
+
+	/**
+	 * Returns the rectangular-prism hitboxes created through this world wrapper in insertion order.
+	 *
+	 * @return immutable view of the created rectangular-prism hitboxes
+	 */
+	public List<RectangularPrism> rectangularPrisms() {
+		return Collections.unmodifiableList(rectangularPrisms);
 	}
 
 	/**

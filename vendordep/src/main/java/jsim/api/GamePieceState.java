@@ -55,7 +55,7 @@ public class GamePieceState {
      * @return A FieldState wrapper containing the spawned GamePieceState.
      */
     public static FieldState<GamePieceState> spawn(Rotation3d exitAngle, Translation3d exitVelocity, Translation2d robotOffsetStart) {
-        GamePieceState state = new GamePieceState(new GamePiecePhysics());
+        GamePieceState state = new GamePieceState(new BallGamePiecePhysics(0.24, 0.09));
         state.lifecycle = Lifecycle.ACTIVE;
         // In reality, this links back into the StateManager
         return new FieldState<>(state);
