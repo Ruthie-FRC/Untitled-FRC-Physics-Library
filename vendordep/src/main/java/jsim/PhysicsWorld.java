@@ -78,16 +78,81 @@ public final class PhysicsWorld implements AutoCloseable {
 	 */
 	public RectangularPrism createRectangularPrism(
 			double lengthMeters, double widthMeters, double heightMeters) {
-		int index = JSimJNI.createBody(worldHandle, 1.0);
+		int index = JSimJNI.createRectangularPrism(worldHandle);
 		if (index < 0) {
 			throw new JSimException("Failed to create rectangular prism in physics world", index,
 				"The physics world may have reached its maximum capacity or internal resources are exhausted. Ensure the world is properly initialized.");
 		}
 
-		RectangularPrism prism = new RectangularPrism(
-				this, index, lengthMeters, widthMeters, heightMeters);
+		RectangularPrism prism = new RectangularPrism(this, index, lengthMeters, widthMeters, heightMeters);
 		rectangularPrisms.add(prism);
 		return prism;
+	}
+
+	/**
+	 * Sets a rectangular prism's world-space position in meters.
+	 *
+	 * @param prismIndex native prism index
+	 * @param xMeters x position in meters
+	 * @param yMeters y position in meters
+	 * @param zMeters z position in meters
+	 */
+	void setRectangularPrismPosition(int prismIndex, double xMeters, double yMeters, double zMeters) {
+		int rc = JSimJNI.setRectangularPrismPosition(worldHandle, prismIndex, xMeters, yMeters, zMeters);
+		if (rc != 0) {
+			throw new JSimException("Failed to set rectangular prism position for prismIndex=" + prismIndex + " to (" + xMeters + ", " + yMeters + ", " + zMeters + ") m", rc,
+				"Prism index may be invalid or the world handle is corrupted. Check that prismIndex >= 0 and the prism exists in this world.");
+		}
+	}
+
+	/**
+	 * Sets a rectangular prism's world-space linear velocity in meters per second.
+	 *
+	 * @param prismIndex native prism index
+	 * @param vxMetersPerSecond x velocity in meters per second
+	 * @param vyMetersPerSecond y velocity in meters per second
+	 * @param vzMetersPerSecond z velocity in meters per second
+	 */
+	void setRectangularPrismLinearVelocity(int prismIndex, double vxMetersPerSecond, double vyMetersPerSecond,
+				double vzMetersPerSecond) {
+		int rc = JSimJNI.setRectangularPrismLinearVelocity(worldHandle, prismIndex, vxMetersPerSecond,
+					vyMetersPerSecond, vzMetersPerSecond);
+		if (rc != 0) {
+			throw new JSimException("Failed to set rectangular prism linear velocity for prismIndex=" + prismIndex + " to (" + vxMetersPerSecond + ", " + vyMetersPerSecond + ", " + vzMetersPerSecond + ") m/s", rc,
+				"Prism index may be invalid or velocity values are non-finite. Check that prismIndex >= 0 and all velocities are finite numbers.");
+		}
+	}
+
+	/**
+	 * Gets the world position for the given rectangular prism.
+	 *
+	 * @param prismIndex native prism index
+	 * @return prism position
+	 */
+	public Pose3d getRectangularPrismPosition(int prismIndex) {
+		double[] values = new double[3];
+		int rc = JSimJNI.getRectangularPrismPosition(worldHandle, prismIndex, values);
+		if (rc != 0) {
+			throw new JSimException("Failed to get rectangular prism position", rc,
+				"Verify the prism index and that the world is initialized; check native logs for details.");
+		}
+		return new Pose3d(values[0], values[1], values[2], new Rotation3d());
+	}
+
+	/**
+	 * Gets the world linear velocity for the given rectangular prism.
+	 *
+	 * @param prismIndex native prism index
+	 * @return prism linear velocity
+	 */
+	public LinearVelocity3d getRectangularPrismLinearVelocity(int prismIndex) {
+		double[] values = new double[3];
+		int rc = JSimJNI.getRectangularPrismLinearVelocity(worldHandle, prismIndex, values);
+		if (rc != 0) {
+			throw new JSimException("Failed to get rectangular prism linear velocity for prismIndex=" + prismIndex, rc,
+				"Prism index may be invalid or does not exist. Check that prismIndex >= 0 and refers to an existing prism in this world.");
+		}
+		return new LinearVelocity3d(values[0], values[1], values[2]);
 	}
 
 	/**

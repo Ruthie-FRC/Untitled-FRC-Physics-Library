@@ -94,6 +94,14 @@ public class JSimJNI {
   public static native int createBall(long worldHandle);
 
   /**
+   * Creates a rectangular prism simulator in the world.
+   *
+   * @param worldHandle the native world handle
+   * @return the native prism index
+   */
+  public static native int createRectangularPrism(long worldHandle);
+
+  /**
    * Sets a body's position in meters.
    *
    * @param worldHandle the native world handle
@@ -227,6 +235,32 @@ public class JSimJNI {
     public static native int setBallLinearVelocity(
       long worldHandle, int ballIndex, double vxMps, double vyMps, double vzMps);
 
+      /**
+       * Sets a rectangular prism's world-space position.
+       *
+       * @param worldHandle the native world handle
+       * @param prismIndex the native prism index
+       * @param xMeters x position in meters
+       * @param yMeters y position in meters
+       * @param zMeters z position in meters
+       * @return zero on success
+       */
+      public static native int setRectangularPrismPosition(
+        long worldHandle, int prismIndex, double xMeters, double yMeters, double zMeters);
+
+      /**
+       * Sets a rectangular prism's world-space linear velocity.
+       *
+       * @param worldHandle the native world handle
+       * @param prismIndex the native prism index
+       * @param vxMps x velocity in m/s
+       * @param vyMps y velocity in m/s
+       * @param vzMps z velocity in m/s
+       * @return zero on success
+       */
+      public static native int setRectangularPrismLinearVelocity(
+        long worldHandle, int prismIndex, double vxMps, double vyMps, double vzMps);
+
   /**
    * Sets the world's gravity vector in meters per second squared.
    *
@@ -357,4 +391,24 @@ public class JSimJNI {
    */
   public static native int getBallLinearVelocity(
       long worldHandle, int ballIndex, double[] outVxyzMps);
+
+  /**
+   * Reads a rectangular prism's world-space position into {@code outXyzMeters}.
+   *
+   * @param worldHandle the native world handle
+   * @param prismIndex the native prism index
+   * @param outXyzMeters the output array that receives the position
+   * @return zero on success
+   */
+  public static native int getRectangularPrismPosition(long worldHandle, int prismIndex, double[] outXyzMeters);
+
+  /**
+   * Reads a rectangular prism's world-space linear velocity into {@code outVxyzMps}.
+   *
+   * @param worldHandle the native world handle
+   * @param prismIndex the native prism index
+   * @param outVxyzMps the output array that receives the linear velocity
+   * @return zero on success
+   */
+  public static native int getRectangularPrismLinearVelocity(long worldHandle, int prismIndex, double[] outVxyzMps);
 }

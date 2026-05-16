@@ -17,22 +17,19 @@ import edu.wpi.first.units.measure.Distance;
  * length, width, and height respectively.
  */
 public final class RectangularPrism {
-  private final PhysicsBody body;
+  private final PhysicsWorld world;
+  private final int prismIndex;
   private final double lengthMeters;
   private final double widthMeters;
   private final double heightMeters;
 
-  RectangularPrism(
-      PhysicsWorld world,
-      int bodyIndex,
-      double lengthMeters,
-      double widthMeters,
+  RectangularPrism(PhysicsWorld world, int prismIndex, double lengthMeters, double widthMeters,
       double heightMeters) {
-    this.body = new PhysicsBody(world, bodyIndex);
+    this.world = world;
+    this.prismIndex = prismIndex;
     this.lengthMeters = lengthMeters;
     this.widthMeters = widthMeters;
     this.heightMeters = heightMeters;
-    this.body.setCollisionBox(lengthMeters, widthMeters, heightMeters);
   }
 
   /**
@@ -40,8 +37,8 @@ public final class RectangularPrism {
    *
    * @return the native body index
    */
-  public int bodyIndex() {
-    return body.bodyIndex();
+  public int prismIndex() {
+    return prismIndex;
   }
 
   /**
@@ -78,7 +75,7 @@ public final class RectangularPrism {
    */
   public void setPosition(Pose3d pose) {
     Translation3d translation = pose.getTranslation();
-    body.setPosition(translation.getX(), translation.getY(), translation.getZ());
+    world.setRectangularPrismPosition(prismIndex, translation.getX(), translation.getY(), translation.getZ());
   }
 
   /**
@@ -87,7 +84,7 @@ public final class RectangularPrism {
    * @param positionMeters the new position in meters
    */
   public void setPosition(Translation3d positionMeters) {
-    body.setPosition(positionMeters.getX(), positionMeters.getY(), positionMeters.getZ());
+    world.setRectangularPrismPosition(prismIndex, positionMeters.getX(), positionMeters.getY(), positionMeters.getZ());
   }
 
   /**
@@ -98,7 +95,7 @@ public final class RectangularPrism {
    */
   @Deprecated(forRemoval = false)
   public void setPosition(Vec3 positionMeters) {
-    body.setPosition(positionMeters.x(), positionMeters.y(), positionMeters.z());
+    world.setRectangularPrismPosition(prismIndex, positionMeters.x(), positionMeters.y(), positionMeters.z());
   }
 
   /**
@@ -109,7 +106,7 @@ public final class RectangularPrism {
    * @param z z position
    */
   public void setPosition(Distance x, Distance y, Distance z) {
-    body.setPosition(x.in(Meters), y.in(Meters), z.in(Meters));
+    world.setRectangularPrismPosition(prismIndex, x.in(Meters), y.in(Meters), z.in(Meters));
   }
 
   /**
@@ -118,7 +115,7 @@ public final class RectangularPrism {
    * @param velocityMps the new linear velocity in meters per second
    */
   public void setLinearVelocity(LinearVelocity3d velocityMps) {
-    body.setLinearVelocity(velocityMps);
+    world.setRectangularPrismLinearVelocity(prismIndex, velocityMps.x(), velocityMps.y(), velocityMps.z());
   }
 
   /**
@@ -129,7 +126,7 @@ public final class RectangularPrism {
    */
   @Deprecated(forRemoval = false)
   public void setLinearVelocity(Vec3 velocityMps) {
-    body.setLinearVelocity(velocityMps.x(), velocityMps.y(), velocityMps.z());
+    world.setRectangularPrismLinearVelocity(prismIndex, velocityMps.x(), velocityMps.y(), velocityMps.z());
   }
 
   /**
@@ -141,7 +138,7 @@ public final class RectangularPrism {
    */
   public void setLinearVelocity(
       double vxMetersPerSecond, double vyMetersPerSecond, double vzMetersPerSecond) {
-    body.setLinearVelocity(vxMetersPerSecond, vyMetersPerSecond, vzMetersPerSecond);
+    world.setRectangularPrismLinearVelocity(prismIndex, vxMetersPerSecond, vyMetersPerSecond, vzMetersPerSecond);
   }
 
   /**
@@ -150,7 +147,7 @@ public final class RectangularPrism {
    * @return the prism position
    */
   public Pose3d position() {
-    return body.position();
+    return world.getRectangularPrismPosition(prismIndex);
   }
 
   /**
@@ -159,6 +156,6 @@ public final class RectangularPrism {
    * @return the prism linear velocity
    */
   public LinearVelocity3d linearVelocity() {
-    return body.linearVelocity();
+    return world.getRectangularPrismLinearVelocity(prismIndex);
   }
 }

@@ -92,6 +92,19 @@ Java_jsim_jni_JSimJNI_createBall
 
 /*
  * Class:     jsim_jni_JSimJNI
+ * Method:    createRectangularPrism
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_createRectangularPrism
+  (JNIEnv*, jclass, jlong world_handle)
+{
+  return static_cast<jint>(
+      c_rsCreateRectangularPrism(static_cast<uint64_t>(world_handle)));
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
  * Method:    setBodyPosition
  * Signature: (JIDDD)I
  */
@@ -500,6 +513,62 @@ Java_jsim_jni_JSimJNI_getBallLinearVelocity
   double vz = 0.0;
   const int rc = c_rsGetBallLinearVelocity(
       static_cast<uint64_t>(world_handle), ball_index, &vx, &vy, &vz);
+  if (rc != 0) {
+    return rc;
+  }
+
+  jdouble values[3] = {vx, vy, vz};
+  env->SetDoubleArrayRegion(out_vxyz, 0, 3, values);
+  return 0;
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    getRectangularPrismPosition
+ * Signature: (JI[D)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_getRectangularPrismPosition
+  (JNIEnv* env, jclass, jlong world_handle, jint prism_index,
+   jdoubleArray out_xyz)
+{
+  if (out_xyz == nullptr || env->GetArrayLength(out_xyz) < 3) {
+    return -1;
+  }
+
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
+  const int rc = c_rsGetRectangularPrismPosition(
+      static_cast<uint64_t>(world_handle), prism_index, &x, &y, &z);
+  if (rc != 0) {
+    return rc;
+  }
+
+  jdouble values[3] = {x, y, z};
+  env->SetDoubleArrayRegion(out_xyz, 0, 3, values);
+  return 0;
+}
+
+/*
+ * Class:     jsim_jni_JSimJNI
+ * Method:    getRectangularPrismLinearVelocity
+ * Signature: (JI[D)I
+ */
+JNIEXPORT jint JNICALL
+Java_jsim_jni_JSimJNI_getRectangularPrismLinearVelocity
+  (JNIEnv* env, jclass, jlong world_handle, jint prism_index,
+   jdoubleArray out_vxyz)
+{
+  if (out_vxyz == nullptr || env->GetArrayLength(out_vxyz) < 3) {
+    return -1;
+  }
+
+  double vx = 0.0;
+  double vy = 0.0;
+  double vz = 0.0;
+  const int rc = c_rsGetRectangularPrismLinearVelocity(
+      static_cast<uint64_t>(world_handle), prism_index, &vx, &vy, &vz);
   if (rc != 0) {
     return rc;
   }

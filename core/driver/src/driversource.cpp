@@ -91,6 +91,17 @@ int c_rsCreateBall(uint64_t world_handle) {
   return static_cast<int>(world->balls().size() - 1);
 }
 
+int c_rsCreateRectangularPrism(uint64_t world_handle) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world) {
+    return -1;
+  }
+
+  world->createRectangularPrism();
+  return static_cast<int>(world->rectangularPrisms().size() - 1);
+}
+
 int c_rsSetBodyPosition(uint64_t world_handle, int body_index,
                         double x_m, double y_m, double z_m) {
   std::lock_guard<std::mutex> lock(g_world_mutex);
@@ -373,6 +384,98 @@ int c_rsGetBallLinearVelocity(uint64_t world_handle, int ball_index,
   }
 
   const frcsim::Vector3 v = balls[idx].state().velocity_mps;
+  *vx_mps = v.x;
+  *vy_mps = v.y;
+  *vz_mps = v.z;
+  return 0;
+}
+
+int c_rsSetRectangularPrismPosition(uint64_t world_handle, int prism_index,
+                                    double x_m, double y_m, double z_m) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world || prism_index < 0) {
+    return -1;
+  }
+
+  auto& prisms = world->rectangularPrisms();
+  const std::size_t idx = static_cast<std::size_t>(prism_index);
+  if (idx >= prisms.size()) {
+    return -1;
+  }
+
+  auto state = prisms[idx].state();
+  state.position_m = frcsim::Vector3{x_m, y_m, z_m};
+  prisms[idx].setState(state);
+  return 0;
+}
+
+int c_rsSetRectangularPrismLinearVelocity(uint64_t world_handle, int prism_index,
+                                          double vx_mps, double vy_mps,
+                                          double vz_mps) {
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world || prism_index < 0) {
+    return -1;
+  }
+
+  auto& prisms = world->rectangularPrisms();
+  const std::size_t idx = static_cast<std::size_t>(prism_index);
+  if (idx >= prisms.size()) {
+    return -1;
+  }
+
+  auto state = prisms[idx].state();
+  state.velocity_mps = frcsim::Vector3{vx_mps, vy_mps, vz_mps};
+  prisms[idx].setState(state);
+  return 0;
+}
+
+int c_rsGetRectangularPrismPosition(uint64_t world_handle, int prism_index,
+                                    double* x_m, double* y_m, double* z_m) {
+  if (!x_m || !y_m || !z_m) {
+    return -1;
+  }
+
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world || prism_index < 0) {
+    return -1;
+  }
+
+  const auto& prisms = world->rectangularPrisms();
+  const std::size_t idx = static_cast<std::size_t>(prism_index);
+  if (idx >= prisms.size()) {
+    return -1;
+  }
+
+  const frcsim::Vector3 p = prisms[idx].state().position_m;
+  *x_m = p.x;
+  *y_m = p.y;
+  *z_m = p.z;
+  return 0;
+}
+
+int c_rsGetRectangularPrismLinearVelocity(uint64_t world_handle, int prism_index,
+                                          double* vx_mps, double* vy_mps,
+                                          double* vz_mps) {
+  if (!vx_mps || !vy_mps || !vz_mps) {
+    return -1;
+  }
+
+  std::lock_guard<std::mutex> lock(g_world_mutex);
+  frcsim::PhysicsWorld* world = getWorld(world_handle);
+  if (!world || prism_index < 0) {
+    return -1;
+  }
+
+  const auto& prisms = world->rectangularPrisms();
+  const std::size_t idx = static_cast<std::size_t>(prism_index);
+  if (idx >= prisms.size()) {
+    return -1;
+  }
+
+  const frcsim::Vector3 v = prisms[idx].state().velocity_mps;
   *vx_mps = v.x;
   *vy_mps = v.y;
   *vz_mps = v.z;

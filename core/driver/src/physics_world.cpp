@@ -32,6 +32,13 @@ BallPhysicsSim3D& PhysicsWorld::createBall(
   return balls_.back();
 }
 
+BoxPhysicsSim3D& PhysicsWorld::createRectangularPrism(
+    const BoxPhysicsSim3D::Config& config,
+    const BoxPhysicsSim3D::BoxProperties& properties) {
+  rectangular_prisms_.emplace_back(config, properties);
+  return rectangular_prisms_.back();
+}
+
 EnvironmentalBoundary& PhysicsWorld::addBoundary() {
   boundaries_.emplace_back();
   return boundaries_.back();
@@ -241,6 +248,10 @@ void PhysicsWorld::step() {
 
   for (auto& ball : balls_) {
     ball.step(dt_s);
+  }
+
+  for (auto& rectangular_prism : rectangular_prisms_) {
+    rectangular_prism.step(dt_s);
   }
 
   // Resolve ball <-> rigid-body collisions after the ball has advanced its own physics.

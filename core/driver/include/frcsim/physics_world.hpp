@@ -12,6 +12,7 @@
 #include "frcsim/field/boundary.hpp"
 #include "frcsim/forces/force_generator.hpp"
 #include "frcsim/gamepiece/ball_physics.hpp"
+#include "frcsim/gamepiece/box_physics.hpp"
 #include "frcsim/rigidbody/rigid_assembly.hpp"
 #include "frcsim/rigidbody/rigid_body.hpp"
 
@@ -263,6 +264,17 @@ class PhysicsWorld {
       const BallPhysicsSim3D::BallProperties& properties =
           BallPhysicsSim3D::BallProperties());
 
+    /**
+     * @brief Creates and registers a 3D rectangular-prism simulator.
+     * @param config Environment and behavior configuration for the prism simulator.
+     * @param properties Physical properties for the prism.
+     * @return Reference to the newly added box simulator.
+     */
+    BoxPhysicsSim3D& createRectangularPrism(
+      const BoxPhysicsSim3D::Config& config = BoxPhysicsSim3D::Config(),
+      const BoxPhysicsSim3D::BoxProperties& properties =
+        BoxPhysicsSim3D::BoxProperties());
+
   /** @brief Mutable access to all registered ball simulators. */
   std::vector<BallPhysicsSim3D>& balls() { return balls_; }
 
@@ -353,6 +365,7 @@ class PhysicsWorld {
   std::vector<RigidBody> bodies_{};
   std::vector<RigidAssembly> assemblies_{};
   std::vector<BallPhysicsSim3D> balls_{};
+  std::vector<BoxPhysicsSim3D> rectangular_prisms_{};
   std::vector<EnvironmentalBoundary> boundaries_{};
   std::vector<std::shared_ptr<ForceGenerator>> global_force_generators_{};
   std::vector<MaterialInteraction> material_interactions_{};
