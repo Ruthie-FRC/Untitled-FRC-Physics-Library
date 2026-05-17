@@ -10,12 +10,12 @@ import api.Rotation3d;
  */
 public class RobotContainer {
     private final SimRobot robot;
-    private final FlywheelSubsystem flywheelSubsystem;
+    private final FlywheelSubsystemExample flywheelSubsystem;
     private final FlywheelHoodSubsystem flywheelHoodSubsystem;
 
     public RobotContainer(SimRobot robot) {
         this.robot = robot;
-        this.flywheelSubsystem = new FlywheelSubsystem(robot);
+        this.flywheelSubsystem = new FlywheelSubsystemExample(robot);
         this.flywheelHoodSubsystem = new FlywheelHoodSubsystem(robot);
     }
 
@@ -35,7 +35,7 @@ public class RobotContainer {
         flywheelHoodSubsystem.stop();
     }
 
-    public FlywheelSubsystem getFlywheelSubsystem() {
+    public FlywheelSubsystemExample getFlywheelSubsystem() {
         return flywheelSubsystem;
     }
 
