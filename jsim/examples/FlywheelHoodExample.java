@@ -8,12 +8,12 @@ import api.SimRobot;
  * Example that models a flywheel plus an adjustable hood for aiming.
  */
 public class FlywheelHoodExample {
-  private final FlywheelSubsystem flywheel;
+  private final FlywheelSubsystemExample flywheel;
   private final GamepieceZone hoodZone;
   private Rotation3d hoodAngle = new Rotation3d(0, 0, 0);
 
   public FlywheelHoodExample(SimRobot robot) {
-    this.flywheel = new FlywheelSubsystem(robot);
+    this.flywheel = new FlywheelSubsystemExample(robot);
     this.hoodZone = new GamepieceZone(robot);
     this.hoodZone.setMode(GamepieceZone.Mode.DISABLED);
   }
@@ -34,7 +34,7 @@ public class FlywheelHoodExample {
     hoodZone.setMode(GamepieceZone.Mode.DISABLED);
   }
 
-  public FlywheelSubsystem getFlywheel() {
+  public FlywheelSubsystemExample getFlywheel() {
     return flywheel;
   }
 

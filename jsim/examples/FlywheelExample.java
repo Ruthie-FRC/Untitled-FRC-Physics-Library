@@ -7,10 +7,10 @@ import api.SimRobot;
  * Simple example wrapper around a generic FlywheelSubsystem.
  */
 public class FlywheelExample {
-  private final FlywheelSubsystem flywheel;
+  private final FlywheelSubsystemExample flywheel;
 
   public FlywheelExample(SimRobot robot) {
-    this.flywheel = new FlywheelSubsystem(robot);
+    this.flywheel = new FlywheelSubsystemExample(robot);
   }
 
   public void set(double left, double right, Rotation3d angle) {
@@ -25,7 +25,7 @@ public class FlywheelExample {
     flywheel.stop();
   }
 
-  public FlywheelSubsystem getFlywheel() {
+  public FlywheelSubsystemExample getFlywheel() {
     return flywheel;
   }
 }

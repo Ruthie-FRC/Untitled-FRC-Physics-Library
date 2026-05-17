@@ -8,13 +8,13 @@ import api.SimRobot;
  * Example that adds a compression/backspin roller to a generic flywheel.
  */
 public class BackspinFlywheelExample {
-  private final FlywheelSubsystem flywheel;
+  private final FlywheelSubsystemExample flywheel;
   private final GamepieceZone backspinRollerZone;
   private double backspinVelocity = 0.0;
   private Rotation3d exitAngle = new Rotation3d(0, 0, 0);
 
   public BackspinFlywheelExample(SimRobot robot) {
-    this.flywheel = new FlywheelSubsystem(robot);
+    this.flywheel = new FlywheelSubsystemExample(robot);
     this.backspinRollerZone = new GamepieceZone(robot);
     this.backspinRollerZone.setMode(GamepieceZone.Mode.DISABLED);
   }
@@ -36,7 +36,7 @@ public class BackspinFlywheelExample {
     backspinRollerZone.setMode(GamepieceZone.Mode.DISABLED);
   }
 
-  public FlywheelSubsystem getFlywheel() {
+  public FlywheelSubsystemExample getFlywheel() {
     return flywheel;
   }
 
